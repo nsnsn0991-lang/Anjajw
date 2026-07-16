@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "trader-dev": {
+      "url": "https://mcp.trader.dev/cursor"
+    }
+  }
+}
