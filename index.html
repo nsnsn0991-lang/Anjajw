@@ -282,6 +282,26 @@
 
   .confetti { position: fixed; top: -20px; width: 12px; height: 12px; z-index: 60; pointer-events: none; animation: fall linear forwards; }
   @keyframes fall { to { transform: translateY(110vh) rotate(720deg); opacity: 0.6; } }
+
+  .sound-toggle {
+    position: fixed; top: 14px; right: 14px; z-index: 70;
+    width: 46px; height: 46px; border-radius: 50%;
+    border: 2px solid var(--panel-border);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text); font-size: 1.2rem; cursor: pointer;
+    backdrop-filter: blur(6px);
+    transition: transform 0.2s ease, background 0.25s ease, opacity 0.25s ease;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .sound-toggle:hover { transform: scale(1.08); background: rgba(255, 255, 255, 0.16); }
+  .sound-toggle.muted { opacity: 0.5; }
+  .sound-toggle.playing { box-shadow: 0 0 0 0 rgba(6, 214, 160, 0.5); animation: soundPulse 2s ease-in-out infinite; }
+  @keyframes soundPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(6, 214, 160, 0.45); }
+    50% { box-shadow: 0 0 0 8px rgba(6, 214, 160, 0); }
+  }
+
+  input[type="range"] { accent-color: var(--accent2); cursor: pointer; }
 </style>
 </head>
 <body>
@@ -289,6 +309,8 @@
     <h1>📝 KUIS MASTER</h1>
     <p class="tagline">Ubah kumpulan soal jadi kuis interaktif dalam sekejap!</p>
   </header>
+
+  <button class="sound-toggle" id="soundToggle" title="Nyalakan / matikan suara" aria-label="Nyalakan atau matikan suara">🔊</button>
 
   <div class="app">
     <div class="tabs">
@@ -359,6 +381,18 @@ Catatan:
         <p class="hint">Atur bagaimana kuis dimainkan. Perubahan berlaku saat kamu mulai kuis berikutnya.</p>
         <div class="settings">
           <div class="setting-row">
+            <div class="label"><b>Musik latar (backsound)</b><small>Musik lembut mengalun selama mengerjakan kuis</small></div>
+            <label class="switch"><input type="checkbox" id="setMusic"><span class="slider"></span></label>
+          </div>
+          <div class="setting-row">
+            <div class="label"><b>Efek suara</b><small>Bunyi saat menjawab benar/salah &amp; saat selesai</small></div>
+            <label class="switch"><input type="checkbox" id="setSfx" checked><span class="slider"></span></label>
+          </div>
+          <div class="setting-row">
+            <div class="label"><b>Volume</b><small>Keras-pelan musik &amp; efek suara</small></div>
+            <input type="range" id="setVolume" min="0" max="100" value="70" style="width:130px;">
+          </div>
+          <div class="setting-row">
             <div class="label"><b>Acak urutan soal</b><small>Soal muncul dengan urutan berbeda tiap main</small></div>
             <label class="switch"><input type="checkbox" id="setShuffleQ" checked><span class="slider"></span></label>
           </div>
@@ -397,8 +431,106 @@ Catatan:
     shuffleQ: true,
     shuffleO: true,
     instant: true,
-    timer: 0
+    timer: 0,
+    music: false,
+    sfx: true,
+    volume: 0.7,
+    muted: false
   };
+
+  // ---------- Sound (Web Audio, tanpa file eksternal) ----------
+  const Sound = (function () {
+    let ctx = null, master = null, musicGain = null, musicTimer = null, chordIdx = 0;
+    let enabledSfx = true, enabledMusic = false, muted = false, vol = 0.7;
+    // Progresi akor lembut (Am – F – C – G) untuk musik latar
+    const CHORDS = [
+      [220.00, 261.63, 329.63],
+      [174.61, 220.00, 261.63],
+      [261.63, 329.63, 392.00],
+      [196.00, 246.94, 293.66]
+    ];
+
+    function ensure() {
+      if (!ctx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        ctx = new AC();
+        master = ctx.createGain();
+        master.gain.value = muted ? 0 : vol;
+        master.connect(ctx.destination);
+        musicGain = ctx.createGain();
+        musicGain.gain.value = 0.5;
+        musicGain.connect(master);
+      }
+      if (ctx.state === 'suspended') ctx.resume();
+      return ctx;
+    }
+
+    function beep(freq, dur, type, gain, at, glideTo) {
+      if (muted || !enabledSfx) return;
+      if (!ensure()) return;
+      const t = ctx.currentTime + (at || 0);
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type || 'sine';
+      o.frequency.setValueAtTime(freq, t);
+      if (glideTo) o.frequency.exponentialRampToValueAtTime(glideTo, t + dur);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(gain || 0.2, t + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(master);
+      o.start(t); o.stop(t + dur + 0.03);
+    }
+
+    function playChord() {
+      if (!ctx || !enabledMusic || muted) return;
+      const chord = CHORDS[chordIdx % CHORDS.length]; chordIdx++;
+      const t = ctx.currentTime;
+      chord.forEach((f, idx) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = idx === 0 ? 'triangle' : 'sine';
+        o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(0.09, t + 0.9);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 3.7);
+        o.connect(g); g.connect(musicGain);
+        o.start(t); o.stop(t + 3.85);
+      });
+    }
+
+    function startMusic() {
+      if (!enabledMusic || muted) return;
+      if (!ensure()) return;
+      if (musicTimer) return;
+      chordIdx = 0;
+      playChord();
+      musicTimer = setInterval(playChord, 3600);
+    }
+    function stopMusic() {
+      if (musicTimer) { clearInterval(musicTimer); musicTimer = null; }
+    }
+
+    return {
+      initGesture() { ensure(); },
+      correct() { [523.25, 659.25, 783.99].forEach((f, i) => beep(f, 0.18, 'triangle', 0.22, i * 0.07)); },
+      wrong() { beep(220, 0.32, 'sawtooth', 0.16, 0, 110); },
+      click() { beep(660, 0.05, 'square', 0.06); },
+      finish(good) {
+        const notes = good ? [523.25, 659.25, 783.99, 1046.50] : [392.00, 440.00, 466.16];
+        notes.forEach((f, i) => beep(f, 0.26, 'triangle', 0.2, i * 0.12));
+      },
+      setSfx(v) { enabledSfx = v; },
+      setMusicEnabled(v) { enabledMusic = v; if (!v) stopMusic(); },
+      setVolume(v) { vol = v; if (master && !muted) master.gain.setTargetAtTime(vol, ctx.currentTime, 0.02); },
+      setMuted(v) {
+        muted = v;
+        if (master) master.gain.setTargetAtTime(muted ? 0 : vol, ctx.currentTime, 0.02);
+        if (muted) stopMusic();
+      },
+      isMuted() { return muted; },
+      startMusic, stopMusic,
+      isPlaying() { return !!musicTimer; }
+    };
+  })();
 
   // ---------- Elements ----------
   const $ = (id) => document.getElementById(id);
@@ -729,6 +861,8 @@ D. Gd`;
     current = 0;
     answers = new Array(quiz.length).fill(null);
     locked = new Array(quiz.length).fill(false);
+    Sound.initGesture();
+    if (settings.music && !settings.muted) { Sound.startMusic(); updateSoundBtn(); }
     renderQuestion();
   }
 
@@ -796,6 +930,10 @@ D. Gd`;
     if (settings.instant) {
       locked[current] = true;
       stopCountdown();
+      if (quiz[current].options[i] && quiz[current].options[i].correct) Sound.correct();
+      else Sound.wrong();
+    } else {
+      Sound.click();
     }
     renderQuestion();
   }
@@ -831,6 +969,8 @@ D. Gd`;
 
   function finish() {
     stopCountdown();
+    Sound.stopMusic();
+    updateSoundBtn();
     // ensure all attempted answers are locked/counted
     let correct = 0;
     quiz.forEach((q, i) => {
@@ -876,6 +1016,7 @@ D. Gd`;
     $('retryBtn').addEventListener('click', startQuiz);
     $('editBtn').addEventListener('click', () => switchView('editor'));
 
+    Sound.finish(pct >= 60);
     if (pct >= 80) launchConfetti();
   }
 
@@ -900,6 +1041,7 @@ D. Gd`;
   function switchView(name) {
     document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === name));
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+    if (name !== 'play') { Sound.stopMusic(); updateSoundBtn(); }
     if (name === 'play') renderPlay();
   }
   document.querySelectorAll('.tab').forEach(tab => {
@@ -908,13 +1050,29 @@ D. Gd`;
 
   // ---------- Settings wiring ----------
   const setShuffleQ = $('setShuffleQ'), setShuffleO = $('setShuffleO'),
-        setInstant = $('setInstant'), setTimer = $('setTimer');
+        setInstant = $('setInstant'), setTimer = $('setTimer'),
+        setMusic = $('setMusic'), setSfx = $('setSfx'), setVolume = $('setVolume'),
+        soundBtn = $('soundToggle');
+
+  function updateSoundBtn() {
+    soundBtn.textContent = settings.muted ? '🔇' : '🔊';
+    soundBtn.classList.toggle('muted', settings.muted);
+    soundBtn.classList.toggle('playing', !settings.muted && Sound.isPlaying());
+  }
 
   function applySettingsToUI() {
     setShuffleQ.checked = settings.shuffleQ;
     setShuffleO.checked = settings.shuffleO;
     setInstant.checked = settings.instant;
     setTimer.value = settings.timer;
+    setMusic.checked = settings.music;
+    setSfx.checked = settings.sfx;
+    setVolume.value = Math.round(settings.volume * 100);
+    Sound.setSfx(settings.sfx);
+    Sound.setMusicEnabled(settings.music);
+    Sound.setVolume(settings.volume);
+    Sound.setMuted(settings.muted);
+    updateSoundBtn();
   }
   setShuffleQ.addEventListener('change', () => { settings.shuffleQ = setShuffleQ.checked; save(); });
   setShuffleO.addEventListener('change', () => { settings.shuffleO = setShuffleO.checked; save(); });
@@ -924,6 +1082,39 @@ D. Gd`;
     if (isNaN(v) || v < 0) v = 0;
     if (v > 300) v = 300;
     settings.timer = v; setTimer.value = v; save();
+  });
+  setMusic.addEventListener('change', () => {
+    settings.music = setMusic.checked;
+    Sound.initGesture();
+    Sound.setMusicEnabled(settings.music);
+    if (settings.music && !settings.muted) Sound.startMusic(); else Sound.stopMusic();
+    updateSoundBtn();
+    save();
+  });
+  setSfx.addEventListener('change', () => {
+    settings.sfx = setSfx.checked;
+    Sound.setSfx(settings.sfx);
+    if (settings.sfx && !settings.muted) { Sound.initGesture(); Sound.click(); }
+    save();
+  });
+  setVolume.addEventListener('input', () => {
+    settings.volume = parseInt(setVolume.value, 10) / 100;
+    Sound.setVolume(settings.volume);
+    save();
+  });
+
+  soundBtn.addEventListener('click', () => {
+    settings.muted = !settings.muted;
+    Sound.initGesture();
+    Sound.setMuted(settings.muted);
+    if (!settings.muted && settings.music &&
+        document.getElementById('view-play').classList.contains('active') &&
+        document.querySelector('.question-text')) {
+      Sound.startMusic();
+    }
+    if (!settings.muted && settings.sfx) Sound.click();
+    updateSoundBtn();
+    save();
   });
 
   soalInput.addEventListener('input', save);

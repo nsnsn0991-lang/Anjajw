@@ -12,6 +12,7 @@ Aplikasi web yang mengubah kumpulan soal pilihan ganda menjadi **kuis interaktif
 - ⏱️ **Batas waktu per soal** — mode tantangan opsional
 - 📊 **Skor & pembahasan** — lihat nilai akhir plus kunci jawaban tiap soal
 - 🧬 **Bank soal bawaan** — 75 soal pilihan ganda Biokimia (Struktur, Fungsi & Metabolisme Protein) siap dimainkan satu klik
+- 🔊 **Backsound & efek suara** — musik latar lembut plus bunyi benar/salah/selesai (Web Audio, tanpa file eksternal, bisa dimatikan)
 - 🎉 **Efek konfeti** — perayaan saat nilaimu tinggi
 - 💾 **Tersimpan otomatis** — soal & pengaturan disimpan di browser (localStorage)
 - 📱 **Responsif** — nyaman di HP maupun desktop
