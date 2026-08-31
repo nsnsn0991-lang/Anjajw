@@ -3,18 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Memoria — Game Memori Seru</title>
+<title>Kuis Master — Ubah Soal Jadi Kuis</title>
 <style>
   :root {
     --bg1: #0f0c29;
     --bg2: #302b63;
     --bg3: #24243e;
-    --card-back1: #667eea;
-    --card-back2: #764ba2;
     --accent: #ffd166;
-    --success: #06d6a0;
+    --accent2: #06d6a0;
+    --danger: #ef476f;
+    --info: #118ab2;
     --text: #f5f5fa;
     --muted: rgba(245, 245, 250, 0.65);
+    --panel: rgba(255, 255, 255, 0.07);
+    --panel-border: rgba(255, 255, 255, 0.12);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -29,7 +31,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 24px 16px 48px;
+    padding: 24px 16px 60px;
     overflow-x: hidden;
   }
 
@@ -38,17 +40,17 @@
     50% { background-position: 100% 50%; }
   }
 
-  header { text-align: center; margin-bottom: 20px; }
+  header { text-align: center; margin-bottom: 18px; }
 
   h1 {
-    font-size: clamp(2rem, 6vw, 3rem);
+    font-size: clamp(1.9rem, 6vw, 3rem);
     background: linear-gradient(90deg, #ffd166, #ef476f, #06d6a0, #118ab2);
     background-size: 300% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
     animation: rainbow 6s linear infinite;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
   }
 
   @keyframes rainbow {
@@ -58,19 +60,22 @@
 
   .tagline { color: var(--muted); margin-top: 6px; font-size: 0.95rem; }
 
-  .controls {
+  .app { width: min(94vw, 760px); }
+
+  /* Tabs */
+  .tabs {
     display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+    gap: 8px;
     justify-content: center;
-    margin-bottom: 18px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
   }
 
-  .btn {
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.08);
+  .tab {
+    border: 2px solid var(--panel-border);
+    background: var(--panel);
     color: var(--text);
-    padding: 10px 20px;
+    padding: 10px 22px;
     border-radius: 999px;
     font-size: 0.95rem;
     font-weight: 600;
@@ -78,448 +83,710 @@
     transition: all 0.25s ease;
     backdrop-filter: blur(6px);
   }
-
-  .btn:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.16); }
-
-  .btn.active {
+  .tab:hover { transform: translateY(-2px); background: rgba(255,255,255,0.16); }
+  .tab.active {
     background: var(--accent);
     color: #1a1a2e;
     border-color: var(--accent);
     box-shadow: 0 4px 20px rgba(255, 209, 102, 0.4);
   }
 
-  .btn.restart {
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 20px;
+    padding: 24px;
+    backdrop-filter: blur(6px);
+  }
+
+  .view { display: none; animation: fadeIn 0.35s ease; }
+  .view.active { display: block; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  h2 { font-size: 1.3rem; margin-bottom: 6px; }
+  .hint { color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 14px; }
+
+  textarea {
+    width: 100%;
+    min-height: 220px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--panel-border);
+    border-radius: 14px;
+    color: var(--text);
+    padding: 14px;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.92rem;
+    line-height: 1.7;
+    resize: vertical;
+  }
+  textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,209,102,0.2); }
+
+  .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+
+  .btn {
+    border: 2px solid var(--panel-border);
+    background: rgba(255,255,255,0.08);
+    color: var(--text);
+    padding: 11px 22px;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+  .btn:hover { transform: translateY(-2px); background: rgba(255,255,255,0.16); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .btn.primary {
+    background: linear-gradient(135deg, #06d6a0, #118ab2);
+    border: none;
+    box-shadow: 0 4px 20px rgba(6, 214, 160, 0.35);
+  }
+  .btn.warn {
     background: linear-gradient(135deg, #ef476f, #b5179e);
     border: none;
     box-shadow: 0 4px 20px rgba(239, 71, 111, 0.35);
   }
 
-  .stats {
-    display: flex;
-    gap: 14px;
-    margin-bottom: 22px;
-    flex-wrap: wrap;
-    justify-content: center;
+  details.guide {
+    margin-top: 16px;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    padding: 12px 16px;
   }
-
-  .stat {
-    background: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 16px;
-    padding: 10px 22px;
-    text-align: center;
-    min-width: 100px;
-    backdrop-filter: blur(6px);
-  }
-
-  .stat .label {
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
+  details.guide summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+  details.guide pre {
+    margin-top: 10px;
+    background: rgba(0,0,0,0.35);
+    padding: 12px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 0.82rem;
+    line-height: 1.6;
     color: var(--muted);
   }
+  details.guide code { color: var(--accent2); }
 
-  .stat .value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--accent);
-    font-variant-numeric: tabular-nums;
-  }
+  .msg { margin-top: 14px; padding: 12px 16px; border-radius: 12px; font-size: 0.9rem; display: none; }
+  .msg.show { display: block; }
+  .msg.ok { background: rgba(6,214,160,0.15); border: 1px solid rgba(6,214,160,0.4); }
+  .msg.err { background: rgba(239,71,111,0.15); border: 1px solid rgba(239,71,111,0.4); }
 
-  .board {
-    display: grid;
-    gap: 12px;
-    perspective: 1000px;
-    width: min(92vw, 560px);
-  }
-
-  .board.easy   { grid-template-columns: repeat(4, 1fr); }
-  .board.medium { grid-template-columns: repeat(4, 1fr); }
-  .board.hard   { grid-template-columns: repeat(6, 1fr); width: min(94vw, 680px); }
-
-  .card {
-    aspect-ratio: 1;
-    position: relative;
-    cursor: pointer;
-    transform-style: preserve-3d;
-    transition: transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1);
-    animation: dealIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
-    animation-delay: var(--deal-delay, 0s);
-  }
-
-  @keyframes dealIn {
-    from {
-      opacity: 0;
-      transform: translateY(40px) rotateY(90deg) scale(0.5);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) rotateY(0) scale(1);
-    }
-  }
-
-  .card.flipped { transform: rotateY(180deg); }
-
-  .card.wrong { animation: shake 0.45s ease; }
-
-  @keyframes shake {
-    0%, 100% { transform: rotateY(180deg) translateX(0); }
-    20% { transform: rotateY(180deg) translateX(-8px); }
-    40% { transform: rotateY(180deg) translateX(8px); }
-    60% { transform: rotateY(180deg) translateX(-6px); }
-    80% { transform: rotateY(180deg) translateX(6px); }
-  }
-
-  .card.wave { animation: wave 0.6s ease; }
-
-  @keyframes wave {
-    0%, 100% { transform: rotateY(180deg) translateY(0); }
-    50% { transform: rotateY(180deg) translateY(-16px) scale(1.08); }
-  }
-
-  .card.matched { cursor: default; animation: pop 0.5s ease; }
-
-  @keyframes pop {
-    0%   { transform: rotateY(180deg) scale(1); }
-    50%  { transform: rotateY(180deg) scale(1.15); }
-    100% { transform: rotateY(180deg) scale(1); }
-  }
-
-  .card-face {
-    position: absolute;
-    inset: 0;
+  /* Preview list */
+  .preview { margin-top: 18px; display: flex; flex-direction: column; gap: 12px; }
+  .q-card {
+    background: rgba(0,0,0,0.22);
+    border: 1px solid var(--panel-border);
     border-radius: 14px;
+    padding: 14px 16px;
+  }
+  .q-card .q-num { color: var(--accent); font-weight: 700; margin-right: 6px; }
+  .q-card .q-text { font-weight: 600; }
+  .q-card ul { list-style: none; margin-top: 8px; display: grid; gap: 4px; }
+  .q-card li { color: var(--muted); font-size: 0.9rem; padding-left: 4px; }
+  .q-card li.correct { color: var(--accent2); font-weight: 600; }
+  .q-card li.correct::after { content: ' ✓'; }
+
+  /* Quiz player */
+  .quiz-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 10px; flex-wrap: wrap; }
+  .progress-wrap { flex: 1; min-width: 160px; }
+  .progress-bar { height: 8px; background: rgba(255,255,255,0.12); border-radius: 999px; overflow: hidden; }
+  .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #06d6a0, #118ab2); transition: width 0.4s ease; }
+  .pill { background: rgba(255,255,255,0.1); border: 1px solid var(--panel-border); border-radius: 999px; padding: 6px 14px; font-weight: 600; font-size: 0.85rem; white-space: nowrap; }
+  .pill .accent { color: var(--accent); }
+
+  .question-text { font-size: 1.25rem; font-weight: 700; line-height: 1.5; margin: 8px 0 20px; }
+
+  .options { display: grid; gap: 12px; }
+  .option {
+    text-align: left;
+    background: rgba(255,255,255,0.06);
+    border: 2px solid var(--panel-border);
+    border-radius: 14px;
+    padding: 14px 18px;
+    font-size: 1rem;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
-    justify-content: center;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    font-size: clamp(1.6rem, 6vw, 2.6rem);
-    user-select: none;
+    gap: 12px;
   }
-
-  .card-front {
-    background: linear-gradient(135deg, var(--card-back1), var(--card-back2));
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
-    border: 2px solid rgba(255, 255, 255, 0.15);
+  .option:hover:not(.locked) { border-color: var(--accent); transform: translateX(4px); }
+  .option .key {
+    width: 30px; height: 30px; flex-shrink: 0;
+    border-radius: 8px; background: rgba(255,255,255,0.12);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.9rem;
   }
+  .option.selected { border-color: var(--accent); background: rgba(255,209,102,0.12); }
+  .option.correct { border-color: var(--accent2); background: rgba(6,214,160,0.16); }
+  .option.correct .key { background: var(--accent2); color: #08261e; }
+  .option.wrong { border-color: var(--danger); background: rgba(239,71,111,0.16); }
+  .option.wrong .key { background: var(--danger); color: #fff; }
+  .option.locked { cursor: default; }
 
-  .card-front::after {
-    content: '✦';
-    color: rgba(255, 255, 255, 0.55);
-    font-size: clamp(1.2rem, 4vw, 1.8rem);
+  .feedback { margin-top: 16px; padding: 12px 16px; border-radius: 12px; font-weight: 600; display: none; }
+  .feedback.show { display: block; animation: fadeIn 0.3s ease; }
+  .feedback.ok { background: rgba(6,214,160,0.15); border: 1px solid rgba(6,214,160,0.4); color: var(--accent2); }
+  .feedback.no { background: rgba(239,71,111,0.15); border: 1px solid rgba(239,71,111,0.4); color: #ffb3c4; }
+
+  .quiz-nav { margin-top: 22px; display: flex; justify-content: space-between; gap: 10px; }
+
+  /* Settings */
+  .settings { display: flex; flex-direction: column; gap: 14px; margin-top: 4px; }
+  .setting-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .setting-row:last-child { border-bottom: none; }
+  .setting-row .label b { display: block; }
+  .setting-row .label small { color: var(--muted); }
+
+  .switch { position: relative; width: 52px; height: 28px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; inset: 0; background: rgba(255,255,255,0.15); border-radius: 999px; cursor: pointer; transition: 0.3s; }
+  .slider::before { content: ''; position: absolute; width: 22px; height: 22px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: 0.3s; }
+  .switch input:checked + .slider { background: var(--accent2); }
+  .switch input:checked + .slider::before { transform: translateX(24px); }
+
+  /* Result */
+  .result-hero { text-align: center; padding: 10px 0 20px; }
+  .score-ring {
+    width: 150px; height: 150px; margin: 0 auto 14px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    background: conic-gradient(var(--accent2) var(--pct, 0%), rgba(255,255,255,0.1) 0);
+    position: relative;
   }
+  .score-ring::before { content: ''; position: absolute; inset: 12px; border-radius: 50%; background: #211d47; }
+  .score-ring .score-val { position: relative; font-size: 2.4rem; font-weight: 800; color: var(--accent); }
+  .score-ring .score-lbl { position: relative; font-size: 0.8rem; color: var(--muted); }
+  .result-hero h2 { font-size: 1.6rem; }
+  .result-hero p { color: var(--muted); margin-top: 4px; }
 
-  .card:not(.flipped):hover .card-front {
-    box-shadow: 0 10px 26px rgba(102, 126, 234, 0.55);
-    border-color: rgba(255, 255, 255, 0.4);
-  }
+  .review { margin-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+  .review-item { background: rgba(0,0,0,0.22); border: 1px solid var(--panel-border); border-radius: 14px; padding: 14px 16px; }
+  .review-item .r-q { font-weight: 600; margin-bottom: 8px; }
+  .review-item .r-q .badge { font-size: 0.8rem; padding: 2px 8px; border-radius: 6px; margin-right: 8px; }
+  .badge.b-ok { background: rgba(6,214,160,0.25); color: var(--accent2); }
+  .badge.b-no { background: rgba(239,71,111,0.25); color: #ffb3c4; }
+  .review-item .r-line { font-size: 0.9rem; color: var(--muted); }
+  .review-item .r-line b.good { color: var(--accent2); }
+  .review-item .r-line b.bad { color: #ffb3c4; }
 
-  .card-back {
-    background: rgba(255, 255, 255, 0.95);
-    transform: rotateY(180deg);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
-  }
-
-  .card.matched .card-back {
-    background: linear-gradient(135deg, #d8fff3, #a7f3d0);
-    box-shadow: 0 0 22px rgba(6, 214, 160, 0.6);
-  }
-
-  .overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(10, 8, 30, 0.85);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.4s ease;
-    z-index: 50;
-    backdrop-filter: blur(8px);
-  }
-
-  .overlay.show { opacity: 1; pointer-events: auto; }
-
-  .modal {
-    background: linear-gradient(160deg, #1e1b4b, #312e81);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 24px;
-    padding: 40px 48px;
-    text-align: center;
-    transform: scale(0.8);
-    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
-    max-width: 90vw;
-  }
-
-  .overlay.show .modal { transform: scale(1); }
-
-  .modal .trophy { font-size: 4rem; animation: bounce 1s ease infinite; display: inline-block; }
-
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-12px); }
-  }
-
-  .modal h2 { font-size: 2rem; margin: 12px 0 6px; color: var(--accent); }
-  .modal p { color: var(--muted); margin-bottom: 8px; line-height: 1.6; }
-  .modal .highlight { color: var(--success); font-weight: 700; }
-  .modal .btn { margin-top: 18px; }
-
-  .confetti {
-    position: fixed;
-    top: -20px;
-    width: 12px;
-    height: 12px;
-    z-index: 60;
-    pointer-events: none;
-    animation: fall linear forwards;
-  }
-
-  @keyframes fall {
-    to { transform: translateY(110vh) rotate(720deg); opacity: 0.6; }
-  }
+  .empty { text-align: center; color: var(--muted); padding: 30px 10px; }
+  .empty .big { font-size: 2.6rem; display: block; margin-bottom: 10px; }
 
   footer { margin-top: 28px; color: var(--muted); font-size: 0.85rem; text-align: center; }
 
-  .bubble {
-    position: fixed;
-    bottom: -60px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.04));
-    pointer-events: none;
-    z-index: -1;
-    animation: float linear infinite;
-  }
-
-  @keyframes float {
-    to { transform: translateY(-115vh) rotate(360deg); }
-  }
-
-  .stat .value.bump { animation: bump 0.3s ease; }
-
-  @keyframes bump {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.3); color: var(--success); }
-  }
-
-  .stat .value.ticking { animation: tick 1s ease infinite; }
-
-  @keyframes tick {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.55; }
-  }
+  .confetti { position: fixed; top: -20px; width: 12px; height: 12px; z-index: 60; pointer-events: none; animation: fall linear forwards; }
+  @keyframes fall { to { transform: translateY(110vh) rotate(720deg); opacity: 0.6; } }
 </style>
 </head>
 <body>
   <header>
-    <h1>🧠 MEMORIA</h1>
-    <p class="tagline">Temukan semua pasangan kartu secepat mungkin!</p>
+    <h1>📝 KUIS MASTER</h1>
+    <p class="tagline">Ubah kumpulan soal jadi kuis interaktif dalam sekejap!</p>
   </header>
 
-  <div class="controls">
-    <button class="btn active" data-level="easy">😊 Mudah (4×4)</button>
-    <button class="btn" data-level="medium">🤔 Sedang (4×5)</button>
-    <button class="btn" data-level="hard">🔥 Sulit (6×6)</button>
-    <button class="btn restart" id="restartBtn">🔄 Ulangi</button>
-  </div>
-
-  <div class="stats">
-    <div class="stat"><div class="label">Waktu</div><div class="value" id="timer">0:00</div></div>
-    <div class="stat"><div class="label">Langkah</div><div class="value" id="moves">0</div></div>
-    <div class="stat"><div class="label">Pasangan</div><div class="value" id="pairs">0/8</div></div>
-    <div class="stat"><div class="label">Rekor</div><div class="value" id="best">—</div></div>
-  </div>
-
-  <div class="board easy" id="board"></div>
-
-  <div class="overlay" id="overlay">
-    <div class="modal">
-      <span class="trophy">🏆</span>
-      <h2>Selamat, Kamu Menang!</h2>
-      <p id="resultText"></p>
-      <p id="recordText"></p>
-      <button class="btn restart" id="playAgainBtn">🎮 Main Lagi</button>
+  <div class="app">
+    <div class="tabs">
+      <button class="tab active" data-view="editor">✏️ Buat Soal</button>
+      <button class="tab" data-view="play">🎮 Mainkan</button>
+      <button class="tab" data-view="settings">⚙️ Pengaturan</button>
     </div>
+
+    <!-- ================= EDITOR ================= -->
+    <section class="view active" id="view-editor">
+      <div class="panel">
+        <h2>Tulis atau tempel soal kamu</h2>
+        <p class="hint">Ketik soal, beri pilihan jawaban dengan huruf (A, B, C, …), dan tandai jawaban benar dengan tanda bintang <code>*</code>. Pisahkan antar soal dengan baris kosong.</p>
+
+        <textarea id="soalInput" placeholder="1. Ibu kota Indonesia adalah...&#10;A. Bandung&#10;B. Jakarta*&#10;C. Surabaya&#10;D. Medan&#10;&#10;2. Hasil dari 5 + 7 adalah...&#10;A. 10&#10;B. 12*&#10;C. 14"></textarea>
+
+        <div class="row">
+          <button class="btn primary" id="parseBtn">⚡ Ubah Jadi Kuis</button>
+          <button class="btn" id="sampleBtn">📄 Isi Contoh</button>
+          <button class="btn warn" id="clearBtn">🗑️ Bersihkan</button>
+        </div>
+
+        <div class="msg" id="parseMsg"></div>
+
+        <details class="guide">
+          <summary>📖 Panduan format soal</summary>
+<pre>Format pilihan ganda (tandai jawaban benar dengan <code>*</code>):
+
+  1. Pertanyaan kamu di sini?
+  A. Pilihan salah
+  B. Pilihan benar*
+  C. Pilihan salah
+
+Alternatif — pakai baris kunci jawaban:
+
+  Siapa presiden pertama Indonesia?
+  A. Soeharto
+  B. Soekarno
+  C. Habibie
+  Jawaban: B
+
+Catatan:
+  • Nomor soal (1. / 2.) boleh ada atau tidak.
+  • Label pilihan boleh A. A) a. 1. dsb.
+  • Pisahkan tiap soal dengan satu baris kosong.
+  • Minimal 2 pilihan per soal, satu ditandai benar.</pre>
+        </details>
+
+        <div class="preview" id="preview"></div>
+      </div>
+    </section>
+
+    <!-- ================= PLAY ================= -->
+    <section class="view" id="view-play">
+      <div class="panel" id="playPanel">
+        <div class="empty" id="playEmpty">
+          <span class="big">🗒️</span>
+          Belum ada kuis. Buat soal dulu di tab <b>Buat Soal</b>, lalu tekan <b>Ubah Jadi Kuis</b>.
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SETTINGS ================= -->
+    <section class="view" id="view-settings">
+      <div class="panel">
+        <h2>Pengaturan Kuis</h2>
+        <p class="hint">Atur bagaimana kuis dimainkan. Perubahan berlaku saat kamu mulai kuis berikutnya.</p>
+        <div class="settings">
+          <div class="setting-row">
+            <div class="label"><b>Acak urutan soal</b><small>Soal muncul dengan urutan berbeda tiap main</small></div>
+            <label class="switch"><input type="checkbox" id="setShuffleQ" checked><span class="slider"></span></label>
+          </div>
+          <div class="setting-row">
+            <div class="label"><b>Acak pilihan jawaban</b><small>Posisi A/B/C/D diacak tiap soal</small></div>
+            <label class="switch"><input type="checkbox" id="setShuffleO" checked><span class="slider"></span></label>
+          </div>
+          <div class="setting-row">
+            <div class="label"><b>Umpan balik langsung</b><small>Tampilkan benar/salah setelah memilih</small></div>
+            <label class="switch"><input type="checkbox" id="setInstant" checked><span class="slider"></span></label>
+          </div>
+          <div class="setting-row">
+            <div class="label"><b>Batas waktu per soal</b><small>Hitung mundur; 0 = tanpa batas</small></div>
+            <input type="number" id="setTimer" min="0" max="300" value="0" style="width:80px;background:rgba(0,0,0,0.25);border:1px solid var(--panel-border);border-radius:8px;color:var(--text);padding:8px;text-align:center;font-size:1rem;">
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 
-  <footer>Dibuat dengan ❤️ — klik kartu untuk membaliknya, cocokkan emoji yang sama!</footer>
+  <footer>Dibuat dengan ❤️ — semua berjalan di browser kamu, tanpa server &amp; tanpa instalasi.</footer>
 
 <script>
 (function () {
-  const EMOJIS = ['🐶','🐱','🦊','🐼','🐨','🦁','🐸','🐵','🦄','🐙','🦋','🐢','🍕','🍩','🍉','🌈','⚽','🎸'];
-  const LEVELS = { easy: 8, medium: 10, hard: 18 };
+  "use strict";
 
-  const board = document.getElementById('board');
-  const timerEl = document.getElementById('timer');
-  const movesEl = document.getElementById('moves');
-  const pairsEl = document.getElementById('pairs');
-  const bestEl = document.getElementById('best');
-  const overlay = document.getElementById('overlay');
-  const resultText = document.getElementById('resultText');
-  const recordText = document.getElementById('recordText');
+  // ---------- State ----------
+  let questions = [];          // parsed source questions
+  let quiz = [];               // active quiz (possibly shuffled)
+  let current = 0;
+  let answers = [];            // user's chosen original-index per question
+  let locked = [];             // whether question already answered (instant mode)
+  let countdownId = null;
 
-  let level = 'easy';
-  let firstCard = null;
-  let lock = false;
-  let moves = 0;
-  let matched = 0;
-  let seconds = 0;
-  let timerId = null;
-  let started = false;
+  const settings = {
+    shuffleQ: true,
+    shuffleO: true,
+    instant: true,
+    timer: 0
+  };
 
-  function formatTime(s) {
-    return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  // ---------- Elements ----------
+  const $ = (id) => document.getElementById(id);
+  const soalInput = $('soalInput');
+  const preview = $('preview');
+  const parseMsg = $('parseMsg');
+  const playPanel = $('playPanel');
+
+  // ---------- Persistence ----------
+  function save() {
+    try {
+      localStorage.setItem('kuis-master', JSON.stringify({
+        text: soalInput.value,
+        questions,
+        settings
+      }));
+    } catch (e) {}
+  }
+  function load() {
+    try {
+      const raw = localStorage.getItem('kuis-master');
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      if (data.text) soalInput.value = data.text;
+      if (Array.isArray(data.questions)) questions = data.questions;
+      if (data.settings) Object.assign(settings, data.settings);
+    } catch (e) {}
   }
 
-  function getBest() {
-    const v = localStorage.getItem('memoria-best-' + level);
-    return v ? JSON.parse(v) : null;
+  // ---------- Parser ----------
+  // Returns { questions, errors }
+  function parseSoal(text) {
+    const blocks = text.replace(/\r/g, '').split(/\n\s*\n/);
+    const out = [];
+    const errors = [];
+
+    const optRe = /^\s*(?:([A-Za-z])|(\d+))\s*[.)\-:]\s+(.*)$/;
+    const keyRe = /^\s*(?:jawaban|kunci|answer|jawab)\s*[:.\-]?\s*(.+)$/i;
+
+    blocks.forEach((block, bi) => {
+      const lines = block.split('\n').map(l => l.trimEnd()).filter(l => l.trim() !== '');
+      if (lines.length === 0) return;
+
+      const qLines = [];
+      const options = [];
+      let keyLine = null;
+
+      lines.forEach(line => {
+        const k = line.match(keyRe);
+        if (k) { keyLine = k[1].trim(); return; }
+        const m = line.match(optRe);
+        if (m && options.length < 26 && (options.length > 0 || qLines.length > 0)) {
+          // treat as an option only after we have a question stem
+          let label = (m[1] || m[2]);
+          let val = m[3];
+          let correct = false;
+          if (/\*\s*$/.test(val) || /^\s*\*/.test(val)) { correct = true; val = val.replace(/\*/g, '').trim(); }
+          if (/\(?(benar|correct)\)?\s*$/i.test(val)) { correct = true; val = val.replace(/\(?(benar|correct)\)?\s*$/i, '').trim(); }
+          options.push({ label: label.toString().toUpperCase(), text: val.trim(), correct });
+        } else {
+          qLines.push(line.replace(/^\s*\d+\s*[.)\-:]\s*/, '').trim());
+        }
+      });
+
+      const qText = qLines.join(' ').trim();
+
+      if (!qText && options.length === 0) return;
+
+      if (options.length < 2) {
+        errors.push(`Soal #${bi + 1} dilewati: butuh minimal 2 pilihan jawaban.`);
+        return;
+      }
+
+      // Resolve correct answer via key line if provided
+      if (keyLine) {
+        const byLetter = keyLine.trim().toUpperCase();
+        let idx = options.findIndex(o => o.label === byLetter);
+        if (idx === -1) {
+          // maybe key is the full answer text
+          idx = options.findIndex(o => o.text.toLowerCase() === keyLine.trim().toLowerCase());
+        }
+        if (idx !== -1) { options.forEach(o => o.correct = false); options[idx].correct = true; }
+      }
+
+      const correctCount = options.filter(o => o.correct).length;
+      if (correctCount === 0) {
+        errors.push(`Soal #${bi + 1} ("${qText.slice(0, 30)}…") dilewati: tidak ada jawaban benar yang ditandai.`);
+        return;
+      }
+      if (correctCount > 1) {
+        // keep only first correct to keep single-answer semantics
+        let seen = false;
+        options.forEach(o => { if (o.correct) { if (seen) o.correct = false; else seen = true; } });
+      }
+
+      out.push({
+        text: qText || '(tanpa teks pertanyaan)',
+        options: options.map(o => ({ text: o.text, correct: o.correct }))
+      });
+    });
+
+    return { questions: out, errors };
   }
 
-  function showBest() {
-    const b = getBest();
-    bestEl.textContent = b ? formatTime(b.time) : '—';
+  // ---------- Editor actions ----------
+  function showMsg(el, text, ok) {
+    el.textContent = text;
+    el.className = 'msg show ' + (ok ? 'ok' : 'err');
   }
 
-  function startTimer() {
-    if (timerId) return;
-    timerEl.classList.add('ticking');
-    timerId = setInterval(() => {
-      seconds++;
-      timerEl.textContent = formatTime(seconds);
-    }, 1000);
-  }
+  function renderPreview() {
+    preview.innerHTML = '';
+    if (questions.length === 0) return;
+    const head = document.createElement('h2');
+    head.style.marginTop = '4px';
+    head.textContent = `Pratinjau — ${questions.length} soal`;
+    preview.appendChild(head);
 
-  function stopTimer() {
-    clearInterval(timerId);
-    timerId = null;
-    timerEl.classList.remove('ticking');
-  }
-
-  function shuffle(arr) {
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
-  }
-
-  function newGame() {
-    stopTimer();
-    firstCard = null;
-    lock = false;
-    moves = 0;
-    matched = 0;
-    seconds = 0;
-    started = false;
-    timerEl.textContent = '0:00';
-    movesEl.textContent = '0';
-    overlay.classList.remove('show');
-
-    const pairCount = LEVELS[level];
-    pairsEl.textContent = '0/' + pairCount;
-    showBest();
-
-    const deck = shuffle(
-      shuffle(EMOJIS.slice()).slice(0, pairCount).flatMap(e => [e, e])
-    );
-
-    board.className = 'board ' + level;
-    board.innerHTML = '';
-    deck.forEach((emoji, i) => {
+    questions.forEach((q, i) => {
       const card = document.createElement('div');
-      card.className = 'card';
-      card.dataset.emoji = emoji;
-      card.style.setProperty('--deal-delay', (i * 0.04) + 's');
+      card.className = 'q-card';
+      const ul = q.options.map(o =>
+        `<li class="${o.correct ? 'correct' : ''}">${escapeHtml(o.text)}</li>`).join('');
       card.innerHTML =
-        '<div class="card-face card-front"></div>' +
-        '<div class="card-face card-back">' + emoji + '</div>';
-      card.addEventListener('click', () => flip(card));
-      board.appendChild(card);
+        `<div><span class="q-num">${i + 1}.</span><span class="q-text">${escapeHtml(q.text)}</span></div>` +
+        `<ul>${ul}</ul>`;
+      preview.appendChild(card);
     });
   }
 
-  function flip(card) {
-    if (lock || card.classList.contains('flipped')) return;
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
 
-    if (!started) { started = true; startTimer(); }
-
-    card.classList.add('flipped');
-
-    if (!firstCard) {
-      firstCard = card;
+  $('parseBtn').addEventListener('click', () => {
+    const { questions: parsed, errors } = parseSoal(soalInput.value);
+    if (parsed.length === 0) {
+      showMsg(parseMsg, '❌ Tidak ada soal valid yang terbaca. ' + (errors[0] || 'Periksa format soalmu.'), false);
+      questions = [];
+      renderPreview();
+      renderPlay();
+      save();
       return;
     }
+    questions = parsed;
+    let m = `✅ Berhasil! ${parsed.length} soal siap dimainkan.`;
+    if (errors.length) m += ` (${errors.length} soal dilewati)`;
+    showMsg(parseMsg, m, true);
+    renderPreview();
+    renderPlay();
+    save();
+  });
 
-    moves++;
-    movesEl.textContent = moves;
-    bump(movesEl);
+  $('sampleBtn').addEventListener('click', () => {
+    soalInput.value =
+`1. Ibu kota Indonesia adalah...
+A. Bandung
+B. Jakarta*
+C. Surabaya
+D. Medan
 
-    if (firstCard.dataset.emoji === card.dataset.emoji) {
-      firstCard.classList.add('matched');
-      card.classList.add('matched');
-      firstCard = null;
-      matched++;
-      pairsEl.textContent = matched + '/' + LEVELS[level];
-      bump(pairsEl);
-      if (matched === LEVELS[level]) win();
-    } else {
-      lock = true;
-      const a = firstCard;
-      firstCard = null;
-      setTimeout(() => {
-        a.classList.add('wrong');
-        card.classList.add('wrong');
-      }, 350);
-      setTimeout(() => {
-        a.classList.remove('flipped', 'wrong');
-        card.classList.remove('flipped', 'wrong');
-        lock = false;
-      }, 900);
+2. Hasil dari 5 + 7 adalah...
+A. 10
+B. 12*
+C. 14
+D. 11
+
+3. Planet terdekat dengan Matahari adalah...
+A. Venus
+B. Bumi
+C. Merkurius*
+D. Mars
+
+4. Siapa penulis novel "Laskar Pelangi"?
+A. Andrea Hirata
+B. Tere Liye
+C. Pramoedya Ananta Toer
+Jawaban: A
+
+5. Lambang kimia untuk emas adalah...
+A. Ag
+B. Au*
+C. Fe
+D. Gd`;
+    parseMsg.className = 'msg';
+    preview.innerHTML = '';
+  });
+
+  $('clearBtn').addEventListener('click', () => {
+    soalInput.value = '';
+    questions = [];
+    parseMsg.className = 'msg';
+    preview.innerHTML = '';
+    renderPlay();
+    save();
+  });
+
+  // ---------- Quiz player ----------
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
     }
+    return a;
   }
 
-  function bump(el) {
-    el.classList.remove('bump');
-    void el.offsetWidth;
-    el.classList.add('bump');
+  function renderPlay() {
+    stopCountdown();
+    if (questions.length === 0) {
+      playPanel.innerHTML =
+        `<div class="empty"><span class="big">🗒️</span>Belum ada kuis. Buat soal dulu di tab <b>Buat Soal</b>, lalu tekan <b>Ubah Jadi Kuis</b>.</div>`;
+      return;
+    }
+    playPanel.innerHTML =
+      `<div class="empty">
+        <span class="big">🎯</span>
+        <h2 style="margin-bottom:6px;">Kuis siap!</h2>
+        <p style="color:var(--muted);margin-bottom:18px;">${questions.length} soal menanti. Semoga beruntung!</p>
+        <button class="btn primary" id="startBtn">🚀 Mulai Kuis</button>
+      </div>`;
+    $('startBtn').addEventListener('click', startQuiz);
   }
 
-  function win() {
-    stopTimer();
-
-    const cards = document.querySelectorAll('.card');
-    cards.forEach((c, i) => {
-      setTimeout(() => {
-        c.classList.add('wave');
-        setTimeout(() => c.classList.remove('wave'), 650);
-      }, i * 60);
+  function startQuiz() {
+    quiz = questions.map(q => {
+      const opts = q.options.map((o, i) => ({ ...o, oi: i }));
+      return { text: q.text, options: settings.shuffleO ? shuffle(opts) : opts };
     });
-    const overlayDelay = cards.length * 60 + 700;
+    if (settings.shuffleQ) quiz = shuffle(quiz);
 
-    resultText.innerHTML =
-      'Kamu menyelesaikannya dalam <span class="highlight">' + formatTime(seconds) +
-      '</span> dengan <span class="highlight">' + moves + ' langkah</span>.';
+    current = 0;
+    answers = new Array(quiz.length).fill(null);
+    locked = new Array(quiz.length).fill(false);
+    renderQuestion();
+  }
 
-    const best = getBest();
-    if (!best || seconds < best.time) {
-      localStorage.setItem('memoria-best-' + level, JSON.stringify({ time: seconds, moves }));
-      recordText.textContent = '🎉 Rekor baru untuk level ini!';
-    } else {
-      recordText.textContent = 'Rekor terbaikmu: ' + formatTime(best.time) + ' (' + best.moves + ' langkah)';
+  function renderQuestion() {
+    stopCountdown();
+    const q = quiz[current];
+    const answered = locked[current];
+    const chosen = answers[current];
+
+    const optsHtml = q.options.map((o, i) => {
+      const key = String.fromCharCode(65 + i);
+      let cls = 'option';
+      if (answered) {
+        cls += ' locked';
+        if (o.correct) cls += ' correct';
+        else if (chosen === i) cls += ' wrong';
+      } else if (chosen === i) {
+        cls += ' selected';
+      }
+      return `<button class="${cls}" data-i="${i}"><span class="key">${key}</span><span>${escapeHtml(o.text)}</span></button>`;
+    }).join('');
+
+    const answeredCount = locked.filter(Boolean).length;
+    const pct = Math.round((current) / quiz.length * 100);
+
+    let feedbackHtml = '';
+    if (answered && settings.instant) {
+      const ok = q.options[chosen] && q.options[chosen].correct;
+      feedbackHtml = ok
+        ? `<div class="feedback ok show">✅ Tepat sekali!</div>`
+        : `<div class="feedback no show">❌ Kurang tepat. Jawaban benar ditandai hijau.</div>`;
     }
-    showBest();
 
-    setTimeout(() => overlay.classList.add('show'), overlayDelay);
-    launchConfetti();
+    const timerPill = settings.timer > 0
+      ? `<div class="pill">⏱️ <span class="accent" id="cd">${settings.timer}</span>s</div>` : '';
+
+    playPanel.innerHTML =
+      `<div class="quiz-top">
+        <div class="pill">Soal <span class="accent">${current + 1}</span> / ${quiz.length}</div>
+        ${timerPill}
+        <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></div>
+      </div>
+      <div class="question-text">${escapeHtml(q.text)}</div>
+      <div class="options" id="options">${optsHtml}</div>
+      ${feedbackHtml}
+      <div class="quiz-nav">
+        <button class="btn" id="prevBtn" ${current === 0 ? 'disabled' : ''}>← Sebelumnya</button>
+        <button class="btn primary" id="nextBtn">${current === quiz.length - 1 ? '🏁 Selesai' : 'Berikutnya →'}</button>
+      </div>`;
+
+    if (!answered) {
+      $('options').querySelectorAll('.option').forEach(btn => {
+        btn.addEventListener('click', () => choose(parseInt(btn.dataset.i, 10)));
+      });
+    }
+    $('prevBtn').addEventListener('click', () => { if (current > 0) { current--; renderQuestion(); } });
+    $('nextBtn').addEventListener('click', next);
+
+    if (settings.timer > 0 && !answered) startCountdown();
+  }
+
+  function choose(i) {
+    if (locked[current]) return;
+    answers[current] = i;
+    if (settings.instant) {
+      locked[current] = true;
+      stopCountdown();
+    }
+    renderQuestion();
+  }
+
+  function next() {
+    // in non-instant mode, lock on leaving so it counts
+    if (!settings.instant && answers[current] !== null) locked[current] = true;
+    if (current === quiz.length - 1) {
+      finish();
+    } else {
+      current++;
+      renderQuestion();
+    }
+  }
+
+  function startCountdown() {
+    let t = settings.timer;
+    const cd = $('cd');
+    countdownId = setInterval(() => {
+      t--;
+      if (cd) cd.textContent = t;
+      if (t <= 0) {
+        stopCountdown();
+        // time up: lock as unanswered/wrong and reveal
+        locked[current] = true;
+        renderQuestion();
+      }
+    }, 1000);
+  }
+  function stopCountdown() {
+    if (countdownId) { clearInterval(countdownId); countdownId = null; }
+  }
+
+  function finish() {
+    stopCountdown();
+    // ensure all attempted answers are locked/counted
+    let correct = 0;
+    quiz.forEach((q, i) => {
+      const chosen = answers[i];
+      if (chosen !== null && q.options[chosen] && q.options[chosen].correct) correct++;
+    });
+    const total = quiz.length;
+    const pct = Math.round(correct / total * 100);
+
+    let title, emoji;
+    if (pct === 100) { title = 'Sempurna! Luar biasa!'; emoji = '🏆'; }
+    else if (pct >= 80) { title = 'Hebat sekali!'; emoji = '🌟'; }
+    else if (pct >= 60) { title = 'Bagus, terus berlatih!'; emoji = '👍'; }
+    else if (pct >= 40) { title = 'Lumayan, jangan menyerah!'; emoji = '💪'; }
+    else { title = 'Ayo coba lagi!'; emoji = '📚'; }
+
+    const reviewHtml = quiz.map((q, i) => {
+      const chosen = answers[i];
+      const correctOpt = q.options.find(o => o.correct);
+      const isRight = chosen !== null && q.options[chosen] && q.options[chosen].correct;
+      const chosenText = chosen !== null ? escapeHtml(q.options[chosen].text) : '<i>tidak dijawab</i>';
+      return `<div class="review-item">
+        <div class="r-q"><span class="badge ${isRight ? 'b-ok' : 'b-no'}">${isRight ? 'Benar' : 'Salah'}</span>${i + 1}. ${escapeHtml(q.text)}</div>
+        ${isRight
+          ? `<div class="r-line">Jawabanmu: <b class="good">${chosenText}</b></div>`
+          : `<div class="r-line">Jawabanmu: <b class="bad">${chosenText}</b> · Kunci: <b class="good">${escapeHtml(correctOpt.text)}</b></div>`}
+      </div>`;
+    }).join('');
+
+    playPanel.innerHTML =
+      `<div class="result-hero">
+        <div class="score-ring" style="--pct:${pct}%"><span class="score-val">${pct}%</span><span class="score-lbl">${correct}/${total} benar</span></div>
+        <h2>${emoji} ${title}</h2>
+        <p>Kamu menjawab benar ${correct} dari ${total} soal.</p>
+      </div>
+      <div class="row" style="justify-content:center;">
+        <button class="btn primary" id="retryBtn">🔁 Main Lagi</button>
+        <button class="btn" id="editBtn">✏️ Ubah Soal</button>
+      </div>
+      <h2 style="margin:22px 0 4px;">Pembahasan</h2>
+      <div class="review">${reviewHtml}</div>`;
+
+    $('retryBtn').addEventListener('click', startQuiz);
+    $('editBtn').addEventListener('click', () => switchView('editor'));
+
+    if (pct >= 80) launchConfetti();
   }
 
   function launchConfetti() {
     const colors = ['#ffd166', '#ef476f', '#06d6a0', '#118ab2', '#b5179e', '#f77f00'];
-    for (let i = 0; i < 120; i++) {
+    for (let i = 0; i < 110; i++) {
       setTimeout(() => {
         const c = document.createElement('div');
         c.className = 'confetti';
@@ -534,33 +801,42 @@
     }
   }
 
-  document.querySelectorAll('[data-level]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('[data-level]').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      level = btn.dataset.level;
-      newGame();
-    });
+  // ---------- Tabs ----------
+  function switchView(name) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === name));
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+    if (name === 'play') renderPlay();
+  }
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => switchView(tab.dataset.view));
   });
 
-  document.getElementById('restartBtn').addEventListener('click', newGame);
-  document.getElementById('playAgainBtn').addEventListener('click', newGame);
+  // ---------- Settings wiring ----------
+  const setShuffleQ = $('setShuffleQ'), setShuffleO = $('setShuffleO'),
+        setInstant = $('setInstant'), setTimer = $('setTimer');
 
-  function spawnBubbles() {
-    for (let i = 0; i < 14; i++) {
-      const b = document.createElement('div');
-      b.className = 'bubble';
-      const size = 14 + Math.random() * 46;
-      b.style.width = b.style.height = size + 'px';
-      b.style.left = Math.random() * 100 + 'vw';
-      b.style.animationDuration = 12 + Math.random() * 18 + 's';
-      b.style.animationDelay = -Math.random() * 20 + 's';
-      document.body.appendChild(b);
-    }
+  function applySettingsToUI() {
+    setShuffleQ.checked = settings.shuffleQ;
+    setShuffleO.checked = settings.shuffleO;
+    setInstant.checked = settings.instant;
+    setTimer.value = settings.timer;
   }
+  setShuffleQ.addEventListener('change', () => { settings.shuffleQ = setShuffleQ.checked; save(); });
+  setShuffleO.addEventListener('change', () => { settings.shuffleO = setShuffleO.checked; save(); });
+  setInstant.addEventListener('change', () => { settings.instant = setInstant.checked; save(); });
+  setTimer.addEventListener('change', () => {
+    let v = parseInt(setTimer.value, 10);
+    if (isNaN(v) || v < 0) v = 0;
+    if (v > 300) v = 300;
+    settings.timer = v; setTimer.value = v; save();
+  });
 
-  spawnBubbles();
-  newGame();
+  soalInput.addEventListener('input', save);
+
+  // ---------- Init ----------
+  load();
+  applySettingsToUI();
+  if (questions.length) renderPreview();
 })();
 </script>
 </body>
