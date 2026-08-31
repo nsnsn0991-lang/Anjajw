@@ -307,6 +307,7 @@
 
         <div class="row">
           <button class="btn primary" id="parseBtn">⚡ Ubah Jadi Kuis</button>
+          <button class="btn" id="bankBtn">🧬 Bank Soal Protein (75)</button>
           <button class="btn" id="sampleBtn">📄 Isi Contoh</button>
           <button class="btn warn" id="clearBtn">🗑️ Bersihkan</button>
         </div>
@@ -551,6 +552,100 @@ Catatan:
     renderPreview();
     renderPlay();
     save();
+  });
+
+  // Bank soal bawaan: Struktur, Fungsi & Metabolisme Protein (Bagian A, 75 butir)
+  // Format: [pertanyaan, [pilihan...], indeksJawabanBenar(0-based)]
+  const BANK = [
+    ['Kata "protein" berasal dari kata protos/proteos yang berarti…', ['akhir','pertama atau utama','pembangun','rantai panjang'], 1],
+    ['Protein merupakan polimer dari monomer…', ['monosakarida','asam lemak','asam amino','nukleotida'], 2],
+    ['Ikatan yang menghubungkan antar monomer penyusun protein adalah…', ['ikatan glikosidik','ikatan ester','ikatan peptida','ikatan fosfodiester'], 2],
+    ['Berikut ini yang bukan merupakan bagian dari struktur asam amino adalah…', ['gugus karboksil (–COOH)','gugus amina (–NH₂)','gugus fosfat (–PO₄)','rantai samping (R)'], 2],
+    ['Atom karbon pusat pada asam amino disebut…', ['karbon β','karbon α','karbon γ','karbon anomerik'], 1],
+    ['Bagian asam amino yang membedakan satu asam amino dengan asam amino lainnya adalah…', ['gugus karboksil','gugus amina','rantai samping (gugus R)','atom karbon pusat'], 2],
+    ['Asam amino yang tidak memiliki stereoisomer adalah…', ['serin','alanin','glisin','valin'], 2],
+    ['Alasan asam amino tersebut tidak memiliki stereoisomer adalah…', ['tidak memiliki gugus amina','atom C pusatnya tidak mengikat empat gugus yang berbeda','tidak memiliki gugus karboksil','rantai sampingnya aromatik'], 1],
+    ['Jika gugus NH₃⁺ terletak di sebelah kanan, maka asam amino diberi awalan…', ['L','D','α','β'], 1],
+    ['Semua asam amino yang terdapat dalam protein memiliki konfigurasi…', ['D','L','campuran D dan L','rasemik'], 1],
+    ['Asam D-alanin dan D-glutamat merupakan komponen penyusun…', ['membran sel hewan','dinding sel bakteri tertentu','inti sel tumbuhan','mitokondria'], 1],
+    ['Penulisan singkat 20 asam amino umum menggunakan…', ['1 huruf saja','2 huruf','3 huruf','4 huruf'], 2],
+    ['Reaksi pembentukan ikatan peptida antar asam amino disebut reaksi…', ['hidrolisis','kondensasi','oksidasi','reduksi'], 1],
+    ['Molekul yang dilepaskan pada reaksi kondensasi asam amino adalah…', ['CO₂','NH₃','H₂O','ATP'], 2],
+    ['Reaksi kondensasi merupakan reaksi antara…', ['gugus karboksilat dengan gugus amino','gugus amino dengan gugus amino','gugus R dengan gugus R','gugus karboksilat dengan gugus karboksilat'], 0],
+    ['Dua asam amino yang terikat secara kovalen membentuk…', ['oligopeptida','dipeptida','polipeptida','multimer'], 1],
+    ['Molekul yang tersusun atas 2 hingga 20 asam amino disebut…', ['dipeptida','oligopeptida','polipeptida','protein globular'], 1],
+    ['Rangkaian yang melebihi 20 asam amino disebut…', ['oligopeptida','tripeptida','polipeptida','multimer'], 2],
+    ['Asam amino esensial adalah asam amino yang…', ['dapat diproduksi sendiri oleh tubuh','tidak dapat diproduksi sendiri oleh tubuh dan diperoleh dari makanan','hanya terdapat pada tumbuhan','tidak dibutuhkan oleh tubuh'], 1],
+    ['Berikut ini yang termasuk asam amino esensial adalah…', ['alanin','serin','lisin','glisin'], 2],
+    ['Berikut ini yang termasuk asam amino non-esensial adalah…', ['valin','tirosin','triptofan','metionin'], 1],
+    ['Penggolongan asam amino berdasarkan gugus R dibagi menjadi … kelompok', ['3','4','5','6'], 2],
+    ['Asam amino berikut termasuk golongan R alifatik non polar, kecuali…', ['valin','leusin','serin','isoleusin'], 2],
+    ['Asam amino yang memiliki gugus thioeter non polar adalah…', ['sistein','metionin','treonin','glutamin'], 1],
+    ['Asam amino non polar yang memiliki rantai samping alifatik dengan struktur siklik adalah…', ['prolin','alanin','glisin','leusin'], 0],
+    ['Semakin hidrofobik suatu asam amino, maka posisinya dalam molekul protein cenderung…', ['di permukaan luar protein','di bagian dalam molekul protein','berada di ujung amino','berada di ujung karboksil'], 1],
+    ['Sifat asam amino dengan gugus R polar tak bermuatan adalah…', ['hidrofobik','hidrofilik, mudah larut dalam air','selalu bermuatan negatif','tidak dapat berinteraksi dengan air'], 1],
+    ['Asam amino dengan gugus R polar tak bermuatan umumnya terletak di…', ['inti protein','kulit luar protein','membran lipid','sisi aktif enzim saja'], 1],
+    ['Kepolaran serin dan treonin ditentukan oleh gugus…', ['sulfhidril','amida','hidroksil','karboksil'], 2],
+    ['Kepolaran sistein ditentukan oleh gugus…', ['hidroksil','sulfhidril (–SH)','amida','imidazol'], 1],
+    ['Kepolaran asparagin dan glutamin ditentukan oleh gugus…', ['amida','hidroksil','karboksil','guanidin'], 0],
+    ['Gugus R pada asam amino polar tak bermuatan dapat terionisasi pada pH tinggi (pH ± 8,3) sehingga dapat mengalami oksidasi dan membentuk ikatan…', ['peptida','hidrogen','disulfida','ionik'], 2],
+    ['Pasangan asam amino dengan gugus R bermuatan negatif (bersifat asam) adalah…', ['lisin dan arginin','aspartat dan glutamat','serin dan treonin','fenilalanin dan tirosin'], 1],
+    ['Asam amino bermuatan negatif bersifat asam karena…', ['menyerap proton pada pH netral','memiliki gugus karboksil pada rantai samping yang melepaskan H⁺ pada pH netral','memiliki gugus amina bebas','memiliki cincin aromatik'], 1],
+    ['Asam amino dengan gugus R bermuatan positif (bersifat basa) adalah…', ['lisin, arginin, histidin','aspartat, glutamat, serin','glisin, alanin, valin','triptofan, tirosin, fenilalanin'], 0],
+    ['Histidin dapat bermuatan positif pada pH netral karena gugus NH₂ dan NH-nya…', ['melepaskan proton','menyerap proton','membentuk ikatan disulfida','teroksidasi'], 1],
+    ['Kelompok asam amino aromatik terdiri atas…', ['fenilalanin, tirosin, triptofan','lisin, arginin, histidin','prolin, glisin, alanin','serin, sistein, treonin'], 0],
+    ['Asam amino aromatik mampu menyerap sinar UV pada panjang gelombang…', ['260 nm','280 nm','340 nm','540 nm'], 1],
+    ['Cincin yang terdapat pada triptofan adalah cincin…', ['imidazol','pirolidin','indol','benzena tersubstitusi OH'], 2],
+    ['Cincin pirolidin terdapat pada asam amino…', ['prolin','histidin','triptofan','tirosin'], 0],
+    ['Cincin imidazol terdapat pada asam amino…', ['prolin','histidin','arginin','lisin'], 1],
+    ['Struktur protein primer merupakan…', ['lilitan heliks yang distabilkan ikatan hidrogen','urutan asam amino pada rantai lurus protein yang disatukan ikatan peptida','susunan tiga dimensi hasil interaksi gugus R','pengaturan beberapa subunit protein'], 1],
+    ['Sifat ikatan peptida pada struktur primer adalah…', ['non-kovalen dan mudah putus','kovalen, sangat stabil, dan tidak dipengaruhi pH ataupun pelarut','ionik dan bergantung pH','hidrogen dan lemah'], 1],
+    ['Struktur sekunder protein terbentuk akibat adanya…', ['ikatan disulfida','ikatan hidrogen antar asam amino','interaksi ionik','ikatan peptida'], 1],
+    ['Berdasarkan polanya, struktur sekunder protein terbagi menjadi…', ['globular dan fibrilar','alfa-heliks dan beta-sheet','monomer dan multimer','primer dan tersier'], 1],
+    ['Pada struktur alfa-heliks, jumlah residu per putaran adalah…', ['2,0','3,6','4,5','6,2'], 1],
+    ['Pada struktur alfa-heliks, posisi rantai samping asam amino adalah…', ['menghadap ke dalam heliks','menghadap keluar','berikatan dengan rantai lain','tegak lurus terhadap sumbu'], 1],
+    ['Istilah "alpha" pada alfa-heliks berarti bahwa ulirannya terlihat…', ['berlawanan arah jarum jam','searah jarum jam','lurus tanpa ulir','berlipat-lipat'], 1],
+    ['Pada struktur beta-sheet, ikatan hidrogen terbentuk antara…', ['dua gugus –SH','atom oksigen karboksil suatu ikatan peptida dengan nitrogen dari ikatan peptida lainnya','gugus R bermuatan positif dan negatif','dua cincin aromatik'], 1],
+    ['Ikatan hidrogen pada beta-sheet dapat terbentuk antara…', ['hanya dua rantai polipeptida yang terpisah','hanya satu rantai yang melipat sendiri','dua rantai polipeptida terpisah atau dua daerah dari satu rantai tunggal yang melipat','rantai polipeptida dengan molekul air'], 2],
+    ['Struktur tersier protein terbentuk dari…', ['urutan linear asam amino','lipatan komponen struktur sekunder membentuk konfigurasi tiga dimensi','gabungan beberapa rantai polipeptida','ikatan peptida antar asam amino'], 1],
+    ['Interaksi ionik pada struktur tersier terjadi antara…', ['dua gugus samping bermuatan positif','gugus samping bermuatan positif dan gugus samping bermuatan negatif','dua gugus hidroksil','dua cincin aromatik'], 1],
+    ['Jembatan disulfida pada struktur tersier terbentuk akibat adanya asam amino…', ['metionin','sistein','serin','treonin'], 1],
+    ['Ikatan disulfida lebih kuat dibandingkan ikatan lain pada struktur tersier karena bersifat…', ['ionik','hidrogen','kovalen','van der Waals'], 2],
+    ['Gaya dispersi Van der Waals terjadi antara dua asam amino yang…', ['bermuatan berlawanan','rantai karbonnya cukup panjang dan memiliki nilai dipol yang berlawanan','memiliki gugus –SH','memiliki cincin aromatik'], 1],
+    ['Struktur kuartener protein menggambarkan…', ['urutan asam amino','lilitan alfa-heliks','pengaturan subunit protein dalam ruang dengan dua atau lebih rantai polipeptida','lipatan tiga dimensi satu rantai'], 2],
+    ['Ikatan yang mengikat subunit-subunit pada struktur kuartener adalah…', ['ikatan kovalen peptida','ikatan non-kovalen (elektrostatis, hidrogen, hidrofobik)','ikatan disulfida saja','ikatan glikosidik'], 1],
+    ['Protein kompleks fungsional yang tersusun atas dua atau lebih subunit disebut…', ['monomer','dimer semu','multimer','oligopeptida'], 2],
+    ['Protein yang berfungsi sebagai monomer…', ['selalu memiliki struktur kuartener','tidak memiliki struktur kuartener','tidak memiliki struktur tersier','tidak memiliki struktur primer'], 1],
+    ['Contoh protein yang memiliki struktur kuartener dengan rantai alfa dan beta adalah…', ['keratin','hemoglobin','kolagen','fibroin'], 1],
+    ['Denaturasi protein adalah…', ['pemecahan protein menjadi asam amino','perubahan struktur dan bentuk sehingga protein kehilangan fungsinya','penambahan gugus fosfat pada protein','pembentukan ikatan peptida baru'], 1],
+    ['Berikut ini merupakan faktor penyebab denaturasi protein, kecuali…', ['pH','suhu','kekuatan ionik','jumlah ribosom'], 3],
+    ['Pernyataan yang benar mengenai renaturasi adalah…', ['selalu mudah terjadi pada semua protein','pada umumnya protein terdenaturasi sangat sulit untuk direnaturasi','renaturasi menghilangkan fungsi protein','renaturasi hanya terjadi pada struktur primer'], 1],
+    ['Berikut ini contoh protein struktural, kecuali…', ['kolagen','keratin','fibroin','insulin'], 3],
+    ['Protein yang ditemukan pada rambut dan kuku serta melindungi jaringan epitel adalah…', ['kolagen','keratin','tubulin','elastin'], 1],
+    ['Protein struktural yang memperkuat tulang, kartilago, tendon, ligamen, dan kulit serta mencapai hampir seperempat protein total tubuh adalah…', ['keratin','kolagen','fibroin','MaSp'], 1],
+    ['Protein yang digunakan ulat sutra untuk membentuk kepompong adalah…', ['fibroin','tubulin','kolagen','kasein'], 0],
+    ['Tubulin membentuk tabung hollow yang disebut…', ['mikrofilamen','mikrotubul','filamen intermediet','sentromer'], 1],
+    ['MaSp (major ampullate spidroin protein) berperan dalam pembentukan…', ['kepompong ulat sutra','jaring laba-laba','rambut mamalia','cangkang telur'], 1],
+    ['Enzim ribonuklease mampu mengakselerasi reaksi kimia spesifik hingga…', ['10 ribu kali lebih cepat','10 juta kali lebih cepat','10 miliar kali lebih cepat','100 kali lebih cepat'], 2],
+    ['Contoh enzim pencernaan yang disebutkan dalam materi adalah…', ['pepsin dan tripsin','insulin dan glukagon','aktin dan miosin','kasein dan gluten'], 0],
+    ['Hormon adalah protein yang disekresi oleh…', ['kelenjar eksokrin','kelenjar endokrin','hati','ginjal'], 1],
+    ['Protein transport dalam darah yang membawa oksigen dari paru-paru ke seluruh jaringan tubuh adalah…', ['albumin','transferin','hemoglobin','lipoprotein'], 2],
+    ['Protein pada mitokondria yang memindahkan elektron dari satu protein kompleks ke protein kompleks lain adalah…', ['sitokrom c','mioglobin','GLUT-1','katenin'], 0],
+    ['Protein penyimpan (cadangan energi) pada air susu mamalia adalah…', ['ovalbumin','kasein','gluten','zein'], 1]
+  ];
+
+  function bankToText(bank) {
+    return bank.map(([q, opts, ans]) =>
+      q + '\n' + opts.map((o, i) =>
+        String.fromCharCode(65 + i) + '. ' + o + (i === ans ? '*' : '')
+      ).join('\n')
+    ).join('\n\n');
+  }
+
+  $('bankBtn').addEventListener('click', () => {
+    soalInput.value = bankToText(BANK);
+    $('parseBtn').click();
+    preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
   $('sampleBtn').addEventListener('click', () => {
