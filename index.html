@@ -382,6 +382,7 @@
           <button class="btn" id="bankBtn">🧬 Bank Protein (75)</button>
           <button class="btn" id="bankBtn2">🍞 Bank Karbohidrat (85)</button>
           <button class="btn" id="bankBtn3">🔬 Bank Bioenergetika (90)</button>
+          <button class="btn" id="bankBtn4">🧈 Bank Lipid (100)</button>
           <button class="btn" id="sampleBtn">📄 Isi Contoh</button>
           <button class="btn warn" id="clearBtn">🗑️ Bersihkan</button>
         </div>
@@ -1063,6 +1064,116 @@ Catatan:
 
   $('bankBtn3').addEventListener('click', () => {
     soalInput.value = bankToText(BANK3);
+    $('parseBtn').click();
+    preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // Bank soal bawaan #4: Metabolisme Lipid (100 butir)
+  const BANK4 = [
+    ['Lipid dapat diartikan sebagai senyawa yang:', ['Mudah larut dalam air','Sukar larut dalam air tetapi mudah larut dalam pelarut organik','Larut dalam air maupun pelarut organik','Tidak larut dalam apa pun'], 1],
+    ['Berikut adalah pelarut organik tempat lipid mudah larut, KECUALI:', ['Etanol','Kloroform','Aseton','Air'], 3],
+    ['Secara garis besar, lipid dibedakan atas ... golongan.', ['2','3','4','5'], 1],
+    ['Tiga golongan besar lipid adalah lipid sederhana, lipid majemuk, dan lipid:', ['Turunan','Kompleks','Netral','Polar'], 0],
+    ['Lipid sederhana adalah ester asam lemak dengan gliserol atau:', ['Asam amino','Alkohol berantai panjang','Glukosa','Fosfat'], 1],
+    ['Ester asam lemak dengan gliserol disebut:', ['Asilgliserol (triasilgliserol)','Lilin','Fosfolipid','Steroid'], 0],
+    ['Ester asam lemak dengan alkohol berantai panjang disebut:', ['Asilgliserol','Lilin (malam/wax)','Fosfolipid','Sfingolipid'], 1],
+    ['Lipid majemuk (compound) jika dihidrolisis akan menghasilkan:', ['Hanya asam lemak','Molekul senyawa lain (non-lipid)','Gliserol saja','Glukosa'], 1],
+    ['Berikut termasuk lipid majemuk, KECUALI:', ['Fosfolipid','Glikolipid','Lipoprotein','Kolesterol'], 3],
+    ['Lipid turunan (derived lipid) adalah senyawa lipid yang merupakan:', ['Ester gliserol','Hasil penguraian senyawa lipid lainnya','Senyawa mengandung fosfat','Gabungan lipid dan protein'], 1],
+    ['Berikut contoh lipid turunan, KECUALI:', ['Asam lemak','Alkohol berantai panjang','Kolesterol','Fosfolipid'], 3],
+    ['Asam lemak merupakan hasil hidrolisis dari:', ['Malam/wax','Asilgliserol','Fosfat','Sfingosin'], 1],
+    ['Salah satu fungsi lipid adalah sebagai penyusun struktur:', ['Dinding sel','Membran sel','Inti sel','Ribosom'], 1],
+    ['Sebagai penyusun membran, lipid berperan sebagai:', ['Katalis reaksi','Barier sel yang mengatur aliran material','Sumber DNA','Pigmen darah'], 1],
+    ['Lipid sebagai cadangan energi disimpan sebagai jaringan:', ['Otot','Adiposa','Saraf','Epitel'], 1],
+    ['Selain struktur dan cadangan energi, lipid juga berfungsi sebagai:', ['Enzim dan asam nukleat','Hormon dan vitamin','Antibodi','Pigmen darah'], 1],
+    ['Berikut termasuk contoh struktur lipid, KECUALI:', ['Asam lemak','Triasilgliserol','Fosfolipid','Asam amino'], 3],
+    ['Asam lemak adalah asam karboksilat dengan rantai C terdiri dari ... atau lebih atom C.', ['2','4','6','10'], 1],
+    ['Asam lemak jenuh adalah asam lemak yang:', ['Mempunyai 1 ikatan rangkap','Tidak mempunyai ikatan rangkap','Mempunyai 2 ikatan rangkap','Bercabang'], 1],
+    ['Berikut contoh asam lemak jenuh, KECUALI:', ['Asam palmitat','Asam stearat','Asam arakhidat','Asam oleat'], 3],
+    ['Asam palmitat memiliki jumlah atom C sebanyak:', ['14','16','18','20'], 1],
+    ['Asam stearat memiliki jumlah atom C sebanyak:', ['16','18','20','22'], 1],
+    ['Asam arakhidat memiliki jumlah atom C sebanyak:', ['16','18','20','22'], 2],
+    ['Asam lemak tak jenuh (esensial) adalah asam lemak yang:', ['Tidak mempunyai ikatan rangkap','Mempunyai ikatan rangkap','Jumlah C-nya ganjil','Bercabang'], 1],
+    ['Asam oleat (C18) memiliki ... ikatan rangkap.', ['1','2','3','4'], 0],
+    ['Asam linoleat (C18) memiliki ... ikatan rangkap.', ['1','2','3','4'], 1],
+    ['Asam linolenat (C18) memiliki ... ikatan rangkap.', ['1','2','3','4'], 2],
+    ['Senyawa lipid yang paling banyak dan luas penyebarannya di alam adalah:', ['Lilin','Triasilgliserol','Sfingolipid','Steroid'], 1],
+    ['Triasilgliserol disebut juga:', ['Lemak netral (trigliserida)','Fosfogliserida','Lipoprotein','Sterol'], 0],
+    ['Triasilgliserol yang banyak mengandung asam lemak tak jenuh memiliki konsistensi:', ['Lebih padat','Lebih cair','Berbentuk kristal','Berbentuk gas'], 1],
+    ['Hidrolisis triasilgliserol akan menghasilkan:', ['Glukosa dan asam amino','Gliserol dan asam lemak bebas','Fosfat dan kolin','Sfingosin'], 1],
+    ['Lilin (malam) adalah ester asam lemak dengan alkohol alifatik berantai panjang berukuran ... atom C.', ['4–8','10–14','16–22','24–30'], 2],
+    ['Contoh senyawa lilin (malam) adalah:', ['Asetil-KoA','Mirisil palmitat','Lesitin','Kolesterol'], 1],
+    ['Fosfolipid (fosfogliserida) adalah senyawa lipid yang mengandung gugus:', ['Amino','Fosfat','Sulfat','Karboksil'], 1],
+    ['Fosfolipid bersifat:', ['Hidrofobik total','Amfifatik (amfipatik)','Ionik penuh','Nonpolar total'], 1],
+    ['Pada fosfolipid, bagian hidrofobik ("ekor") adalah:', ['Gugus fosfat','Rantai atom karbon yang panjang','Gugus amino','Gliserol'], 1],
+    ['Pada fosfolipid, bagian hidrofilik ("kepala") adalah:', ['Rantai karbon panjang','Gugus fosfat','Asam lemak','Sfingosin'], 1],
+    ['Fungsi fosfolipid antara lain sebagai komponen membran sel dan sebagai:', ['Pigmen','Agen emulsi','Enzim','Hormon'], 1],
+    ['Sfingolipid tidak mengandung gliserol, tetapi mengandung:', ['Kolesterol','Sfingosin','Fosfat saja','Glukosa'], 1],
+    ['Sfingosin adalah suatu:', ['Asam lemak jenuh','Alkohol amino berantai C panjang','Gula pentosa','Asam empedu'], 1],
+    ['Sfingomielin adalah fosfolipid yang banyak terdapat pada:', ['Hati dan ginjal','Otak dan jaringan saraf','Otot dan tulang','Kulit'], 1],
+    ['Lipoprotein adalah gabungan antara lipid dengan:', ['Karbohidrat','Protein','Asam nukleat','Fosfat'], 1],
+    ['Terdapat ... kelas mayor lipoprotein plasma.', ['2','3','4','5'], 2],
+    ['Lipoprotein yang mengangkut trigliserida dari usus ke jaringan lain adalah:', ['Kilomikron','VLDL','LDL','HDL'], 0],
+    ['Kilomikron mengangkut trigliserida dari usus ke seluruh jaringan, KECUALI:', ['Hati','Ginjal','Otot','Jaringan lemak'], 1],
+    ['Lipoprotein yang mengikat trigliserida di hati dan mengangkutnya ke jaringan lemak adalah:', ['Kilomikron','VLDL','LDL','HDL'], 1],
+    ['Lipoprotein yang berperan mengangkut kolesterol ke jaringan perifer adalah:', ['Kilomikron','VLDL','LDL','HDL'], 2],
+    ['Lipoprotein yang mengikat kolesterol plasma dan mengangkutnya ke hati adalah:', ['Kilomikron','VLDL','LDL','HDL'], 3],
+    ['Kepanjangan VLDL adalah:', ['Very low-density lipoprotein','Variable low-density lipoprotein','Very light-density lipoprotein','Ventral lipoprotein'], 0],
+    ['Berbeda dengan lipid lain, steroid tidak dapat mengalami:', ['Oksidasi','Saponifikasi (tidak tersaponifikasi)','Hidrolisis','Esterifikasi'], 1],
+    ['Steroid adalah senyawa yang memiliki inti:', ['Benzena','Siklopentano-perhidrofenantren','Imidazol','Purin'], 1],
+    ['Berikut termasuk senyawa steroid, KECUALI:', ['Kolesterol','Hormon seks','Asam empedu','Asam palmitat'], 3],
+    ['Vitamin yang tergolong lipid (larut lemak) adalah:', ['B dan C','A, D, E, K','B kompleks','C dan K'], 1],
+    ['Vitamin A, D, E, K dimasukkan golongan lipid karena:', ['Larut dalam air','Sukar larut air namun mudah larut pelarut organik','Berbentuk gas','Mengandung logam'], 1],
+    ['Gliserol hasil hidrolisis lipid (trigliserida) dapat menjadi:', ['Pigmen','Sumber energi','Hormon','Enzim'], 1],
+    ['Gliserol yang ditambah 1 gugus fosfat dari ATP akan membentuk:', ['Gliserol 3-fosfat','Piruvat','Asetil-KoA','Malonil-KoA'], 0],
+    ['Gliserol 3-fosfat diubah menjadi dihidroksiaseton fosfat yang merupakan produk jalur:', ['Siklus Krebs','Glikolisis','Oksidasi beta','Fosforilasi oksidatif'], 1],
+    ['Sebelum dioksidasi, asam lemak harus diaktifkan menjadi:', ['Malonil-KoA','Asil-KoA','Asetil-KoA','Asil karnitin'], 1],
+    ['Aktivasi asam lemak menjadi asil-KoA memerlukan ATP dan:', ['NADPH','Koenzim A','Biotin','Karnitin'], 1],
+    ['Enzim yang mengaktifkan asam lemak menjadi asil-KoA adalah:', ['Tiolase','Asil-KoA sintetase (tiokinase)','Karnitin transferase','Hidratase'], 1],
+    ['Jalur katabolisme lipid yang paling penting adalah oksidasi:', ['Alfa','Beta','Omega','Gamma'], 1],
+    ['Selain oksidasi beta, asam lemak dapat dioksidasi melalui jalur:', ['Alfa dan omega','Gamma dan delta','Glikolisis','Pentosa fosfat'], 0],
+    ['Enzim-enzim oksidasi beta asam lemak berada di dalam:', ['Sitosol','Mitokondria','Nukleus','Retikulum endoplasma'], 1],
+    ['Karena tidak dapat menembus membran mitokondria, asam lemak diangkut melalui sistem:', ['Karnitin','Biotin','NADPH','Gliserol'], 0],
+    ['Transport asam lemak ke matriks mitokondria berlangsung melalui ... tahap reaksi.', ['2','3','4','5'], 1],
+    ['Aktivasi asam lemak menjadi asil-KoA berlangsung di:', ['Matriks mitokondria','Sitosol','Nukleus','Lisosom'], 1],
+    ['Enzim yang mengubah asil-KoA menjadi asil karnitin adalah:', ['Karnitin-asil transferase I','Karnitin-asil transferase II','Translokase','Tiolase'], 0],
+    ['Pemindahan asil karnitin ke dalam matriks mitokondria dilakukan oleh:', ['Karnitin-asil transferase I','Karnitin-asilkarnitin translokase','Tiokinase','Hidratase'], 1],
+    ['Di dalam matriks, asil karnitin diubah kembali menjadi asil-KoA oleh enzim:', ['Karnitin-asil transferase I','Karnitin-asil transferase II','Translokase','Tiolase'], 1],
+    ['Oksidasi beta asam lemak berlangsung dalam ... tahap reaksi.', ['3','4','5','6'], 1],
+    ['Tahap pertama oksidasi beta dikatalisis oleh asil-KoA dehidrogenase yang mengandung gugus prostetik:', ['NAD','FAD','Biotin','Heme'], 1],
+    ['Pada tahap pertama oksidasi beta, FAD berperan sebagai:', ['Donor karbon','Akseptor proton (elektron)','Sumber ATP','Katalis air'], 1],
+    ['Tahap kedua oksidasi beta (reaksi hidrasi) dikatalisis oleh enzim:', ['Tiolase','Enoil-KoA hidratase','Asil-KoA dehidrogenase','Tiokinase'], 1],
+    ['Tahap keempat oksidasi beta (pengeluaran asetil-KoA) dikatalisis oleh enzim:', ['Hidratase','Tiolase (asetil KoA-asetil transferase)','Sintetase','Translokase'], 1],
+    ['Setiap satu putaran oksidasi beta mengeluarkan 1 asetil-KoA dan mengurangi rantai sebanyak ... atom C.', ['1','2','3','4'], 1],
+    ['Oksidasi beta berlangsung berulang sampai seluruh rantai asil teroksidasi menjadi:', ['Malonil-KoA','Asetil-KoA','Gliserol','Piruvat'], 1],
+    ['Untuk mengaktivasi asam lemak menjadi asil-KoA dibutuhkan:', ['1 ATP','2 ATP','5 ATP','12 ATP'], 1],
+    ['Frekuensi (jumlah putaran) oksidasi beta dihitung dengan rumus:', ['(½ × jumlah atom C)','(½ × jumlah atom C) − 1','jumlah atom C − 1','2 × jumlah atom C'], 1],
+    ['Jumlah energi yang didapat tiap satu kali oksidasi beta adalah:', ['2 ATP','5 ATP','12 ATP','17 ATP'], 1],
+    ['Jumlah asetil-KoA yang dihasilkan dari suatu asam lemak adalah:', ['jumlah atom C','½ × jumlah atom C','(½ × jumlah atom C) − 1','2 × jumlah atom C'], 1],
+    ['Setiap asetil-KoA yang masuk siklus Krebs menghasilkan:', ['5 ATP','10 ATP','12 ATP','2 ATP'], 2],
+    ['Untuk asam lemak dengan 10 atom C, jumlah putaran oksidasi beta adalah:', ['3','4','5','6'], 1],
+    ['Untuk asam lemak dengan 10 atom C, jumlah asetil-KoA yang terbentuk adalah:', ['4','5','6','10'], 1],
+    ['Total energi bersih metabolisme asam lemak dengan 10 atom C adalah:', ['60 ATP','72 ATP','78 ATP','80 ATP'], 2],
+    ['Untuk asam palmitat (C16), jumlah putaran oksidasi beta adalah:', ['6','7','8','9'], 1],
+    ['Untuk asam palmitat (C16), jumlah asetil-KoA yang terbentuk adalah:', ['7','8','9','16'], 1],
+    ['Biosintesis lipid berlangsung di luar mitokondria, yaitu di sitosol dan:', ['Nukleus','Mikrosom (retikulum endoplasma)','Lisosom','Membran plasma'], 1],
+    ['Dalam tubuh manusia, biosintesis lipid berlangsung terutama di jaringan adiposa, hati, dan kelenjar mammae saat:', ['Tidur','Laktasi','Puasa','Berolahraga'], 1],
+    ['Di dalam tubuh, asam-asam lemak disintesis dari:', ['Malonil-KoA','Asetil-KoA','Gliserol','Piruvat'], 1],
+    ['Sebagian besar asam lemak yang terdapat di alam mempunyai jumlah atom C:', ['Ganjil','Genap','Prima','Kelipatan tiga'], 1],
+    ['Pernyataan yang benar tentang biosintesis asam lemak adalah:', ['Merupakan kebalikan langsung oksidasi beta','Bukan kebalikan oksidasi beta dan memakai enzim yang berbeda','Memakai enzim yang sama dengan oksidasi beta','Berlangsung di dalam mitokondria'], 1],
+    ['Biosintesis asam lemak de novo dikatalisis oleh kompleks enzim:', ['Asil-KoA dehidrogenase','Sintase asam lemak','Tiolase','Tiokinase'], 1],
+    ['Berikut adalah kofaktor biosintesis asam lemak de novo, KECUALI:', ['NADPH','Biotin','HCO₃⁻','FAD'], 3],
+    ['Sumber CO₂ pada biosintesis asam lemak de novo adalah:', ['O₂','HCO₃⁻ (bikarbonat)','Karbonat padat','CO dalam darah'], 1],
+    ['Senyawa pembawa atom C untuk perpanjangan rantai pada biosintesis asam lemak adalah:', ['Asetil-KoA','Malonil-KoA','Asil karnitin','Suksinil-KoA'], 1],
+    ['Malonil-KoA disintesis dari asetil-KoA dan:', ['NADPH','HCO₃⁻','Gliserol','ATP saja'], 1],
+    ['Asam lemak terpanjang yang dihasilkan biosintesis de novo adalah:', ['Asam palmitat (C16)','Asam stearat (C18)','Asam arakhidat (C20)','Asam oleat (C18)'], 0],
+    ['Perpanjangan rantai asam lemak (>C16) dari asam palmitat dikatalisis oleh sistem enzim:', ['Tiolase','ELOVL (fatty acid elongation system)','Asil-KoA sintetase','Karnitin transferase'], 1],
+    ['Biosintesis triasilgliserol diawali dengan pengaktifan gliserol menjadi gliserol-3-fosfat oleh enzim:', ['Gliserokinase','Heksokinase','Tiokinase','Lipase'], 0],
+    ['Prekursor biosintesis kolesterol adalah asetil-KoA, yang diangkut dari mitokondria ke sitosol melalui:', ['Sistem karnitin','Acetyl-group shuttle','Translokase ADP/ATP','Difusi bebas'], 1]
+  ];
+
+  $('bankBtn4').addEventListener('click', () => {
+    soalInput.value = bankToText(BANK4);
     $('parseBtn').click();
     preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });

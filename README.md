@@ -13,7 +13,7 @@ Aplikasi web yang mengubah kumpulan soal pilihan ganda menjadi **kuis interaktif
 - 🔀 **Acak soal & pilihan** — cegah hafalan urutan
 - ⏱️ **Batas waktu per soal** — mode tantangan opsional
 - 📊 **Skor & pembahasan** — lihat nilai akhir plus kunci jawaban tiap soal
-- 🧬 **Bank soal bawaan** — 3 bank siap main satu klik: 75 soal Protein, 85 soal Karbohidrat, & 90 soal Bioenergetika/Siklus Krebs/Fosforilasi Oksidatif
+- 🧬 **Bank soal bawaan** — 4 bank siap main satu klik: 75 soal Protein, 85 soal Karbohidrat, 90 soal Bioenergetika/Siklus Krebs/Fosforilasi Oksidatif, & 100 soal Metabolisme Lipid
 - 🔊 **Backsound & efek suara** — musik latar lembut plus bunyi benar/salah/selesai (Web Audio, tanpa file eksternal, bisa dimatikan)
 - 🎉 **Efek konfeti** — perayaan saat nilaimu tinggi
 - 💾 **Tersimpan otomatis** — soal & pengaturan disimpan di browser (localStorage)
