@@ -379,7 +379,8 @@
 
         <div class="row">
           <button class="btn primary" id="parseBtn">⚡ Ubah Jadi Kuis</button>
-          <button class="btn" id="bankBtn">🧬 Bank Soal Protein (75)</button>
+          <button class="btn" id="bankBtn">🧬 Bank Protein (75)</button>
+          <button class="btn" id="bankBtn2">🍞 Bank Karbohidrat (85)</button>
           <button class="btn" id="sampleBtn">📄 Isi Contoh</button>
           <button class="btn warn" id="clearBtn">🗑️ Bersihkan</button>
         </div>
@@ -864,8 +865,103 @@ Catatan:
     ).join('\n\n');
   }
 
+  // Bank soal bawaan #2: Struktur, Fungsi & Metabolisme Karbohidrat (Bagian I, 85 butir)
+  const BANK2 = [
+    ['Secara kimia, karbohidrat didefinisikan sebagai:', ['Polihidroksi alkohol','Polihidroksi aldehida atau keton','Polihidroksi asam karboksilat','Polimer asam amino','Ester asam lemak dengan gliserol'], 1],
+    ['Kata "saccharide" berasal dari bahasa Yunani sakcharon yang berarti:', ['Manis','Energi','Gula','Pati','Serat'], 2],
+    ['Rumus umum monosakarida adalah:', ['CnH2nOn','Cn(H2O)n','CnH2nO','C6H12O6 saja','Cn(HO)2n'], 1],
+    ['Karbohidrat disintesis dari CO₂ dan H₂O melalui proses:', ['Respirasi seluler','Glikolisis','Fermentasi','Fotosintesis','Glukoneogenesis'], 3],
+    ['Gula pentosa yang menjadi kerangka struktural DNA adalah:', ['Ribosa','Deoksiribosa','Xilosa','Arabinosa','Ribulosa'], 1],
+    ['Karbohidrat yang tersusun dari lebih dari 10 unit monosakarida disebut:', ['Monosakarida','Disakarida','Oligosakarida','Polisakarida','Glikosida'], 3],
+    ['Monosakarida terkecil memiliki jumlah atom karbon:', ['2','3','4','5','6'], 1],
+    ['Dihidroksiaseton digolongkan sebagai ketosa karena mengandung gugus:', ['Aldehid','Keton','Karboksil','Amino','Sulfat'], 1],
+    ['Monosakarida dengan jumlah karbon n = 5 disebut:', ['Triosa','Tetrosa','Pentosa','Heksosa','Heptosa'], 2],
+    ['Monosakarida dengan n = 7 disebut:', ['Pentosa','Heksosa','Heptosa','Oktosa','Tetrosa'], 2],
+    ['Dalam proyeksi Fischer, atom yang terikat pada karbon asimetris melalui ikatan horizontal berada:', ['Di belakang bidang halaman','Di depan bidang halaman','Sejajar bidang halaman','Tegak lurus ke bawah','Tidak dapat ditentukan'], 1],
+    ['Penentuan konfigurasi D dan L pada monosakarida didasarkan pada konfigurasi absolut atom karbon asimetris yang:', ['Paling dekat dengan gugus aldehid/keto','Terjauh dari gugus aldehid atau keto','Berada di tengah rantai','Mengikat gugus CH₂OH pertama','Mengikat dua gugus hidroksil'], 1],
+    ['Dua molekul yang merupakan bayangan cermin satu sama lain dan tidak dapat ditumpangtindihkan disebut:', ['Epimer','Anomer','Enansiomer','Isomer struktural','Tautomer'], 2],
+    ['Penamaan D dan L pada gula juga berkaitan dengan kemampuannya:', ['Larut dalam air','Memutar bidang polarisasi cahaya','Mereduksi ion logam','Membentuk ikatan glikosidik','Mengalami hidrolisis'], 1],
+    ['Monosakarida utama yang terdapat dalam darah dan menjadi sumber ATP dalam respirasi seluler adalah:', ['Fruktosa','Galaktosa','Glukosa','Manosa','Ribosa'], 2],
+    ['Gula yang banyak terdapat dalam madu dan buah-buahan serta merupakan hasil hidrolisis sukrosa adalah:', ['Glukosa','Fruktosa','Galaktosa','Laktosa','Maltosa'], 1],
+    ['Galaktosa dikenal sebagai gula susu karena merupakan bagian dari:', ['Sukrosa','Maltosa','Laktosa','Selulosa','Glikogen'], 2],
+    ['Monosakarida yang merupakan konstituen asam ribonukleat (RNA) adalah:', ['D-Ribosa','2-D-Deoksiribosa','D-Xilosa','L-Arabinosa','D-Manosa'], 0],
+    ['Monosakarida yang banyak ditemukan pada material berkayu (woody materials) dan menjadi konstituen polisakarida tumbuhan adalah:', ['D-Galaktosa','D-Xilosa','D-Manosa','D-Ribosa','D-Fruktosa'], 1],
+    ['D-Sedoheptulosa merupakan intermediat pada:', ['Glikolisis dan siklus Krebs','Siklus Calvin dan jalur pentosa fosfat','Glukoneogenesis','Jalur asam uronat','Glikogenolisis'], 1],
+    ['Ikatan yang menghubungkan antar unit monosakarida disebut:', ['Ikatan peptida','Ikatan ester','Ikatan glikosidik','Ikatan hidrogen','Ikatan disulfida'], 2],
+    ['Ikatan glikosidik terbentuk melalui reaksi:', ['Hidrolisis','Eliminasi air (kondensasi)','Oksidasi','Reduksi','Fosforilasi'], 1],
+    ['Rumus disakarida C₁₂H₂₂O₁₁ diperoleh dari:', ['2 C₆H₁₂O₆ + H₂O','2 C₆H₁₂O₆ − H₂O','C₆H₁₂O₆ + C₆H₁₀O₅','2 C₆H₁₂O₆ − 2 H₂O','C₆H₁₂O₆ × 2'], 1],
+    ['Maltosa tersusun dari:', ['Glukosa + fruktosa, ikatan α1→2','Dua glukosa, ikatan α1→4','Galaktosa + glukosa, ikatan β1→4','Dua galaktosa, ikatan β1→4','Glukosa + manosa, ikatan α1→6'], 1],
+    ['Enzim yang menghidrolisis maltosa adalah:', ['Laktase','Sukrase','Maltase','Amilase','Invertase'], 2],
+    ['Sukrosa tersusun dari glukosa dan fruktosa dengan ikatan:', ['C1α glu – C2β fru','C1β gal – C4 glu','α1→4 glukosidik','β1→4 glukosidik','α1→6 glukosidik'], 0],
+    ['Enzim yang menghidrolisis sukrosa disebut juga:', ['Laktase','Invertase','Maltase','Amilase','Selulase'], 1],
+    ['Laktosa tersusun dari:', ['Dua glukosa','Glukosa dan fruktosa','Galaktosa dan glukosa','Galaktosa dan fruktosa','Manosa dan glukosa'], 2],
+    ['Enzim yang menghidrolisis laktosa dikenal juga sebagai:', ['α-glukosidase','β-galaktosidase','α-amilase','Invertase','Fosforilase'], 1],
+    ['Disakarida yang dikenal sebagai "gula meja" dan diperoleh dari tebu serta bit adalah:', ['Maltosa','Laktosa','Sukrosa','Selobiosa','Trehalosa'], 2],
+    ['Maltosa merupakan hasil hidrolisis dari:', ['Selulosa','Pati','Kitin','Glikogen otot saja','Laktosa'], 1],
+    ['Polisakarida yang tersusun hanya dari satu jenis monomer disebut:', ['Heteropolisakarida','Homopolisakarida','Proteoglikan','Glikoprotein','Oligosakarida'], 1],
+    ['Bentuk pati yang tidak bercabang dan tersusun dari residu glukosa dengan ikatan α-1,4 adalah:', ['Amilopektin','Amilosa','Glikogen','Selulosa','Kitin'], 1],
+    ['Ikatan yang membentuk percabangan pada amilopektin dan glikogen adalah:', ['α1→4','α1→6','β1→4','β1→6','α1→2'], 1],
+    ['Dibandingkan amilopektin, glikogen memiliki ciri:', ['Percabangan lebih sedikit dan rantai lebih panjang','Percabangan lebih banyak (tiap ± 8 residu) dan rantai lebih pendek','Tidak bercabang sama sekali','Ikatan β1→4','Monomernya galaktosa'], 1],
+    ['Ikatan antar residu glukosa pada selulosa adalah:', ['α1→4','α1→6','β1→4','β1→6','α1→2'], 2],
+    ['Monomer penyusun kitin adalah:', ['D-glukosa','D-galaktosa','N-asetil-β-D-glukosamin','N-asetil-D-galaktosamin','Asam glukuronat'], 2],
+    ['Kitin terutama menyusun:', ['Dinding sel tumbuhan','Eksoskeleton moluska dan artropoda','Membran sel bakteri','Matriks tulang','Kapsul virus'], 1],
+    ['Enzim yang menghidrolisis pati dengan cepat dan disekresikan oleh kelenjar ludah serta pankreas adalah:', ['β-amilase','α-amilase','Selulase','Glukosidase','Fosforilase'], 1],
+    ['Glikogen disimpan terutama di dalam:', ['Otak dan ginjal','Hati dan otot','Jaringan lemak dan limpa','Pankreas dan usus','Kulit dan paru'], 1],
+    ['Pada setiap residu glukosa selulosa, pita yang terbentuk saling berputar sebesar:', ['45°','90°','120°','180°','360°'], 3],
+    ['Glikosaminoglikan selalu bermuatan negatif karena adanya gugus:', ['Amino dan hidroksil','Karboksilat dan sulfat','Fosfat dan amino','Metil dan asetil','Keton dan aldehid'], 1],
+    ['Yang bukan termasuk glikosaminoglikan utama adalah:', ['Kondroitin sulfat','Keratan sulfat','Heparin','Dermatan sulfat','Amilopektin'], 4],
+    ['Proteoglikan berfungsi sebagai:', ['Pembawa oksigen dalam darah','Pelumas sendi dan komponen struktural jaringan ikat','Katalis reaksi glikolisis','Sumber utama ATP','Reseptor hormon steroid'], 1],
+    ['Hormon glikoprotein yang disekresikan oleh ginjal dan merangsang produksi sel darah merah adalah:', ['Insulin','Glukagon','Eritropoietin','Tiroksin','Epinefrin'], 2],
+    ['Lektin adalah:', ['Karbohidrat yang mengikat lipid','Protein yang mengikat karbohidrat secara spesifik','Enzim pemecah glikogen','Polisakarida struktural bakteri','Hormon pengatur glukosa darah'], 1],
+    ['Fungsi utama lektin pada hewan adalah:', ['Menyimpan energi','Memfasilitasi kontak antar sel','Mengkatalisis fosforilasi glukosa','Membentuk eksoskeleton','Mengangkut oksigen'], 1],
+    ['Enzim yang bertanggung jawab atas pembentukan antigen golongan darah A, B, dan O adalah:', ['Glikosidase','Glikosiltransferase','Fosforilase','Transaminase','Dehidrogenase'], 1],
+    ['Gula yang membedakan antigen A dari antigen O adalah:', ['Fukosa (Fuc)','Galaktosa (Gal)','N-asetilgalaktosamin (GalNAc)','N-asetilglukosamin (GlcNAc)','Manosa'], 2],
+    ['Jalur metabolisme yang berupa sintesis senyawa dan molekul yang lebih besar dan kompleks disebut:', ['Katabolik','Anabolik','Amfibolik','Hidrolitik','Oksidatif'], 1],
+    ['Siklus asam sitrat merupakan contoh jalur:', ['Anabolik murni','Katabolik murni','Amfibolik','Fermentatif','Anaerob'], 2],
+    ['Pencernaan karbohidrat dimulai di:', ['Lambung','Mulut','Duodenum','Ileum','Kolon'], 1],
+    ['Produk kerja amilase saliva terhadap polisakarida adalah:', ['Hanya glukosa','Dekstrin, maltosa, dan sedikit glukosa','Asam amino dan peptida','Asam lemak dan gliserol','Laktosa dan galaktosa'], 1],
+    ['Amilase pankreas menghidrolisis dekstrin menjadi:', ['Maltosa dan glukosa','Sukrosa dan fruktosa','Laktosa dan galaktosa','Selulosa dan pati','Piruvat dan laktat'], 0],
+    ['Karbohidrat yang tidak dapat dicerna manusia dan diekskresikan melalui usus besar adalah:', ['Pati','Glikogen','Selulosa','Maltosa','Sukrosa'], 2],
+    ['Tiga jalur utama pemanfaatan glukosa dalam sel adalah:', ['Glikolisis, β-oksidasi, dan siklus urea','Penyimpanan (glikogen/pati/sukrosa), glikolisis, dan jalur pentosa fosfat','Glikolisis, lipogenesis, dan ketogenesis','Glukoneogenesis, glikogenolisis, dan proteolisis','Fermentasi, respirasi, dan fotosintesis'], 1],
+    ['Glikolisis berlangsung di dalam:', ['Matriks mitokondria','Sitoplasma (sitosol)','Membran dalam mitokondria','Retikulum endoplasma','Nukleus'], 1],
+    ['Jumlah tahapan reaksi glikolisis adalah:', ['5','8','10','12','15'], 2],
+    ['Produk akhir jalur glikolisis adalah:', ['Dua molekul asetil-KoA','Dua molekul piruvat (3 karbon)','Satu molekul laktat','Enam molekul CO₂','Dua molekul oksaloasetat'], 1],
+    ['Pada fase persiapan (preparatory phase, reaksi 1–5) glikolisis:', ['Dihasilkan 4 ATP','Digunakan 2 ATP','Digunakan 2 NADH','Dihasilkan 2 piruvat','Tidak terjadi perubahan energi'], 1],
+    ['Hasil bersih (net) glikolisis per molekul glukosa adalah:', ['2 ATP dan 2 NADH','4 ATP dan 4 NADH','38 ATP','2 ATP dan 4 NADH','1 ATP dan 1 NADH'], 0],
+    ['Enzim yang mengkatalisis reaksi pertama glikolisis adalah:', ['Fosfofruktokinase','Heksokinase','Aldolase','Enolase','Piruvat kinase'], 1],
+    ['Heksokinase dihambat oleh kadar tinggi:', ['ATP','AMP','Glukosa-6-fosfat','Fruktosa-1,6-bisfosfat','Asetil-KoA'], 2],
+    ['Enzim alosterik pada glikolisis yang dihambat oleh ATP tinggi dan diaktivasi oleh ADP serta AMP tinggi adalah:', ['Heksokinase','Fosfofruktokinase','Piruvat kinase','Fosfogliserat mutase','Triosa fosfat isomerase'], 1],
+    ['Piruvat kinase dihambat ketika kadar tinggi:', ['ADP dan AMP','ATP atau asetil-KoA','Glukosa-6-fosfat','NAD⁺','Fosfat anorganik'], 1],
+    ['Enzim aldolase memecah fruktosa-1,6-bisfosfat menjadi:', ['Dua molekul gliseraldehid-3-fosfat','Gliseraldehid-3-fosfat dan dihidroksiaseton fosfat','Piruvat dan laktat','Glukosa dan fruktosa','Dua molekul 1,3-bisfosfogliserat'], 1],
+    ['Enzim yang mengubah dihidroksiaseton fosfat menjadi gliseraldehid-3-fosfat adalah:', ['Aldolase','Triosa fosfat isomerase','Fosfoheksosa isomerase','Enolase','Fosfogliserat mutase'], 1],
+    ['Reaksi glikolisis yang menghasilkan NADH dikatalisis oleh:', ['Piruvat kinase','Fosfogliserat kinase','Gliseraldehid-3-fosfat dehidrogenase','Enolase','Heksokinase'], 2],
+    ['Enzim enolase mengubah 2-fosfogliserat menjadi fosfoenolpiruvat dengan melepaskan:', ['CO₂','H₂O','NADH','ATP','Fosfat anorganik'], 1],
+    ['Pembentukan ATP pada reaksi 7 dan 10 glikolisis merupakan contoh:', ['Fosforilasi oksidatif','Fotofosforilasi','Fosforilasi tingkat substrat','Fosforilasi alosterik','Transfosforilasi'], 2],
+    ['Galaktosa memasuki jalur glikolisis pada titik:', ['Glukosa-6-fosfat','Fruktosa-6-fosfat','Fruktosa-1,6-bisfosfat','Gliseraldehid-3-fosfat','Piruvat'], 0],
+    ['Fruktosa di jaringan adiposa memasuki glikolisis sebagai:', ['Glukosa-6-fosfat','Fruktosa-6-fosfat','DHAP','1,3-bisfosfogliserat','Oksaloasetat'], 1],
+    ['Dalam kondisi aerob, piruvat akan mengalami:', ['Reduksi menjadi laktat','Dekarboksilasi menjadi asetil-KoA dan CO₂','Karboksilasi menjadi oksaloasetat oleh laktat dehidrogenase','Konversi menjadi etanol','Fosforilasi menjadi PEP'], 1],
+    ['Dalam kondisi anaerob, piruvat diubah menjadi laktat oleh enzim:', ['Piruvat dekarboksilase','Laktat dehidrogenase','Alkohol dehidrogenase','Piruvat karboksilase','Piruvat kinase'], 1],
+    ['Tujuan utama reduksi piruvat menjadi laktat pada kondisi anaerob adalah:', ['Menghasilkan ATP tambahan','Mengoksidasi NADH kembali menjadi NAD⁺ agar glikolisis berlanjut','Menghasilkan CO₂','Menyimpan energi dalam bentuk lemak','Membentuk asetil-KoA'], 1],
+    ['Enzim yang mengkatalisis dekarboksilasi piruvat pada fermentasi alkohol dan membutuhkan koenzim tiamin pirofosfat adalah:', ['Alkohol dehidrogenase','Piruvat dekarboksilase','Laktat dehidrogenase','Piruvat karboksilase','Aldolase'], 1],
+    ['Jaringan yang sangat tergantung pada keadaan aerob sehingga berbahaya bila terjadi iskemia adalah:', ['Otot rangka','Otot jantung','Eritrosit','Jaringan lemak','Kulit'], 1],
+    ['Pada sel kanker, proses glikolisis berlangsung lebih cepat daripada kebutuhan siklus asam sitrat sehingga terjadi:', ['Penumpukan asetil-KoA','Pembentukan laktat berlebihan','Defisiensi NADPH','Penurunan konsumsi glukosa','Peningkatan glukoneogenesis'], 1],
+    ['Glikogenesis diaktivasi oleh hormon:', ['Glukagon','Epinefrin','Insulin','Kortisol','Tiroksin'], 2],
+    ['Bentuk glukosa aktif yang digunakan untuk sintesis glikogen adalah:', ['Glukosa-6-fosfat','Glukosa-1-fosfat','UDP-glukosa','ADP-glukosa','Fruktosa-6-fosfat'], 2],
+    ['Enzim yang menambahkan unit glukosa dari UDP-glukosa ke rantai glikogen adalah:', ['Glikogen fosforilase','Glikogen sintase','Fosfoglukomutase','UDPGlc pirofosforilase','Glukokinase'], 1],
+    ['Glikogenolisis di hati diaktivasi oleh glukagon dan di otot oleh epinefrin, serta dihambat oleh:', ['Kortisol','Insulin','Tiroksin','cAMP','Somatostatin'], 1],
+    ['Produk pertama pemecahan glikogen oleh glikogen fosforilase adalah:', ['Glukosa bebas','Glukosa-1-fosfat','Glukosa-6-fosfat','UDP-glukosa','Fruktosa-6-fosfat'], 1],
+    ['Enzim yang mengubah glukosa-1-fosfat menjadi glukosa-6-fosfat adalah:', ['Fosfoglukomutase','Glukokinase','Heksokinase','Glukosa-6-fosfatase','Fosfofruktokinase'], 0],
+    ['Enzim glukosa-6-fosfatase yang memungkinkan pelepasan glukosa bebas ke dalam darah hanya terdapat di:', ['Otot rangka dan otak','Hati dan ginjal','Jaringan lemak dan limpa','Eritrosit dan otot jantung','Semua jaringan tubuh'], 1]
+  ];
+
   $('bankBtn').addEventListener('click', () => {
     soalInput.value = bankToText(BANK);
+    $('parseBtn').click();
+    preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  $('bankBtn2').addEventListener('click', () => {
+    soalInput.value = bankToText(BANK2);
     $('parseBtn').click();
     preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
