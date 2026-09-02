@@ -381,6 +381,7 @@
           <button class="btn primary" id="parseBtn">⚡ Ubah Jadi Kuis</button>
           <button class="btn" id="bankBtn">🧬 Bank Protein (75)</button>
           <button class="btn" id="bankBtn2">🍞 Bank Karbohidrat (85)</button>
+          <button class="btn" id="bankBtn3">🔬 Bank Bioenergetika (90)</button>
           <button class="btn" id="sampleBtn">📄 Isi Contoh</button>
           <button class="btn warn" id="clearBtn">🗑️ Bersihkan</button>
         </div>
@@ -962,6 +963,106 @@ Catatan:
 
   $('bankBtn2').addEventListener('click', () => {
     soalInput.value = bankToText(BANK2);
+    $('parseBtn').click();
+    preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // Bank soal bawaan #3: Bioenergetika, Siklus Krebs & Fosforilasi Oksidatif (90 butir)
+  const BANK3 = [
+    ['Bioenergetika (termodinamika biokimia) adalah ilmu tentang:', ['Perubahan energi yang menyertai reaksi biokimia','Struktur tiga dimensi protein','Laju reaksi enzimatik','Sintesis DNA','Transpor melintasi membran'], 0],
+    ['Sistem biologis pada dasarnya bersifat ... dan menggunakan energi kimia untuk menjalankan proses kehidupan.', ['isobarik','isotermik','isokorik','adiabatik','isotonik'], 1],
+    ['Bentuk malnutrisi akibat habisnya cadangan energi yang disebutkan dalam materi adalah:', ['Kwashiorkor','Marasmus','Obesitas','Anemia','Rakitis'], 1],
+    ['Hormon yang mengontrol laju pembebasan energi (laju metabolik) adalah:', ['Insulin','Hormon tiroid','Glukagon','Kortisol','Adrenalin'], 1],
+    ['Kelebihan simpanan energi menyebabkan ... yang menjadi faktor risiko penyakit kardiovaskular dan DM tipe 2.', ['Marasmus','Obesitas','Hipertiroid','Anemia','Osteoporosis'], 1],
+    ['Dalam suatu sistem, energi bebas adalah:', ['Energi total sistem','Energi yang bermanfaat/dapat melakukan kerja','Energi yang hilang sebagai panas','Energi ikatan kovalen','Energi kinetik molekul'], 1],
+    ['Perubahan energi bebas Gibbs (ΔG) juga dikenal sebagai:', ['Entalpi','Entropi','Potensial kimia','Energi aktivasi','Kalor jenis'], 2],
+    ['Hukum pertama termodinamika menyatakan bahwa energi total suatu sistem (termasuk sekitarnya):', ['Selalu meningkat','Selalu menurun','Tetap konstan','Menjadi nol','Berubah acak'], 2],
+    ['Hukum kedua termodinamika menyatakan bahwa jika suatu proses terjadi spontan, maka ... total sistem pasti meningkat.', ['Entalpi','Entropi','Energi bebas','Suhu','Tekanan'], 1],
+    ['Entropi adalah:', ['Jumlah energi bermanfaat','Tingkat kekacauan atau ketidakteraturan sistem','Panas yang dilepas','Potensial redoks','Energi aktivasi'], 1],
+    ['Entropi menjadi maksimal ketika sistem:', ['Baru mulai bereaksi','Mendekati keseimbangan','Membeku','Kehilangan semua energi','Dipanaskan'], 1],
+    ['Persamaan yang menggabungkan kedua hukum termodinamika adalah:', ['ΔG = ΔH + TΔS','ΔG = ΔH − TΔS','ΔG = TΔS − ΔH','ΔG = ΔH × TΔS','ΔG = ΔS − TΔH'], 1],
+    ['Dalam persamaan ΔG = ΔH − TΔS, ΔH menyatakan:', ['Perubahan entropi','Perubahan entalpi (panas)','Suhu mutlak','Energi bebas','Potensial redoks'], 1],
+    ['Jika ΔG bernilai negatif, reaksi berlangsung:', ['Spontan dan bersifat eksergonik','Tidak spontan dan endergonik','Seimbang','Irreversibel dan endergonik','Spontan dan endergonik'], 0],
+    ['Jika ΔG bernilai positif, reaksi bersifat ... dan hanya berjalan bila memperoleh energi bebas.', ['Eksergonik','Endergonik','Spontan','Isotermik','Katabolik'], 1],
+    ['Jika ΔG bernilai nol, sistem berada dalam keadaan:', ['Eksergonik','Endergonik','Seimbang (equilibrium)','Irreversibel','Spontan'], 2],
+    ['Jika ΔG berukuran besar, reaksi berjalan menuju penyelesaian dan bersifat:', ['Reversibel','Irreversibel','Seimbang','Endergonik','Isotermik'], 1],
+    ['Suatu proses endergonik dapat berlangsung dengan cara:', ['Berdiri sendiri','Digabungkan (coupling) dengan proses eksergonik','Menurunkan suhu','Meningkatkan entropi saja','Melepas panas'], 1],
+    ['Reaksi eksergonik (penguraian/oksidasi molekul bahan bakar) secara umum disebut:', ['Anabolisme','Katabolisme','Glukoneogenesis','Lipogenesis','Transaminasi'], 1],
+    ['Reaksi sintesis yang membentuk zat disebut:', ['Katabolisme','Anabolisme','Oksidasi','Hidrolisis','Fermentasi'], 1],
+    ['Zat antara (pembawa) berenergi-tinggi yang utama di dalam sel hidup adalah:', ['ADP','AMP','ATP','GTP','NADH'], 2],
+    ['ATP adalah nukleotida yang terdiri dari adenosin (adenin + ribosa) dan ... gugus fosfat.', ['satu','dua','tiga','empat','lima'], 2],
+    ['Dalam reaksi di dalam sel, ATP berfungsi sebagai kompleks dengan ion:', ['Ca²⁺','Na⁺','Mg²⁺','K⁺','Fe²⁺'], 2],
+    ['ATP mengandung ... gugus fosfat berenergi tinggi.', ['satu','dua','tiga','empat','nol'], 1],
+    ['ADP mengandung ... gugus fosfat berenergi tinggi.', ['nol','satu','dua','tiga','empat'], 1],
+    ['Fosfat dalam AMP tergolong berenergi rendah karena merupakan:', ['Ikatan anhidrida','Ikatan ester normal','Ikatan glikosidik','Ikatan peptida','Ikatan hidrogen'], 1],
+    ['Siklus ATP/ADP menghubungkan proses yang menghasilkan ~P dengan proses yang:', ['Menyimpan lemak','Menggunakan ~P','Membentuk DNA','Memecah protein','Mengangkut oksigen'], 1],
+    ['Kompartemen ATP/ADP total sangat kecil sehingga hanya cukup mempertahankan jaringan aktif selama:', ['Beberapa jam','Beberapa menit','Beberapa detik','Beberapa hari','Seminggu'], 2],
+    ['Sumber ~P yang secara kuantitatif terbanyak dalam organisme aerobik adalah:', ['Glikolisis','Siklus asam sitrat','Fosforilasi oksidatif','Fermentasi','Fotosintesis'], 2],
+    ['Pada fosforilasi oksidatif, ATP dihasilkan di ... seketika O₂ direduksi menjadi H₂O.', ['Sitosol','Matriks mitokondria','Retikulum endoplasma','Nukleus','Membran plasma'], 1],
+    ['Glikolisis menghasilkan pembentukan netto ... ~P per molekul glukosa.', ['satu','dua','tiga','empat','enam'], 1],
+    ['Dua reaksi glikolisis penghasil ~P dikatalisis oleh fosfogliserat kinase dan:', ['Heksokinase','Piruvat kinase','Aldolase','Enolase','Fosfofruktokinase'], 1],
+    ['Dalam siklus asam sitrat, satu ~P dihasilkan langsung pada tahap:', ['Sitrat sintase','Akonitase','Suksinil tiokinase','Fumarase','Malat dehidrogenase'], 2],
+    ['Fosfagen berfungsi sebagai ... fosfat berenergi tinggi.', ['Bentuk pengangkut','Bentuk simpanan','Bentuk pembuangan','Katalisator','Akseptor elektron'], 1],
+    ['Fosfagen yang terdapat di otot rangka, jantung, spermatozoa, dan otak vertebrata adalah:', ['Arginin fosfat','Kreatin fosfat','Glukosa-6-fosfat','Fosfoenolpiruvat','AMP'], 1],
+    ['Fosfagen yang terdapat pada otot invertebrata adalah:', ['Kreatin fosfat','Arginin fosfat','Kreatinin','Karbamil fosfat','ATP'], 1],
+    ['Enzim adenilil kinase memungkinkan AMP diperoleh kembali menjadi ADP melalui:', ['Hidrolisis','Refosforilasi','Oksidasi','Deaminasi','Transaminasi'], 1],
+    ['Peningkatan AMP saat ATP berkurang memungkinkan AMP menjadi sinyal metabolik (alosterik) untuk:', ['Menghambat semua reaksi','Meningkatkan laju reaksi katabolik','Menurunkan produksi ATP','Menghentikan glikolisis','Memecah protein'], 1],
+    ['ATP disebut sebagai ... sel yang memindahkan energi bebas dari zat berpotensi tinggi ke zat berpotensi rendah.', ['"pabrik energi"','"alat tukar energi (energy currency)"','"gudang lemak"','"pembawa oksigen"','"cetak biru genetik"'], 1],
+    ['Secara kimiawi, oksidasi didefinisikan sebagai:', ['Penambahan elektron','Pengeluaran elektron','Penambahan proton','Pengeluaran air','Penambahan oksigen saja'], 1],
+    ['Reduksi didefinisikan sebagai:', ['Pengeluaran elektron','Penambahan elektron','Pengeluaran proton','Penambahan oksigen','Pengeluaran hidrogen'], 1],
+    ['Respirasi adalah proses sel memperoleh energi (ATP) dari reaksi terkendali ... dengan oksigen membentuk air.', ['karbon','hidrogen','nitrogen','sulfur','fosfor'], 1],
+    ['Potensial redoks untuk sistem biologis (E′₀) biasanya dinyatakan pada pH:', ['0,0','4,0','7,0','10,0','14,0'], 2],
+    ['Pada sistem biologis (pH 7,0), potensial elektroda hidrogen sebesar:', ['0,0 volt','−0,42 volt','+0,42 volt','+1,1 volt','−1,1 volt'], 1],
+    ['Enzim yang berperan dalam oksidasi dan reduksi disebut:', ['Transferase','Oksidoreduktase','Hidrolase','Liase','Isomerase'], 1],
+    ['Oksidoreduktase diklasifikasikan menjadi empat kelompok: oksidase, dehidrogenase, hidroperoksidase, dan:', ['Transaminase','Oksigenase','Kinase','Fosfatase','Sintase'], 1],
+    ['Oksidase menggunakan ... sebagai akseptor hidrogen.', ['NAD⁺','FAD','Oksigen','Air','Hidrogen peroksida'], 2],
+    ['Produk reaksi oksidase adalah air atau:', ['Karbon dioksida','Hidrogen peroksida','Amonia','Metana','Asam laktat'], 1],
+    ['Sitokrom oksidase adalah komponen terminal rantai respiratorik yang memindahkan elektron ke akseptor akhir, yaitu:', ['NAD⁺','Koenzim Q','Oksigen','Sitokrom c','Air'], 2],
+    ['Enzim flavoprotein mengandung gugus prostetik:', ['NAD⁺ atau NADP⁺','FMN atau FAD','Heme','Biotin','Tiamin pirofosfat'], 1],
+    ['FMN dan FAD dibentuk dalam tubuh dari vitamin:', ['Niasin','Riboflavin','Tiamin','Asam pantotenat','Piridoksin'], 1],
+    ['Xantin oksidase (mengandung molibdenum) berperan mengubah basa purin menjadi:', ['Urea','Asam urat','Amonia','Kreatinin','Bilirubin'], 1],
+    ['Dehidrogenase ... sebagai akseptor hidrogen.', ['Selalu menggunakan oksigen','Tidak dapat menggunakan oksigen','Hanya menggunakan air','Menggunakan CO₂','Menggunakan hidrogen peroksida'], 1],
+    ['Banyak dehidrogenase menggunakan koenzim nikotinamid (NAD⁺/NADP⁺) yang dibentuk dari vitamin:', ['Riboflavin','Niasin','Tiamin','Biotin','Asam folat'], 1],
+    ['Dalam reaksi, FAD menerima ... membentuk FADH₂.', ['1 elektron dan 1 H⁺','2 elektron dan 2 H⁺','4 elektron','2 H⁺ saja','1 elektron saja'], 1],
+    ['Dua jenis enzim yang termasuk hidroperoksidase adalah peroksidase dan:', ['Oksidase','Katalase','Dehidrogenase','Oksigenase','Sitokrom'], 1],
+    ['Hidroperoksidase berperan penting melindungi tubuh terhadap efek berbahaya dari:', ['Asam laktat','Spesies oksigen reaktif (ROS)','Amonia','Radikal karbon','Ion logam'], 1],
+    ['Katalase menggunakan hidrogen peroksida sebagai:', ['Hanya donor elektron','Hanya akseptor elektron','Donor sekaligus akseptor elektron','Substrat oksigenase','Koenzim'], 2],
+    ['Oksigenase mengatalisis pemindahan langsung dan penggabungan ... ke dalam molekul substrat.', ['Hidrogen','Oksigen','Elektron','Proton','Air'], 1],
+    ['Dioksigenase menggabungkan ... atom oksigen molekular ke dalam substrat.', ['satu','kedua (dua)','tiga','empat','nol'], 1],
+    ['Monooksigenase (hidroksilase) hanya memasukkan ... atom oksigen molekular ke dalam substrat.', ['satu','dua','tiga','empat','nol'], 0],
+    ['Menurut ringkasan, oksigenase memerantarai ... obat dan steroid.', ['Oksidasi sempurna','Hidroksilasi','Reduksi','Fosforilasi','Deaminasi'], 1],
+    ['Nama lain siklus asam sitrat adalah siklus Krebs atau siklus:', ['Asam dikarboksilat','Asam trikarboksilat','Asam monokarboksilat','Pentosa fosfat','Glioksilat'], 1],
+    ['Siklus asam sitrat berlangsung di:', ['Sitosol','Mitokondria (matriks)','Nukleus','Retikulum endoplasma','Lisosom'], 1],
+    ['Siklus asam sitrat mengoksidasi gugus asetil pada asetil-KoA menjadi:', ['H₂O','CO₂','Laktat','Etanol','Glukosa'], 1],
+    ['Siklus asam sitrat adalah jalur bersama terakhir untuk oksidasi:', ['Hanya karbohidrat','Hanya lipid','Karbohidrat, lipid, dan protein','Hanya protein','Asam nukleat'], 2],
+    ['Metabolit akhir bersama karbohidrat, lipid, dan protein yang masuk ke siklus adalah:', ['Piruvat','Asetil-KoA','Oksaloasetat','Sitrat','Laktat'], 1],
+    ['Dalam siklus, asetil-KoA bereaksi dengan ... untuk membentuk sitrat.', ['Malat','Oksaloasetat','Fumarat','Suksinat','α-ketoglutarat'], 1],
+    ['Satu putaran siklus asam sitrat menghasilkan ... ATP.', ['dua','empat','sepuluh','dua belas','tiga puluh delapan'], 2],
+    ['Per satu putaran siklus (per asetil-KoA) dihasilkan:', ['1 NADH dan 1 FADH₂','3 NADH dan 1 FADH₂','2 NADH dan 2 FADH₂','4 NADH saja','3 FADH₂ dan 1 NADH'], 1],
+    ['Setiap molekul NADH menghasilkan sekitar ... ATP.', ['1,5','2,5','3,0','4,0','10'], 1],
+    ['Setiap FADH₂ menghasilkan sekitar ... ATP.', ['1,0','1,5','2,5','3,0','4,0'], 1],
+    ['Dalam siklus, 1 ATP (atau GTP) terbentuk melalui fosforilasi tingkat-substrat yang dikatalisis oleh:', ['Sitrat sintase','Akonitase','Suksinat tiokinase','Fumarase','Isositrat dehidrogenase'], 2],
+    ['Empat vitamin B esensial dalam siklus asam sitrat adalah riboflavin, niasin, tiamin, dan:', ['Biotin','Asam pantotenat','Asam folat','Piridoksin','Kobalamin'], 1],
+    ['Riboflavin (dalam bentuk FAD) merupakan kofaktor untuk enzim:', ['Isositrat dehidrogenase','Suksinat dehidrogenase','Malat dehidrogenase','Sitrat sintase','Akonitase'], 1],
+    ['Tiamin (tiamin difosfat) menjadi koenzim untuk dekarboksilasi pada reaksi:', ['Isositrat dehidrogenase','α-ketoglutarat dehidrogenase','Malat dehidrogenase','Suksinat dehidrogenase','Fumarase'], 1],
+    ['Asam pantotenat berperan sebagai bagian dari:', ['FAD','NAD','Koenzim A','Tiamin difosfat','Biotin'], 2],
+    ['Siklus asam sitrat bersifat amfibolik karena:', ['Hanya menghasilkan ATP','Berperan dalam oksidasi sekaligus penyediaan bahan untuk sintesis (glukoneogenesis, sintesis asam lemak, interkonversi asam amino)','Hanya memecah lemak','Hanya terjadi di sitosol','Tidak memerlukan oksigen'], 1],
+    ['Sebagian besar fosforilasi oksidatif berlangsung di mitokondria yang disebut sebagai ... sel.', ['"dapur"','"powerhouse" (pabrik energi)','"otak"','"gudang"','"pos jaga"'], 1],
+    ['Membran mitokondria yang bersifat permeabel selektif adalah membran:', ['Luar','Dalam','Tengah','Krista luar','Plasma'], 1],
+    ['Rantai respiratorik, selain mengoksidasi ekuivalen pereduksi, juga bertindak sebagai:', ['Pompa natrium','Pompa proton','Pompa kalsium','Saluran klorida','Reseptor hormon'], 1],
+    ['Komponen rantai respiratorik terkandung dalam ... kompleks protein besar pada membran dalam mitokondria.', ['dua','tiga','empat','lima','enam'], 2],
+    ['Elektron mengalir melalui rantai respiratorik pada potensial redoks ... dari NAD⁺/NADH ke O₂/2H₂O.', ['0,42 V','1,1 V','2,5 V','0,0 V','7,0 V'], 1],
+    ['Teori kemiosmotik yang menjelaskan penggandengan transpor elektron dengan pembentukan ATP dikemukakan oleh:', ['Hans Krebs (1937)','Peter Mitchell (1961)','Otto Warburg (1931)','Albert Lehninger (1950)','Fritz Lipmann (1941)'], 1],
+    ['Kompleks I rantai respiratorik disebut ... tempat elektron dipindahkan dari NADH ke koenzim Q.', ['Suksinat-Q reduktase','NADH-Q oksidoreduktase','Sitokrom c oksidase','ATP sintase','Q-sitokrom c oksidoreduktase'], 1],
+    ['Koenzim Q pada rantai respiratorik disebut juga:', ['Sitokrom c','Ubikuinon','Flavin','Heme','Plastokuinon'], 1],
+    ['Kompleks yang menuntaskan rantai dengan memindahkan elektron ke O₂ (membentuk H₂O) adalah:', ['Kompleks I','Kompleks II','Kompleks III','Sitokrom c oksidase (Kompleks IV)','ATP sintase'], 3],
+    ['Substrat seperti suksinat menyalurkan elektron ke Q melalui ... (bukan Kompleks I).', ['Kompleks I','Suksinat-Q reduktase (Kompleks II)','Kompleks III','Kompleks IV','ATP sintase'], 1],
+    ['Kompleks rantai respiratorik yang bekerja sebagai pompa proton adalah:', ['Kompleks I dan II','Kompleks II dan III','Kompleks I, III, dan IV','Hanya Kompleks IV','Semua kompleks I–IV'], 2],
+    ['ATP sintase di membran dalam mitokondria berfungsi sebagai:', ['Pompa natrium','Motor pemutar untuk membentuk ATP','Enzim pemecah ATP','Kanal proton pasif saja','Reseptor ADP'], 1]
+  ];
+
+  $('bankBtn3').addEventListener('click', () => {
+    soalInput.value = bankToText(BANK3);
     $('parseBtn').click();
     preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
