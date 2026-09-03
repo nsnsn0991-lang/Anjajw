@@ -383,6 +383,7 @@
           <button class="btn" id="bankBtn2">🍞 Bank Karbohidrat (85)</button>
           <button class="btn" id="bankBtn3">🔬 Bank Bioenergetika (90)</button>
           <button class="btn" id="bankBtn4">🧈 Bank Lipid (100)</button>
+          <button class="btn" id="bankBtn5">💧 Bank Pondasi Biokimia (100)</button>
           <button class="btn" id="sampleBtn">📄 Isi Contoh</button>
           <button class="btn warn" id="clearBtn">🗑️ Bersihkan</button>
         </div>
@@ -1174,6 +1175,116 @@ Catatan:
 
   $('bankBtn4').addEventListener('click', () => {
     soalInput.value = bankToText(BANK4);
+    $('parseBtn').click();
+    preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // Bank soal bawaan #5: Pondasi Biokimiawi (100 butir)
+  const BANK5 = [
+    ['Biokimia adalah ilmu yang mempelajari:', ['Hanya struktur tulang manusia','Hubungan molekul dalam sel hidup, reaksi kimianya, dan regulasi proses metabolik','Pergerakan benda mati','Klasifikasi hewan'], 1],
+    ['Biokimia disebut bahasa dasar semua ilmu biologi karena:', ['Kehidupan bergantung pada reaksi biokimia','Mudah dipelajari','Tidak membutuhkan alat','Hanya berupa teori'], 0],
+    ['Komponen terbesar makhluk hidup ditempati oleh:', ['Protein','Air','Lipid','Karbohidrat'], 1],
+    ['Selain air, makhluk hidup tersusun atas senyawa:', ['Organik saja','Anorganik saja','Organik dan anorganik','Logam saja'], 2],
+    ['Berikut adalah gugus fungsi pada senyawa organik, KECUALI:', ['Metil (-CH₃)','Hidroksil (-OH)','Karboksil (-COOH)','Natrium (-Na)'], 3],
+    ['Gugus fungsi -CH₃ disebut:', ['Metil','Hidroksil','Karboksil','Amino'], 0],
+    ['Gugus fungsi -OH disebut:', ['Metil','Hidroksil','Karboksil','Amino'], 1],
+    ['Gugus fungsi -COOH disebut:', ['Metil','Hidroksil','Karboksil','Amino'], 2],
+    ['Gugus fungsi -NH₂ disebut:', ['Metil','Hidroksil','Karboksil','Amino'], 3],
+    ['Contoh ikatan kimia yang menghubungkan gugus pada senyawa organik adalah:', ['Ester dan fosfomonoester','Ikatan logam','Ikatan van der Waals saja','Ikatan ionik saja'], 0],
+    ['Tujuan umum pembelajaran ini adalah memahami pondasi dasar yang menopang fungsi:', ['Tumbuhan','Sel, jaringan, dan organ manusia','Bakteri','Virus'], 1],
+    ['Berikut termasuk tujuan khusus pembelajaran, KECUALI:', ['Menjelaskan komponen anorganik tubuh','Menjelaskan struktur dan sifat air','Menjelaskan konsep asam, basa, dan pH','Menjelaskan teknik kloning DNA'], 3],
+    ['Unsur utama penyusun dasar molekul makhluk hidup adalah:', ['C, H, O, dan N','Na, K, Ca, dan Cl','Fe, Zn, Cu, dan Mg','Au, Ag, Pt, dan Pb'], 0],
+    ['Unsur utama C, H, O, N menyusun sekitar ... dari tubuh.', ['50%','75%','99,4%','25%'], 2],
+    ['Sisa penyusun tubuh selain unsur utama merupakan:', ['Air','Lemak','Mineral dalam bentuk kation dan anion','Protein'], 2],
+    ['Berikut termasuk kation utama makhluk hidup, KECUALI:', ['Na','K','Ca','Cl'], 3],
+    ['Kation utama makhluk hidup adalah Na, K, Ca, Mg, dan:', ['Fe','Cl','SO₄','PO₄'], 0],
+    ['Selain kation utama, berikut termasuk kation lain pada tubuh:', ['Zn dan Cu','Cl dan SO₄','HCO₃ dan PO₄','H₂PO₄ dan Cl'], 0],
+    ['Berikut termasuk anion tubuh, KECUALI:', ['Cl','HCO₃','PO₄','Ca'], 3],
+    ['Kadar anion tubuh dipengaruhi oleh faktor:', ['Makanan, penyakit, dan umur','Hanya suhu','Hanya tekanan','Hanya cahaya'], 0],
+    ['Ca (kalsium) di dalam tubuh berperan sebagai:', ['Kation','Anion','Gugus fungsi','Gas'], 0],
+    ['Cl (klorida) di dalam tubuh berperan sebagai:', ['Kation','Anion','Logam berat','Gas mulia'], 1],
+    ['Kelompok berikut yang semuanya merupakan anion tubuh adalah:', ['Na, K, Ca, Mg','HCO₃, H₂PO₄, SO₄, Cl','Fe, Zn, Cu, Na','Ca, Mg, K, Fe'], 1],
+    ['Pernyataan yang benar tentang unsur di alam adalah:', ['Semua unsur penting bagi makhluk hidup','Tidak semua unsur penting bagi makhluk hidup','Semua unsur bersifat racun','Hanya logam yang penting'], 1],
+    ['Fe (besi) di dalam tubuh tergolong:', ['Kation','Anion','Gas','Gugus fungsi'], 0],
+    ['SO₄ (sulfat) di dalam tubuh tergolong:', ['Kation','Anion','Unsur utama','Gugus metil'], 1],
+    ['Senyawa makromolekul pada makhluk hidup terdiri atas karbohidrat, protein, lipid, dan:', ['Asam nukleat','Air','Mineral','Vitamin'], 0],
+    ['Berikut termasuk makromolekul makhluk hidup, KECUALI:', ['Karbohidrat','Protein','Lipid','Air'], 3],
+    ['Contoh biomolekul dalam bentuk terstruktur adalah:', ['Fosfolipid, protein, dan glikolipid','Glukosa bebas','Ion Na','Air'], 0],
+    ['Biomolekul dalam bentuk tidak berstruktur berfungsi sebagai:', ['Makanan cadangan dan senyawa antara metabolisme','Dinding sel','Pigmen','Enzim tunggal'], 0],
+    ['Fosfolipid dan glikolipid merupakan contoh biomolekul bentuk:', ['Terstruktur','Tidak berstruktur','Anorganik','Gas'], 0],
+    ['Empat golongan makromolekul utama makhluk hidup adalah:', ['Karbohidrat, protein, lipid, asam nukleat','Air, mineral, vitamin, enzim','Na, K, Ca, Fe','Metil, hidroksil, karboksil, amino'], 0],
+    ['Asam nukleat termasuk golongan ... makhluk hidup.', ['Makromolekul','Ion','Gas','Mineral'], 0],
+    ['Senyawa cadangan makanan tergolong biomolekul bentuk:', ['Terstruktur','Tidak berstruktur','Anorganik','Ionik'], 1],
+    ['Komponen kimia utama dalam organisme hidup adalah:', ['Protein','Air','Lipid','Glukosa'], 1],
+    ['Air disebut pelarut biologik ideal karena mampu melarutkan:', ['Hanya komponen organik','Hanya komponen anorganik','Komponen organik dan anorganik','Hanya logam'], 2],
+    ['Berikut termasuk fungsi air dalam tubuh, KECUALI:', ['Mengangkut nutrisi ke sel','Menentukan volume sel','Membuang limbah melalui urine','Menyimpan informasi genetik'], 3],
+    ['Air membuang produk limbah tubuh terutama melalui:', ['Keringat saja','Urine','Napas','Rambut'], 1],
+    ['Air bertindak sebagai pendingin tubuh melalui cara:', ['Buang air besar','Berkeringat','Menggigil','Bernapas cepat'], 1],
+    ['Air menentukan volume sel melalui:', ['Pembekuan','Pengangkutannya masuk dan keluar sel','Penguapan total','Pembakaran'], 1],
+    ['Molekul air membentuk:', ['Ion tunggal','Dipol','Logam','Gas mulia'], 1],
+    ['Struktur molekul air digambarkan sebagai:', ['Garis lurus','Tetrahedron yang agak miring dengan oksigen di tengah','Lingkaran sempurna','Kubus'], 1],
+    ['Pada molekul air, atom yang berada di tengah struktur tetrahedron adalah:', ['Hidrogen','Oksigen','Karbon','Nitrogen'], 1],
+    ['Ikatan hidrogen pada air terbentuk ketika nukleus hidrogen berinteraksi dengan:', ['Inti atom karbon','Pasangan elektron bebas pada atom oksigen lain','Ion natrium','Gugus metil'], 1],
+    ['Dalam air cair, secara rata-rata satu molekul air berikatan hidrogen dengan ... molekul lain.', ['1,5','2,5','3,5','5,0'], 2],
+    ['Ikatan hidrogen memungkinkan air melarutkan biomolekul organik yang mengandung:', ['Logam berat','Gugus fungsional yang dapat membentuk ikatan hidrogen','Gas mulia','Ion tunggal'], 1],
+    ['Atom hidrogen dalam molekul air berikatan dengan oksigen melalui ikatan:', ['Ionik','Kovalen','Logam','Hidrogen'], 1],
+    ['Atom oksigen pada molekul air bersifat ... elektron.', ['Penarik','Pendonor','Netral terhadap','Penolak'], 0],
+    ['Sifat dipol air disebabkan oleh distribusi muatan yang:', ['Merata sempurna','Tidak merata (ada kutub positif dan negatif)','Netral total','Acak'], 1],
+    ['Kemampuan air melarutkan banyak zat menjadikannya:', ['Pelarut biologik ideal','Pigmen','Katalis enzim','Gas'], 0],
+    ['Istilah pH diperkenalkan pada tahun:', ['1889','1909','1929','1961'], 1],
+    ['Istilah pH diperkenalkan oleh:', ['Sorensen','Peter Mitchell','Hans Krebs','Harper'], 0],
+    ['Sorensen mendefinisikan pH sebagai:', ['Log positif konsentrasi ion hidrogen','Log negatif konsentrasi ion hidrogen','Konsentrasi ion OH⁻','Jumlah total proton'], 1],
+    ['Rumus pH adalah:', ['pH = log[H⁺]','pH = −log[H⁺]','pH = [H⁺]','pH = −[OH⁻]'], 1],
+    ['Nilai pH yang rendah sesuai dengan konsentrasi H⁺ yang:', ['Rendah','Tinggi','Nol','Tetap'], 1],
+    ['Nilai pH yang tinggi sesuai dengan konsentrasi H⁺ yang:', ['Tinggi','Rendah','Sangat tinggi','Tak berubah'], 1],
+    ['Menurut definisi, asam adalah:', ['Donor proton','Akseptor proton','Donor elektron','Akseptor elektron'], 0],
+    ['Menurut definisi, basa adalah:', ['Donor proton','Akseptor proton','Donor elektron','Akseptor elektron'], 1],
+    ['pH adalah derajat keasaman yang menyatakan:', ['Suhu larutan','Tingkat keasaman atau kebasaan suatu larutan','Warna larutan','Massa jenis larutan'], 1],
+    ['Semakin tinggi konsentrasi ion H⁺, maka larutan akan semakin:', ['Basa','Asam (pH turun)','Netral','Tidak berubah'], 1],
+    ['Proton yang dimaksud dalam definisi asam-basa adalah ion:', ['OH⁻','H⁺','Na⁺','Cl⁻'], 1],
+    ['Suatu zat yang menerima proton berperan sebagai:', ['Asam','Basa','Garam','Buffer'], 1],
+    ['Suatu zat yang melepaskan proton berperan sebagai:', ['Asam','Basa','Garam','Ion'], 0],
+    ['Hubungan antara pH dan [H⁺] bersifat:', ['Berbanding lurus','Berbanding terbalik (logaritmik negatif)','Tidak berhubungan','Kuadratik'], 1],
+    ['Jika [H⁺] = 1×10⁻³ M, maka pH = ...', ['2','3','4','7'], 1],
+    ['Jika [H⁺] = 1×10⁻⁷ M, maka pH = ...', ['5','6','7','8'], 2],
+    ['Jika [H⁺] = 1×10⁻⁹ M, maka pH = ...', ['7','8','9','10'], 2],
+    ['Jika [H⁺] = 1×10⁻¹ M, maka pH = ...', ['1','2','3','0'], 0],
+    ['Jika [H⁺] = 1×10⁻⁵ M, maka pH = ...', ['3','4','5','6'], 2],
+    ['Jika [H⁺] = 1×10⁻¹¹ M, maka pH = ...', ['9','10','11','12'], 2],
+    ['Larutan dengan pH = 7 bersifat:', ['Asam','Netral','Basa','Garam'], 1],
+    ['Larutan dengan pH = 3 bersifat:', ['Asam','Netral','Basa','Buffer'], 0],
+    ['Larutan dengan pH = 10 bersifat:', ['Asam','Netral','Basa','Tidak dapat ditentukan'], 2],
+    ['Jika [H⁺] = 1×10⁻⁴ M, maka pH = ...', ['3','4','5','6'], 1],
+    ['Jika [H⁺] = 1×10⁻⁸ M, maka pH = ...', ['6','7','8','9'], 2],
+    ['Larutan A memiliki pH 2 dan larutan B memiliki pH 5. Maka:', ['A lebih basa daripada B','A lebih asam daripada B','Keduanya sama','B lebih asam daripada A'], 1],
+    ['Semakin kecil nilai pH suatu larutan, larutan tersebut semakin:', ['Basa','Asam','Netral','Encer'], 1],
+    ['Jika [H⁺] = 1×10⁻¹² M, maka pH = ...', ['10','11','12','13'], 2],
+    ['Larutan dengan [H⁺] = 1×10⁻⁶ M memiliki pH ... dan bersifat ...', ['6 dan asam','6 dan basa','8 dan asam','8 dan basa'], 0],
+    ['Larutan dengan pH lebih besar dari 7 memiliki konsentrasi H⁺ yang ... dibanding larutan netral.', ['Lebih tinggi','Lebih rendah','Sama','Nol'], 1],
+    ['Rentang pH tubuh (darah) yang normal adalah:', ['7,0 – 7,2','7,35 – 7,45','6,8 – 7,0','7,5 – 7,8'], 1],
+    ['Jika pH darah < 7,35 maka kondisi ini disebut:', ['Alkalosis','Asidosis','Normal','Netral'], 1],
+    ['Jika pH darah > 7,45 maka kondisi ini disebut:', ['Asidosis','Alkalosis','Normal','Hipoksia'], 1],
+    ['pH darah 7,40 tergolong:', ['Asidosis','Normal','Alkalosis','Kritis'], 1],
+    ['pH darah 7,30 tergolong:', ['Asidosis','Normal','Alkalosis','Netral'], 0],
+    ['pH darah 7,50 tergolong:', ['Asidosis','Normal','Alkalosis','Netral'], 2],
+    ['pH darah 7,20 tergolong:', ['Asidosis','Normal','Alkalosis','Netral'], 0],
+    ['pH darah 7,48 tergolong:', ['Asidosis','Normal','Alkalosis','Netral'], 2],
+    ['Dalam menjaga keseimbangan asam-basa, kadar H⁺ yang diserap harus ... kadar H⁺ yang dilepaskan.', ['Lebih besar dari','Lebih kecil dari','Setara dengan','Tidak berhubungan dengan'], 2],
+    ['Di dalam tubuh, pH dijaga keseimbangannya secara:', ['Longgar','Ketat','Acak','Berubah-ubah bebas'], 1],
+    ['Kondisi pH darah 7,10 menunjukkan:', ['Alkalosis','Asidosis','Normal','Netral'], 1],
+    ['Kondisi pH darah 7,55 menunjukkan:', ['Asidosis','Alkalosis','Normal','Netral'], 1],
+    ['Pengaturan keseimbangan asam-basa dilakukan melalui pengaturan ion:', ['Natrium','Hidrogen (H⁺)','Kalium','Klorida'], 1],
+    ['Keseimbangan asam-basa tubuh dikoordinasi oleh ... sistem.', ['2','3','4','5'], 1],
+    ['Tiga sistem pengatur keseimbangan asam-basa adalah paru, ginjal, dan:', ['Jantung','Sistem buffer','Hati','Limpa'], 1],
+    ['Sistem yang bereaksi paling cepat (beberapa detik) dalam mengatur asam-basa adalah:', ['Paru','Ginjal','Sistem buffer','Kulit'], 2],
+    ['Sistem buffer bereaksi dalam waktu:', ['Beberapa detik','Beberapa menit sampai jam','Beberapa jam sampai hari','Beberapa minggu'], 0],
+    ['Paru mengatur keseimbangan asam-basa dalam waktu:', ['Beberapa detik','Beberapa menit sampai jam','Beberapa hari','Beberapa minggu'], 1],
+    ['Ginjal mengatur keseimbangan asam-basa dalam waktu:', ['Beberapa detik','Beberapa menit','Beberapa jam sampai beberapa hari','Seketika'], 2],
+    ['Urutan kecepatan reaksi sistem pengatur asam-basa dari tercepat ke terlambat adalah:', ['Ginjal → paru → buffer','Buffer → paru → ginjal','Paru → buffer → ginjal','Ginjal → buffer → paru'], 1]
+  ];
+
+  $('bankBtn5').addEventListener('click', () => {
+    soalInput.value = bankToText(BANK5);
     $('parseBtn').click();
     preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
