@@ -385,6 +385,7 @@
           <button class="btn" id="bankBtn4">🧈 Bank Lipid (100)</button>
           <button class="btn" id="bankBtn5">💧 Bank Pondasi Biokimia (100)</button>
           <button class="btn" id="bankBtn6">🧫 Bank Membran Sel (100)</button>
+          <button class="btn" id="bankBtn6s">🧱 Membran: Struktur (76)</button>
           <button class="btn" id="sampleBtn">📄 Isi Contoh</button>
           <button class="btn warn" id="clearBtn">🗑️ Bersihkan</button>
         </div>
@@ -1396,6 +1397,13 @@ Catatan:
 
   $('bankBtn6').addEventListener('click', () => {
     soalInput.value = bankToText(BANK6);
+    $('parseBtn').click();
+    preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // Membran Sel — hanya bagian struktur (soal 1-76: pengertian, komposisi, struktur & sifat membran)
+  $('bankBtn6s').addEventListener('click', () => {
+    soalInput.value = bankToText(BANK6.slice(0, 76));
     $('parseBtn').click();
     preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
