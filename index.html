@@ -384,6 +384,7 @@
           <button class="btn" id="bankBtn3">🔬 Bank Bioenergetika (90)</button>
           <button class="btn" id="bankBtn4">🧈 Bank Lipid (100)</button>
           <button class="btn" id="bankBtn5">💧 Bank Pondasi Biokimia (100)</button>
+          <button class="btn" id="bankBtn6">🧫 Bank Membran Sel (100)</button>
           <button class="btn" id="sampleBtn">📄 Isi Contoh</button>
           <button class="btn warn" id="clearBtn">🗑️ Bersihkan</button>
         </div>
@@ -1285,6 +1286,116 @@ Catatan:
 
   $('bankBtn5').addEventListener('click', () => {
     soalInput.value = bankToText(BANK5);
+    $('parseBtn').click();
+    preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // Bank soal bawaan #6: Membran Sel (100 butir) — soal & kunci dari pengguna
+  const BANK6 = [
+    ['Membran sel adalah selaput tipis, halus, dan elastis yang…', ['menyusun inti sel','menyelubungi permukaan sel hidup dan memisahkan sitoplasma dari lingkungan luar','hanya ada pada sel tumbuhan','menggantikan dinding sel'], 1],
+    ['Sifat transpor membran sel adalah…', ['bebas','selektif','acak','tidak terbatas'], 1],
+    ['Komponen membran sel yang jumlahnya paling sedikit adalah…', ['lipid','protein','karbohidrat','air'], 2],
+    ['Berikut fungsi membran sel, KECUALI…', ['pembatas mekanik dan kimiawi','transduksi sinyal','sintesis protein pada ribosom bebas','regulasi transpor zat'], 2],
+    ['Fungsi membran menjaga keutuhan bentuk sel disebut…', ['kompartmentalisasi','mempertahankan integritas sel','adhesi','eksositosis'], 1],
+    ['Enzim membran berperan pada proses berikut, KECUALI…', ['biosintesis lipid','metabolisme xenobiotik','fosforilasi oksidatif','replikasi DNA'], 3],
+    ['Pengaturan keluar-masuk zat untuk menjaga homeostasis berlangsung melalui…', ['pori, saluran (channel), dan transporter','ribosom','nukleolus','sentriol'], 0],
+    ['Membran yang membungkus mitokondria dengan susunan berbeda dari membran plasma menunjukkan fungsi…', ['proteksi','kompartmentalisasi sel','adhesi','sekresi'], 1],
+    ['Fungsi membran yang berperan dalam pembentukan jaringan adalah…', ['kontak dengan sel lain','difusi','osmosis','katalisis'], 0],
+    ['Kemampuan membran menerima sekaligus menghasilkan sinyal disebut…', ['endositosis','transduksi sinyal','kompartmentalisasi','permeabilitas'], 1],
+    ['Komposisi utama membran sel adalah…', ['lipid, protein, karbohidrat','lipid, asam nukleat, air','protein, mineral, air','karbohidrat, vitamin, lipid'], 0],
+    ['Komponen yang berperan penting dalam struktur dan sifat dinamis membran adalah…', ['protein','lipid','karbohidrat','mineral'], 1],
+    ['Komponen yang berperan penting dalam fungsi membran adalah…', ['lipid','protein','glikolipid','air'], 1],
+    ['Dominasi lipid atau protein pada suatu membran bergantung pada…', ['usia sel','jenis membran selnya','suhu tubuh','jumlah air'], 1],
+    ['Lipid membran diklasifikasikan berdasarkan…', ['warnanya','strukturnya','beratnya','kelarutannya dalam air'], 1],
+    ['Tiga kelompok besar lipid membran polar adalah…', ['fosfolipid, glikolipid, lipid eter arkhebakteri','trigliserida, kolesterol, protein','asam lemak, gliserol, fosfat','steroid, terpen, vitamin'], 0],
+    ['Lipid utama penyusun membran sel adalah…', ['sfingomielin','kolesterol','gliserofosfolipid','gangliosida'], 2],
+    ['Backbone gliserofosfolipid adalah…', ['sfingosin','gliserol','kolin','inositol'], 1],
+    ['Pada gliserofosfolipid, posisi C1 umumnya ditempati…', ['asam lemak jenuh','asam lemak tak jenuh','gugus fosfat','karbohidrat'], 0],
+    ['Posisi C2 gliserofosfolipid umumnya ditempati…', ['asam lemak jenuh','asam lemak tak jenuh','kolin','gliserol'], 1],
+    ['Yang menentukan nama dan jenis gliserofosfolipid adalah…', ['panjang rantai asam lemak','gugus fungsional (R)','jumlah karbon gliserol','suhu'], 1],
+    ['Sifat amfipatik berarti molekul memiliki…', ['dua ekor jenuh','bagian hidrofilik dan hidrofobik sekaligus','muatan netral','dua gugus fosfat'], 1],
+    ['Gliserofosfolipid dengan gugus X berupa kolin disebut…', ['fosfatidilserin','fosfatidilkolin','fosfatidiletanolamin','kardiolipin'], 1],
+    ['Gliserofosfolipid dengan gugus X berupa serin disebut…', ['fosfatidilserin','fosfatidilinositol','asam fosfatidat','sfingomielin'], 0],
+    ['Gugus X pada kardiolipin adalah…', ['kolin','etanolamin','fosfatidilgliserol','glukosa'], 2],
+    ['Gliserofosfolipid tanpa gugus X (X = —H) disebut…', ['asam fosfatidat','seramida','sfingomielin','gangliosida'], 0],
+    ['Backbone sfingolipid adalah…', ['gliserol','kolesterol','sfingosin, suatu amino alkohol','asam fosfatidat'], 2],
+    ['Perbedaan utama sfingolipid dengan gliserofosfolipid terletak pada…', ['sifat amfipatiknya','backbone-nya','jumlah ekornya','muatannya'], 1],
+    ['Sfingolipid dengan gugus X fosfokolin adalah…', ['seramida','sfingomielin','glukosilserebrosida','gangliosida GM2'], 1],
+    ['Sfingolipid yang menjadi penyusun utama membran sel saraf (myelin) adalah…', ['gangliosida','sfingomielin','laktosilseramida','kardiolipin'], 1],
+    ['Kolesterol merupakan lipid utama ke- … di dalam membran.', ['pertama','kedua','ketiga','keempat'], 2],
+    ['Daerah polar kolesterol terletak pada…', ['C-3 (gugus hidroksil)','C-17','cincin B','rantai alkil'], 0],
+    ['Daerah non-polar kolesterol berada pada…', ['gugus hidroksil','gugus samping hidrokarbon (C-17)','cincin A','gugus fosfat'], 1],
+    ['Fungsi kolesterol dalam membran sel adalah…', ['menambah permeabilitas air','mengubah fluiditas dan mengurangi permeabilitas','mensintesis protein','mengikat DNA'], 1],
+    ['Kolesterol membran terutama ditemukan pada sel…', ['bakteri','hewan/eukariot','virus','arkhea'], 1],
+    ['Makin banyak kolesterol pada membran, maka permeabilitas terhadap air…', ['meningkat','menurun','tetap','hilang total'], 1],
+    ['Contoh jaringan dengan permeabilitas air rendah akibat kandungan kolesterol tinggi adalah…', ['alveolus','tubuli distal ginjal','mukosa lambung','eritrosit'], 1],
+    ['Pada suhu rendah, kolesterol berperan…', ['mempercepat pemadatan','mencegah solidifikasi membran','melarutkan fosfolipid','tidak berpengaruh'], 1],
+    ['Pada suhu moderat, kolesterol…', ['menurunkan fluiditas membran','menaikkan fluiditas','memecah bilayer','menetralkan muatan'], 0],
+    ['Gugus hidroksil C-3 kolesterol dapat berkondensasi dengan asam lemak membentuk…', ['trigliserida','ester sterol','fosfolipid','glikolipid'], 1],
+    ['Fungsi protein membran meliputi hal berikut, KECUALI…', ['menjaga struktur membran','reseptor pengikat hormon','fasilitator transportasi zat','menyimpan informasi genetik'], 3],
+    ['Protein membran diklasifikasikan berdasarkan…', ['ukurannya','kemampuannya memisahkan diri dari membran','muatannya','warnanya'], 1],
+    ['Protein integral terletak…', ['hanya di permukaan luar','di dalam membran','di sitosol bebas','di dalam nukleus'], 1],
+    ['Peran protein integral meliputi…', ['pengikatan ligan, aktivitas katalitik, dan transportasi','hanya transduksi sinyal','hanya struktural','replikasi DNA'], 0],
+    ['Contoh protein integral adalah…', ['integrin dan glikoforin','albumin dan globulin','aktin dan miosin','kolagen dan elastin'], 0],
+    ['Protein perifer terletak…', ['menembus bilayer','pada permukaan membran','di inti bilayer','dalam lisosom'], 1],
+    ['Protein perifer mudah terlepas karena…', ['berukuran besar','hanya berinteraksi di permukaan membran','bermuatan positif','terikat DNA'], 1],
+    ['Peran utama protein perifer adalah…', ['aktivitas transduksi sinyal','transpor aktif','sintesis lipid','pembentukan pori'], 0],
+    ['Protein yang menembus membran dari sisi luar ke dalam disebut protein…', ['perifer','transmembran','sitosolik','sekretorik'], 1],
+    ['Polisakarida pada membran ditemukan dalam bentuk…', ['amilum dan glikogen','glikoprotein dan glikolipid','selulosa','kitin'], 1],
+    ['Rantai oligosakarida glikoprotein membran plasma terpapar pada sisi…', ['sitoplasmik','ekstraselular','inti bilayer','dalam mitokondria'], 1],
+    ['Protein membran dapat berfungsi sebagai berikut, KECUALI…', ['pompa dan saluran ion','carrier','enzim','cadangan energi utama'], 3],
+    ['Struktur dasar membran sel adalah…', ['monolayer lipid','lipid bilayer','jala protein','lapisan karbohidrat'], 1],
+    ['Pada bilayer, kepala polar fosfolipid menghadap ke…', ['inti bilayer','sisi ekstraselular dan sitoplasma','hanya ke luar sel','hanya ke dalam sel'], 1],
+    ['Ekor non-polar fosfolipid pada bilayer…', ['menghadap keluar','saling berhadapan di inti bilayer','mengikat air','bermuatan negatif'], 1],
+    ['Susunan bilayer menyebabkan membran bersifat…', ['permeabel zat polar, impermeabel zat non-polar','impermeabel zat polar, permeabel zat non-polar','permeabel semua zat','impermeabel semua zat'], 1],
+    ['Secara keseluruhan, membran bersifat predominan…', ['polar','non-polar','bermuatan','netral total'], 1],
+    ['Model struktur membran yang berlaku saat ini adalah…', ['sandwich model','fluid mosaic model','unit membrane statis','lattice model'], 1],
+    ['Pada fluid mosaic model, rantai asil lemak di interior membentuk…', ['region hidrofilik padat','region hidrofobik yang fluid','saluran air','lapisan karbohidrat'], 1],
+    ['Protein integral dipertahankan di dalam bilayer terutama oleh…', ['ikatan ion','interaksi hidrofobik dengan rantai samping asam amino non-polar','ikatan hidrogen','gaya elektrostatik kepala polar'], 1],
+    ['Pada membran, protein dan lipid…', ['tidak dapat bergerak sama sekali','bebas bergerak lateral dalam bidang bilayer','bebas berpindah antar-lapisan tanpa hambatan','hanya bergerak vertikal'], 1],
+    ['Perpindahan lipid atau protein dari satu sisi bilayer ke sisi lainnya bersifat…', ['bebas','terbatas/restriksi','sangat cepat','spontan terus-menerus'], 1],
+    ['Protein integral dapat berupa…', ['single transmembrane helix atau multiple transmembrane helices','hanya rantai lurus','hanya bentuk globular bebas','hanya β-sheet'], 0],
+    ['Protein perifer dapat melekat pada membran melalui…', ['ikatan kovalen dengan lipid','penetrasi ke inti bilayer','ikatan dengan DNA','gaya gravitasi'], 0],
+    ['Sterol pada membran terletak…', ['di antara molekul fosfolipid dalam bilayer','di luar membran','di dalam nukleus','di sitosol bebas'], 0],
+    ['Distribusi karbohidrat yang hanya pada satu sisi membran menunjukkan sifat…', ['simetri membran','asimetri membran','fluiditas','permeabilitas'], 1],
+    ['Faktor yang mempengaruhi fluiditas membran adalah…', ['kandungan asam lemak dan kolesterol','jumlah ribosom','kadar DNA','tebal dinding sel'], 0],
+    ['Asam lemak jenuh menyebabkan kepadatan membran karena…', ['rantai bengkok','struktur lurus menaikkan gaya Van der Waals','mengikat air','menolak protein'], 1],
+    ['Asam lemak tak jenuh cis meningkatkan fluiditas karena…', ['rantai lurus rapat','rantai bengkok membuat kedudukan molekul renggang','bermuatan','mengikat kolesterol'], 1],
+    ['Membran dengan banyak asam lemak jenuh akan bersifat…', ['lebih fluid','lebih viskos/padat','tidak stabil','permeabel penuh'], 1],
+    ['Istilah "unsaturated tails prevent packing" berarti…', ['ekor tak jenuh mencegah penyusunan rapat','ekor tak jenuh memadatkan membran','ekor jenuh mencegah pengemasan','kolesterol memutus bilayer'], 0],
+    ['Efek kolesterol terhadap fluiditas…', ['selalu menaikkan','selalu menurunkan tanpa syarat','menurunkan pada suhu moderat, mencegah solidifikasi pada suhu rendah','tidak ada efek'], 2],
+    ['Sifat amfipatik gliserofosfolipid merupakan…', ['sifat utama membran sel','sifat sementara','sifat khusus bakteri','sifat kolesterol saja'], 0],
+    ['Membran bersifat selektif permeabel artinya…', ['semua zat bebas lewat','hanya zat tertentu dapat melewatinya','tidak ada zat yang lewat','hanya air yang lewat'], 1],
+    ['Zat yang paling mudah menembus bilayer secara langsung adalah…', ['ion Na⁺','glukosa','gas non-polar seperti O₂ dan CO₂','protein'], 2],
+    ['Sifat "elastis" membran terutama ditopang oleh…', ['dinding sel','sifat fluid lipid bilayer','rantai DNA','mikrotubulus ekstrasel'], 1],
+    ['Berdasarkan penggunaan protein, transportasi dibagi menjadi…', ['aktif dan pasif','facilitated dan free transport','difusi dan osmosis','endositosis dan eksositosis'], 1],
+    ['Free transport adalah…', ['lewatnya zat tanpa bantuan protein','transpor dengan ATP','transpor lewat vesikel','transpor lewat pompa'], 0],
+    ['Channel protein memiliki…', ['pori polar tempat ion dan zat hidrofilik lewat','inti hidrofobik','gugus karbohidrat','aktivitas ATPase wajib'], 0],
+    ['Transporter memindahkan molekul melalui…', ['perubahan konformasi','pemotongan membran','difusi bebas','endositosis'], 0],
+    ['Aquaporin berfungsi mengatur…', ['keluar-masuknya glukosa','keluar-masuknya air di tubulus ginjal','transpor ion Na⁺','transpor protein'], 1],
+    ['Kerja aquaporin dipengaruhi oleh hormon…', ['insulin','ADH (antidiuretic hormone)','glukagon','tiroksin'], 1],
+    ['GLUT-1 berfungsi mengatur keluar-masuknya…', ['air','glukosa','natrium','asam amino'], 1],
+    ['Voltage-gated Na⁺ channel membuka dan menutup tergantung…', ['kadar glukosa','potensial membran','suhu','pH darah'], 1],
+    ['Masuknya ion Na⁺ melalui voltage-gated channel menyebabkan…', ['hiperpolarisasi','depolarisasi sel','apoptosis','lisis sel'], 1],
+    ['Contoh transpor pasif berupa difusi sederhana adalah…', ['difusi CO₂ dan O₂','absorbsi glukosa usus halus','pompa Na-K','fagositosis'], 0],
+    ['Contoh difusi terfasilitasi adalah…', ['difusi O₂','transport glukosa ke dalam sel','osmosis air','eksositosis'], 1],
+    ['Absorbsi air di usus halus merupakan contoh…', ['osmosis','transpor aktif','fagositosis','pinositosis'], 0],
+    ['Absorbsi glukosa oleh sel usus halus merupakan contoh…', ['transpor pasif','transpor aktif (membutuhkan energi)','difusi sederhana','osmosis'], 1],
+    ['Endositosis adalah proses…', ['penggabungan molekul besar ke dalam sel melalui vesikel','pengeluaran zat dari sel','difusi ion','sintesis protein'], 0],
+    ['Fagositosis hanya dapat dilakukan oleh…', ['semua sel','sel imun (makrofag dan granulosit)','sel saraf','eritrosit'], 1],
+    ['Pinositosis dapat dilakukan oleh…', ['hanya makrofag','semua sel','hanya neuron','hanya sel ginjal'], 1],
+    ['Pengambilan kembali protein dari filtrat urin oleh sel ginjal terjadi melalui…', ['fagositosis','pinositosis','eksositosis','osmosis'], 1],
+    ['Pengeluaran neurotransmitter oleh neuron merupakan contoh…', ['endositosis','eksositosis','difusi','transpor aktif primer'], 1],
+    ['Urutan tahap komunikasi sel yang benar adalah…', ['transduksi–resepsi–respons','resepsi–transduksi–respons','respons–resepsi–transduksi','resepsi–respons–transduksi'], 1],
+    ['Second messenger adalah senyawa…', ['berberat molekul besar dan tidak larut','berberat molekul rendah, bersifat diffusible','protein transmembran','asam nukleat'], 1],
+    ['Reseptor yang memiliki kanal ion teraktivasi ligan dan berperan pada transmisi cepat adalah…', ['ligand-gated ion channel','GPCR','kinase-linked receptor','nuclear receptor'], 0],
+    ['Reseptor yang membutuhkan G-protein karena tidak memiliki aktivitas katalitik adalah…', ['reseptor ionotropik','G-protein coupled receptor','reseptor tirosin kinase','reseptor inti'], 1],
+    ['Reseptor kinase-linked memulai kaskade sinyal dengan cara…', ['membuka kanal ion','fosforilasi','endositosis','hidrolisis GTP'], 1],
+    ['Reseptor inti kelas I umumnya berada di sitoplasma, membentuk homodimer, lalu bermigrasi ke nukleus; ligannya sebagian besar berupa…', ['neurotransmitter','hormon steroid','ion','gas terlarut'], 1]
+  ];
+
+  $('bankBtn6').addEventListener('click', () => {
+    soalInput.value = bankToText(BANK6);
     $('parseBtn').click();
     preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
