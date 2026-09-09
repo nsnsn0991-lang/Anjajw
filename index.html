@@ -352,6 +352,20 @@
   @keyframes floatUp { to { transform: translateY(-70px); opacity: 0; } }
 
   .winner-banner { text-align: center; font-size: 1.9rem; font-weight: 800; margin: 4px 0 2px; text-wrap: balance; }
+
+  .isian-wrap { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .isian-input {
+    flex: 1; min-width: 200px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid var(--panel-border);
+    border-radius: 14px; color: var(--text);
+    padding: 14px 18px; font-size: 1.05rem;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .isian-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.2); }
+  .isian-input.ok { border-color: var(--accent2); background: rgba(6, 214, 160, 0.16); }
+  .isian-input.no { border-color: var(--danger); background: rgba(239, 71, 111, 0.16); }
+  .q-card li.correct { word-break: break-word; }
 </style>
 </head>
 <body>
@@ -409,11 +423,24 @@ Alternatif — pakai baris kunci jawaban:
   C. Habibie
   Jawaban: B
 
+Soal isian (jawaban DIKETIK) — tulis pertanyaan + baris Jawaban, TANPA pilihan:
+
+  Ibu kota Indonesia adalah...
+  Jawaban: Jakarta
+
+Jawaban alternatif dipisah dengan garis miring (/):
+
+  Organ pemompa darah adalah...
+  Jawaban: jantung / hati (salah)   ← contoh, pakai yang benar saja
+
 Catatan:
   • Nomor soal (1. / 2.) boleh ada atau tidak.
   • Label pilihan boleh A. A) a. 1. dsb.
   • Pisahkan tiap soal dengan satu baris kosong.
-  • Minimal 2 pilihan per soal, satu ditandai benar.</pre>
+  • Pilihan ganda: minimal 2 pilihan, satu ditandai benar (*).
+  • Isian: tanpa pilihan, cukup baris "Jawaban: ...".
+    Pengecekan tidak peka huruf besar/kecil; beberapa jawaban
+    alternatif dipisah dengan tanda "/".</pre>
         </details>
 
         <div class="preview" id="preview"></div>
@@ -695,8 +722,19 @@ Catatan:
 
       if (!qText && options.length === 0) return;
 
+      // Soal isian (jawaban diketik): tidak ada pilihan, tetapi ada baris Jawaban
+      if (options.length === 0) {
+        if (keyLine) {
+          const answersList = keyLine.split(/\s*[\/;]\s*/).map(a => a.trim()).filter(Boolean);
+          out.push({ text: qText || '(tanpa teks pertanyaan)', type: 'isian', answers: answersList, displayAnswer: keyLine.trim() });
+        } else {
+          errors.push(`Soal #${bi + 1} dilewati: tidak ada pilihan maupun baris "Jawaban:".`);
+        }
+        return;
+      }
+
       if (options.length < 2) {
-        errors.push(`Soal #${bi + 1} dilewati: butuh minimal 2 pilihan jawaban.`);
+        errors.push(`Soal #${bi + 1} dilewati: butuh minimal 2 pilihan jawaban (atau gunakan baris "Jawaban:" tanpa pilihan untuk soal isian).`);
         return;
       }
 
@@ -724,6 +762,7 @@ Catatan:
 
       out.push({
         text: qText || '(tanpa teks pertanyaan)',
+        type: 'mcq',
         options: options.map(o => ({ text: o.text, correct: o.correct }))
       });
     });
@@ -748,11 +787,17 @@ Catatan:
     questions.forEach((q, i) => {
       const card = document.createElement('div');
       card.className = 'q-card';
-      const ul = q.options.map(o =>
-        `<li class="${o.correct ? 'correct' : ''}">${escapeHtml(o.text)}</li>`).join('');
+      let body;
+      if (q.type === 'isian') {
+        body = `<ul><li class="correct">✍️ Jawaban (diketik): ${escapeHtml(q.displayAnswer)}</li></ul>`;
+      } else {
+        const ul = q.options.map(o =>
+          `<li class="${o.correct ? 'correct' : ''}">${escapeHtml(o.text)}</li>`).join('');
+        body = `<ul>${ul}</ul>`;
+      }
       card.innerHTML =
         `<div><span class="q-num">${i + 1}.</span><span class="q-text">${escapeHtml(q.text)}</span></div>` +
-        `<ul>${ul}</ul>`;
+        body;
       preview.appendChild(card);
     });
   }
@@ -1497,8 +1542,11 @@ D. Gd`;
 
   function startQuiz() {
     quiz = questions.map(q => {
+      if (q.type === 'isian') {
+        return { text: q.text, type: 'isian', answers: q.answers.slice(), displayAnswer: q.displayAnswer };
+      }
       const opts = q.options.map((o, i) => ({ ...o, oi: i }));
-      return { text: q.text, options: settings.shuffleO ? shuffle(opts) : opts };
+      return { text: q.text, type: 'mcq', options: settings.shuffleO ? shuffle(opts) : opts };
     });
     if (settings.shuffleQ) quiz = shuffle(quiz);
 
@@ -1512,41 +1560,86 @@ D. Gd`;
     renderQuestion();
   }
 
+  function normalizeAns(s) {
+    return String(s).toLowerCase().trim().replace(/\s+/g, ' ').replace(/[.,;:!?]+$/, '');
+  }
+  function isCorrect(i) {
+    const q = quiz[i], ans = answers[i];
+    if (q.type === 'isian') {
+      if (ans == null || ans === '') return false;
+      const n = normalizeAns(ans);
+      return q.answers.some(a => normalizeAns(a) === n);
+    }
+    return ans !== null && q.options[ans] && q.options[ans].correct;
+  }
+  // Jawaban bot: untuk isian mengembalikan boolean benar; untuk pilihan ganda indeks opsi
+  function botRespond(q) {
+    if (q.type === 'isian') return Math.random() < BOT[botLevel].p;
+    const ci = q.options.findIndex(o => o.correct);
+    if (Math.random() < BOT[botLevel].p) return ci;
+    const wrong = q.options.map((o, i) => i).filter(i => i !== ci);
+    return wrong.length ? wrong[Math.floor(Math.random() * wrong.length)] : ci;
+  }
+
   function renderQuestion() {
     stopCountdown();
     const q = quiz[current];
     const answered = locked[current];
     const chosen = answers[current];
-
-    const optsHtml = q.options.map((o, i) => {
-      const key = String.fromCharCode(65 + i);
-      let cls = 'option';
-      if (answered) {
-        cls += ' locked';
-        if (o.correct) cls += ' correct';
-        else if (chosen === i) cls += ' wrong';
-      } else if (chosen === i) {
-        cls += ' selected';
-      }
-      return `<button class="${cls}" data-i="${i}"><span class="key">${key}</span><span>${escapeHtml(o.text)}</span></button>`;
-    }).join('');
-
+    const isIsian = q.type === 'isian';
     const botMode = mode === 'bot';
+
+    let answerAreaHtml;
+    if (isIsian) {
+      const val = (answered && answers[current] != null) ? escapeHtml(answers[current]) : '';
+      const okCls = answered ? (isCorrect(current) ? 'ok' : 'no') : '';
+      answerAreaHtml =
+        `<div class="isian-wrap">
+          <input type="text" id="isianInput" class="isian-input ${okCls}" placeholder="Ketik jawabanmu…" value="${val}" ${answered ? 'disabled' : ''} autocomplete="off" autocapitalize="off" spellcheck="false">
+          ${(!answered && instantOn()) ? '<button class="btn primary" id="checkBtn">✓ Periksa</button>' : ''}
+        </div>`;
+    } else {
+      const optsHtml = q.options.map((o, i) => {
+        const key = String.fromCharCode(65 + i);
+        let cls = 'option';
+        if (answered) {
+          cls += ' locked';
+          if (o.correct) cls += ' correct';
+          else if (chosen === i) cls += ' wrong';
+        } else if (chosen === i) {
+          cls += ' selected';
+        }
+        return `<button class="${cls}" data-i="${i}"><span class="key">${key}</span><span>${escapeHtml(o.text)}</span></button>`;
+      }).join('');
+      answerAreaHtml = `<div class="options" id="options">${optsHtml}</div>`;
+    }
+
     const pct = Math.round((current) / quiz.length * 100);
 
     let feedbackHtml = '';
     if (answered && instantOn()) {
-      const ok = q.options[chosen] && q.options[chosen].correct;
-      feedbackHtml = ok
-        ? `<div class="feedback ok show">✅ Tepat sekali!</div>`
-        : `<div class="feedback no show">❌ Kurang tepat. Jawaban benar ditandai hijau.</div>`;
+      const ok = isCorrect(current);
+      if (isIsian) {
+        feedbackHtml = ok
+          ? `<div class="feedback ok show">✅ Benar!</div>`
+          : `<div class="feedback no show">❌ Kurang tepat. Jawaban: <b>${escapeHtml(q.displayAnswer)}</b></div>`;
+      } else {
+        feedbackHtml = ok
+          ? `<div class="feedback ok show">✅ Tepat sekali!</div>`
+          : `<div class="feedback no show">❌ Kurang tepat. Jawaban benar ditandai hijau.</div>`;
+      }
     }
 
     let botLineHtml = '';
     if (answered && botMode && botAnswers[current] != null) {
-      const bi = botAnswers[current];
-      const bok = q.options[bi] && q.options[bi].correct;
-      botLineHtml = `<div class="bot-line">${BOT[botLevel].emoji} ${BOT[botLevel].name} memilih <b>${String.fromCharCode(65 + bi)}</b> — <b class="${bok ? 'good' : 'bad'}">${bok ? 'benar' : 'salah'}</b></div>`;
+      const r = botAnswers[current];
+      if (isIsian) {
+        const bok = r === true;
+        botLineHtml = `<div class="bot-line">${BOT[botLevel].emoji} ${BOT[botLevel].name} menjawab — <b class="${bok ? 'good' : 'bad'}">${bok ? 'benar' : 'salah'}</b></div>`;
+      } else {
+        const bok = q.options[r] && q.options[r].correct;
+        botLineHtml = `<div class="bot-line">${BOT[botLevel].emoji} ${BOT[botLevel].name} memilih <b>${String.fromCharCode(65 + r)}</b> — <b class="${bok ? 'good' : 'bad'}">${bok ? 'benar' : 'salah'}</b></div>`;
+      }
     }
 
     let versusHtml = '';
@@ -1573,7 +1666,7 @@ D. Gd`;
         <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></div>
       </div>
       <div class="question-text">${escapeHtml(q.text)}</div>
-      <div class="options" id="options">${optsHtml}</div>
+      ${answerAreaHtml}
       ${feedbackHtml}
       ${botLineHtml}
       <div class="quiz-nav">
@@ -1582,45 +1675,77 @@ D. Gd`;
       </div>`;
 
     if (!answered) {
-      $('options').querySelectorAll('.option').forEach(btn => {
-        btn.addEventListener('click', () => choose(parseInt(btn.dataset.i, 10)));
-      });
+      if (isIsian) {
+        const inp = $('isianInput');
+        if (inp) {
+          inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submitIsian(); } });
+          setTimeout(() => inp.focus(), 40);
+        }
+        const cb = $('checkBtn');
+        if (cb) cb.addEventListener('click', submitIsian);
+      } else {
+        $('options').querySelectorAll('.option').forEach(btn => {
+          btn.addEventListener('click', () => choose(parseInt(btn.dataset.i, 10)));
+        });
+      }
     }
-    $('prevBtn').addEventListener('click', () => { if (current > 0) { current--; renderQuestion(); } });
+    $('prevBtn').addEventListener('click', () => { if (current > 0) { captureIsian(); current--; renderQuestion(); } });
     $('nextBtn').addEventListener('click', next);
 
     if (settings.timer > 0 && !answered) startCountdown();
   }
 
-  function choose(i) {
-    if (locked[current]) return;
-    answers[current] = i;
+  // Simpan jawaban isian yang sedang diketik (agar tidak hilang saat pindah soal)
+  function captureIsian() {
     const q = quiz[current];
-    if (instantOn()) {
-      locked[current] = true;
-      stopCountdown();
-      const youCorrect = q.options[i] && q.options[i].correct;
-      if (youCorrect) {
-        youScore++; streak++; if (streak > bestStreak) bestStreak = streak;
-        Sound.correct(); pointPop('+1');
-        if (streak >= 3) { Sound.combo(streak); pointPop('🔥 x' + streak, '#f77f00'); }
-      } else {
-        streak = 0; Sound.wrong();
-      }
-      if (mode === 'bot') {
-        const bi = botAnswer(q);
-        botAnswers[current] = bi;
-        if (q.options[bi] && q.options[bi].correct) botScore++;
-      }
-    } else {
-      Sound.click();
+    if (q && q.type === 'isian' && !locked[current]) {
+      const inp = $('isianInput');
+      if (inp) answers[current] = inp.value;
     }
+  }
+
+  // Kunci soal saat ini, beri skor, efek suara, dan jawaban bot (hanya dipanggil pada mode instan)
+  function lockAndScore() {
+    locked[current] = true;
+    stopCountdown();
+    if (isCorrect(current)) {
+      youScore++; streak++; if (streak > bestStreak) bestStreak = streak;
+      Sound.correct(); pointPop('+1');
+      if (streak >= 3) { Sound.combo(streak); pointPop('🔥 x' + streak, '#f77f00'); }
+    } else {
+      streak = 0; Sound.wrong();
+    }
+    if (mode === 'bot') {
+      const r = botRespond(quiz[current]);
+      botAnswers[current] = r;
+      const bok = quiz[current].type === 'isian' ? r === true : (quiz[current].options[r] && quiz[current].options[r].correct);
+      if (bok) botScore++;
+    }
+  }
+
+  function choose(i) {
+    if (locked[current] || quiz[current].type === 'isian') return;
+    answers[current] = i;
+    if (instantOn()) lockAndScore();
+    else Sound.click();
+    renderQuestion();
+  }
+
+  function submitIsian() {
+    if (locked[current]) return;
+    const inp = $('isianInput');
+    const val = inp ? inp.value.trim() : '';
+    if (!val) { if (inp) inp.focus(); return; }
+    answers[current] = val;
+    if (instantOn()) lockAndScore();
     renderQuestion();
   }
 
   function next() {
+    captureIsian();
     // in non-instant mode, lock on leaving so it counts
-    if (!instantOn() && answers[current] !== null) locked[current] = true;
+    const a = answers[current];
+    if (!instantOn() && a !== null && a !== undefined && a !== '') locked[current] = true;
     if (current === quiz.length - 1) {
       finish();
     } else {
@@ -1651,12 +1776,9 @@ D. Gd`;
     stopCountdown();
     Sound.stopMusic();
     updateSoundBtn();
-    // ensure all attempted answers are locked/counted
+    // hitung jawaban benar (pilihan ganda & isian)
     let correct = 0;
-    quiz.forEach((q, i) => {
-      const chosen = answers[i];
-      if (chosen !== null && q.options[chosen] && q.options[chosen].correct) correct++;
-    });
+    quiz.forEach((q, i) => { if (isCorrect(i)) correct++; });
     const total = quiz.length;
     const pct = Math.round(correct / total * 100);
 
@@ -1668,15 +1790,22 @@ D. Gd`;
     else { title = 'Ayo coba lagi!'; emoji = '📚'; }
 
     const reviewHtml = quiz.map((q, i) => {
-      const chosen = answers[i];
-      const correctOpt = q.options.find(o => o.correct);
-      const isRight = chosen !== null && q.options[chosen] && q.options[chosen].correct;
-      const chosenText = chosen !== null ? escapeHtml(q.options[chosen].text) : '<i>tidak dijawab</i>';
+      const isRight = isCorrect(i);
+      const ans = answers[i];
+      let chosenText, keyText;
+      if (q.type === 'isian') {
+        chosenText = (ans != null && ans !== '') ? escapeHtml(ans) : '<i>tidak dijawab</i>';
+        keyText = escapeHtml(q.displayAnswer);
+      } else {
+        const correctOpt = q.options.find(o => o.correct);
+        chosenText = (ans !== null && ans !== undefined) ? escapeHtml(q.options[ans].text) : '<i>tidak dijawab</i>';
+        keyText = escapeHtml(correctOpt.text);
+      }
       return `<div class="review-item">
         <div class="r-q"><span class="badge ${isRight ? 'b-ok' : 'b-no'}">${isRight ? 'Benar' : 'Salah'}</span>${i + 1}. ${escapeHtml(q.text)}</div>
         ${isRight
           ? `<div class="r-line">Jawabanmu: <b class="good">${chosenText}</b></div>`
-          : `<div class="r-line">Jawabanmu: <b class="bad">${chosenText}</b> · Kunci: <b class="good">${escapeHtml(correctOpt.text)}</b></div>`}
+          : `<div class="r-line">Jawabanmu: <b class="bad">${chosenText}</b> · Kunci: <b class="good">${keyText}</b></div>`}
       </div>`;
     }).join('');
 
