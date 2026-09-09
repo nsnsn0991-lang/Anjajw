@@ -3,18 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Memoria — Game Memori Seru</title>
+<title>Kuis Master — Ubah Soal Jadi Kuis</title>
 <style>
   :root {
     --bg1: #0f0c29;
     --bg2: #302b63;
     --bg3: #24243e;
-    --card-back1: #667eea;
-    --card-back2: #764ba2;
     --accent: #ffd166;
-    --success: #06d6a0;
+    --accent2: #06d6a0;
+    --danger: #ef476f;
+    --info: #118ab2;
     --text: #f5f5fa;
     --muted: rgba(245, 245, 250, 0.65);
+    --panel: rgba(255, 255, 255, 0.07);
+    --panel-border: rgba(255, 255, 255, 0.12);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -29,7 +31,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 24px 16px 48px;
+    padding: 24px 16px 60px;
     overflow-x: hidden;
   }
 
@@ -38,17 +40,17 @@
     50% { background-position: 100% 50%; }
   }
 
-  header { text-align: center; margin-bottom: 20px; }
+  header { text-align: center; margin-bottom: 18px; }
 
   h1 {
-    font-size: clamp(2rem, 6vw, 3rem);
+    font-size: clamp(1.9rem, 6vw, 3rem);
     background: linear-gradient(90deg, #ffd166, #ef476f, #06d6a0, #118ab2);
     background-size: 300% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
     animation: rainbow 6s linear infinite;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
   }
 
   @keyframes rainbow {
@@ -58,19 +60,22 @@
 
   .tagline { color: var(--muted); margin-top: 6px; font-size: 0.95rem; }
 
-  .controls {
+  .app { width: min(94vw, 760px); }
+
+  /* Tabs */
+  .tabs {
     display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+    gap: 8px;
     justify-content: center;
-    margin-bottom: 18px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
   }
 
-  .btn {
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.08);
+  .tab {
+    border: 2px solid var(--panel-border);
+    background: var(--panel);
     color: var(--text);
-    padding: 10px 20px;
+    padding: 10px 22px;
     border-radius: 999px;
     font-size: 0.95rem;
     font-weight: 600;
@@ -78,448 +83,1784 @@
     transition: all 0.25s ease;
     backdrop-filter: blur(6px);
   }
-
-  .btn:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.16); }
-
-  .btn.active {
+  .tab:hover { transform: translateY(-2px); background: rgba(255,255,255,0.16); }
+  .tab.active {
     background: var(--accent);
     color: #1a1a2e;
     border-color: var(--accent);
     box-shadow: 0 4px 20px rgba(255, 209, 102, 0.4);
   }
 
-  .btn.restart {
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 20px;
+    padding: 24px;
+    backdrop-filter: blur(6px);
+  }
+
+  .view { display: none; animation: fadeIn 0.35s ease; }
+  .view.active { display: block; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  h2 { font-size: 1.3rem; margin-bottom: 6px; }
+  .hint { color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 14px; }
+
+  textarea {
+    width: 100%;
+    min-height: 220px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--panel-border);
+    border-radius: 14px;
+    color: var(--text);
+    padding: 14px;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.92rem;
+    line-height: 1.7;
+    resize: vertical;
+  }
+  textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,209,102,0.2); }
+
+  .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+
+  .btn {
+    border: 2px solid var(--panel-border);
+    background: rgba(255,255,255,0.08);
+    color: var(--text);
+    padding: 11px 22px;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+  .btn:hover { transform: translateY(-2px); background: rgba(255,255,255,0.16); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .btn.primary {
+    background: linear-gradient(135deg, #06d6a0, #118ab2);
+    border: none;
+    box-shadow: 0 4px 20px rgba(6, 214, 160, 0.35);
+  }
+  .btn.warn {
     background: linear-gradient(135deg, #ef476f, #b5179e);
     border: none;
     box-shadow: 0 4px 20px rgba(239, 71, 111, 0.35);
   }
 
-  .stats {
-    display: flex;
-    gap: 14px;
-    margin-bottom: 22px;
-    flex-wrap: wrap;
-    justify-content: center;
+  details.guide {
+    margin-top: 16px;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    padding: 12px 16px;
   }
-
-  .stat {
-    background: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 16px;
-    padding: 10px 22px;
-    text-align: center;
-    min-width: 100px;
-    backdrop-filter: blur(6px);
-  }
-
-  .stat .label {
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
+  details.guide summary { cursor: pointer; font-weight: 600; color: var(--accent); }
+  details.guide pre {
+    margin-top: 10px;
+    background: rgba(0,0,0,0.35);
+    padding: 12px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 0.82rem;
+    line-height: 1.6;
     color: var(--muted);
   }
+  details.guide code { color: var(--accent2); }
 
-  .stat .value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--accent);
-    font-variant-numeric: tabular-nums;
-  }
+  .msg { margin-top: 14px; padding: 12px 16px; border-radius: 12px; font-size: 0.9rem; display: none; }
+  .msg.show { display: block; }
+  .msg.ok { background: rgba(6,214,160,0.15); border: 1px solid rgba(6,214,160,0.4); }
+  .msg.err { background: rgba(239,71,111,0.15); border: 1px solid rgba(239,71,111,0.4); }
 
-  .board {
-    display: grid;
-    gap: 12px;
-    perspective: 1000px;
-    width: min(92vw, 560px);
-  }
-
-  .board.easy   { grid-template-columns: repeat(4, 1fr); }
-  .board.medium { grid-template-columns: repeat(4, 1fr); }
-  .board.hard   { grid-template-columns: repeat(6, 1fr); width: min(94vw, 680px); }
-
-  .card {
-    aspect-ratio: 1;
-    position: relative;
-    cursor: pointer;
-    transform-style: preserve-3d;
-    transition: transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1);
-    animation: dealIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
-    animation-delay: var(--deal-delay, 0s);
-  }
-
-  @keyframes dealIn {
-    from {
-      opacity: 0;
-      transform: translateY(40px) rotateY(90deg) scale(0.5);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) rotateY(0) scale(1);
-    }
-  }
-
-  .card.flipped { transform: rotateY(180deg); }
-
-  .card.wrong { animation: shake 0.45s ease; }
-
-  @keyframes shake {
-    0%, 100% { transform: rotateY(180deg) translateX(0); }
-    20% { transform: rotateY(180deg) translateX(-8px); }
-    40% { transform: rotateY(180deg) translateX(8px); }
-    60% { transform: rotateY(180deg) translateX(-6px); }
-    80% { transform: rotateY(180deg) translateX(6px); }
-  }
-
-  .card.wave { animation: wave 0.6s ease; }
-
-  @keyframes wave {
-    0%, 100% { transform: rotateY(180deg) translateY(0); }
-    50% { transform: rotateY(180deg) translateY(-16px) scale(1.08); }
-  }
-
-  .card.matched { cursor: default; animation: pop 0.5s ease; }
-
-  @keyframes pop {
-    0%   { transform: rotateY(180deg) scale(1); }
-    50%  { transform: rotateY(180deg) scale(1.15); }
-    100% { transform: rotateY(180deg) scale(1); }
-  }
-
-  .card-face {
-    position: absolute;
-    inset: 0;
+  /* Preview list */
+  .preview { margin-top: 18px; display: flex; flex-direction: column; gap: 12px; }
+  .q-card {
+    background: rgba(0,0,0,0.22);
+    border: 1px solid var(--panel-border);
     border-radius: 14px;
+    padding: 14px 16px;
+  }
+  .q-card .q-num { color: var(--accent); font-weight: 700; margin-right: 6px; }
+  .q-card .q-text { font-weight: 600; }
+  .q-card ul { list-style: none; margin-top: 8px; display: grid; gap: 4px; }
+  .q-card li { color: var(--muted); font-size: 0.9rem; padding-left: 4px; }
+  .q-card li.correct { color: var(--accent2); font-weight: 600; }
+  .q-card li.correct::after { content: ' ✓'; }
+
+  /* Quiz player */
+  .quiz-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 10px; flex-wrap: wrap; }
+  .progress-wrap { flex: 1; min-width: 160px; }
+  .progress-bar { height: 8px; background: rgba(255,255,255,0.12); border-radius: 999px; overflow: hidden; }
+  .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #06d6a0, #118ab2); transition: width 0.4s ease; }
+  .pill { background: rgba(255,255,255,0.1); border: 1px solid var(--panel-border); border-radius: 999px; padding: 6px 14px; font-weight: 600; font-size: 0.85rem; white-space: nowrap; }
+  .pill .accent { color: var(--accent); }
+
+  .question-text { font-size: 1.25rem; font-weight: 700; line-height: 1.5; margin: 8px 0 20px; }
+
+  .options { display: grid; gap: 12px; }
+  .option {
+    text-align: left;
+    background: rgba(255,255,255,0.06);
+    border: 2px solid var(--panel-border);
+    border-radius: 14px;
+    padding: 14px 18px;
+    font-size: 1rem;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
-    justify-content: center;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    font-size: clamp(1.6rem, 6vw, 2.6rem);
-    user-select: none;
+    gap: 12px;
   }
-
-  .card-front {
-    background: linear-gradient(135deg, var(--card-back1), var(--card-back2));
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
-    border: 2px solid rgba(255, 255, 255, 0.15);
+  .option:hover:not(.locked) { border-color: var(--accent); transform: translateX(4px); }
+  .option .key {
+    width: 30px; height: 30px; flex-shrink: 0;
+    border-radius: 8px; background: rgba(255,255,255,0.12);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.9rem;
   }
+  .option.selected { border-color: var(--accent); background: rgba(255,209,102,0.12); }
+  .option.correct { border-color: var(--accent2); background: rgba(6,214,160,0.16); }
+  .option.correct .key { background: var(--accent2); color: #08261e; }
+  .option.wrong { border-color: var(--danger); background: rgba(239,71,111,0.16); }
+  .option.wrong .key { background: var(--danger); color: #fff; }
+  .option.locked { cursor: default; }
 
-  .card-front::after {
-    content: '✦';
-    color: rgba(255, 255, 255, 0.55);
-    font-size: clamp(1.2rem, 4vw, 1.8rem);
+  .feedback { margin-top: 16px; padding: 12px 16px; border-radius: 12px; font-weight: 600; display: none; }
+  .feedback.show { display: block; animation: fadeIn 0.3s ease; }
+  .feedback.ok { background: rgba(6,214,160,0.15); border: 1px solid rgba(6,214,160,0.4); color: var(--accent2); }
+  .feedback.no { background: rgba(239,71,111,0.15); border: 1px solid rgba(239,71,111,0.4); color: #ffb3c4; }
+
+  .quiz-nav { margin-top: 22px; display: flex; justify-content: space-between; gap: 10px; }
+
+  /* Settings */
+  .settings { display: flex; flex-direction: column; gap: 14px; margin-top: 4px; }
+  .setting-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .setting-row:last-child { border-bottom: none; }
+  .setting-row .label b { display: block; }
+  .setting-row .label small { color: var(--muted); }
+
+  .switch { position: relative; width: 52px; height: 28px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; inset: 0; background: rgba(255,255,255,0.15); border-radius: 999px; cursor: pointer; transition: 0.3s; }
+  .slider::before { content: ''; position: absolute; width: 22px; height: 22px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: 0.3s; }
+  .switch input:checked + .slider { background: var(--accent2); }
+  .switch input:checked + .slider::before { transform: translateX(24px); }
+
+  /* Result */
+  .result-hero { text-align: center; padding: 10px 0 20px; }
+  .score-ring {
+    width: 150px; height: 150px; margin: 0 auto 14px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    background: conic-gradient(var(--accent2) var(--pct, 0%), rgba(255,255,255,0.1) 0);
+    position: relative;
   }
+  .score-ring::before { content: ''; position: absolute; inset: 12px; border-radius: 50%; background: #211d47; }
+  .score-ring .score-val { position: relative; font-size: 2.4rem; font-weight: 800; color: var(--accent); }
+  .score-ring .score-lbl { position: relative; font-size: 0.8rem; color: var(--muted); }
+  .result-hero h2 { font-size: 1.6rem; }
+  .result-hero p { color: var(--muted); margin-top: 4px; }
 
-  .card:not(.flipped):hover .card-front {
-    box-shadow: 0 10px 26px rgba(102, 126, 234, 0.55);
-    border-color: rgba(255, 255, 255, 0.4);
-  }
+  .review { margin-top: 20px; display: flex; flex-direction: column; gap: 12px; }
+  .review-item { background: rgba(0,0,0,0.22); border: 1px solid var(--panel-border); border-radius: 14px; padding: 14px 16px; }
+  .review-item .r-q { font-weight: 600; margin-bottom: 8px; }
+  .review-item .r-q .badge { font-size: 0.8rem; padding: 2px 8px; border-radius: 6px; margin-right: 8px; }
+  .badge.b-ok { background: rgba(6,214,160,0.25); color: var(--accent2); }
+  .badge.b-no { background: rgba(239,71,111,0.25); color: #ffb3c4; }
+  .review-item .r-line { font-size: 0.9rem; color: var(--muted); }
+  .review-item .r-line b.good { color: var(--accent2); }
+  .review-item .r-line b.bad { color: #ffb3c4; }
 
-  .card-back {
-    background: rgba(255, 255, 255, 0.95);
-    transform: rotateY(180deg);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
-  }
-
-  .card.matched .card-back {
-    background: linear-gradient(135deg, #d8fff3, #a7f3d0);
-    box-shadow: 0 0 22px rgba(6, 214, 160, 0.6);
-  }
-
-  .overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(10, 8, 30, 0.85);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.4s ease;
-    z-index: 50;
-    backdrop-filter: blur(8px);
-  }
-
-  .overlay.show { opacity: 1; pointer-events: auto; }
-
-  .modal {
-    background: linear-gradient(160deg, #1e1b4b, #312e81);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 24px;
-    padding: 40px 48px;
-    text-align: center;
-    transform: scale(0.8);
-    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
-    max-width: 90vw;
-  }
-
-  .overlay.show .modal { transform: scale(1); }
-
-  .modal .trophy { font-size: 4rem; animation: bounce 1s ease infinite; display: inline-block; }
-
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-12px); }
-  }
-
-  .modal h2 { font-size: 2rem; margin: 12px 0 6px; color: var(--accent); }
-  .modal p { color: var(--muted); margin-bottom: 8px; line-height: 1.6; }
-  .modal .highlight { color: var(--success); font-weight: 700; }
-  .modal .btn { margin-top: 18px; }
-
-  .confetti {
-    position: fixed;
-    top: -20px;
-    width: 12px;
-    height: 12px;
-    z-index: 60;
-    pointer-events: none;
-    animation: fall linear forwards;
-  }
-
-  @keyframes fall {
-    to { transform: translateY(110vh) rotate(720deg); opacity: 0.6; }
-  }
+  .empty { text-align: center; color: var(--muted); padding: 30px 10px; }
+  .empty .big { font-size: 2.6rem; display: block; margin-bottom: 10px; }
 
   footer { margin-top: 28px; color: var(--muted); font-size: 0.85rem; text-align: center; }
 
-  .bubble {
-    position: fixed;
-    bottom: -60px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.04));
-    pointer-events: none;
-    z-index: -1;
-    animation: float linear infinite;
+  .confetti { position: fixed; top: -20px; width: 12px; height: 12px; z-index: 60; pointer-events: none; animation: fall linear forwards; }
+  @keyframes fall { to { transform: translateY(110vh) rotate(720deg); opacity: 0.6; } }
+
+  .sound-toggle {
+    position: fixed; top: 14px; right: 14px; z-index: 70;
+    width: 46px; height: 46px; border-radius: 50%;
+    border: 2px solid var(--panel-border);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text); font-size: 1.2rem; cursor: pointer;
+    backdrop-filter: blur(6px);
+    transition: transform 0.2s ease, background 0.25s ease, opacity 0.25s ease;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .sound-toggle:hover { transform: scale(1.08); background: rgba(255, 255, 255, 0.16); }
+  .sound-toggle.muted { opacity: 0.5; }
+  .sound-toggle.playing { box-shadow: 0 0 0 0 rgba(6, 214, 160, 0.5); animation: soundPulse 2s ease-in-out infinite; }
+  @keyframes soundPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(6, 214, 160, 0.45); }
+    50% { box-shadow: 0 0 0 8px rgba(6, 214, 160, 0); }
   }
 
-  @keyframes float {
-    to { transform: translateY(-115vh) rotate(360deg); }
+  input[type="range"] { accent-color: var(--accent2); cursor: pointer; }
+
+  /* Mode selection */
+  .mode-cards { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 16px 0; }
+  .mode-card {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    min-width: 160px; padding: 16px 20px; border-radius: 16px;
+    border: 2px solid var(--panel-border); background: rgba(255, 255, 255, 0.06);
+    color: var(--text); cursor: pointer; font-weight: 700; font-size: 1.05rem;
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
   }
+  .mode-card small { font-weight: 400; color: var(--muted); font-size: 0.78rem; }
+  .mode-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+  .mode-card.active { border-color: var(--accent2); background: rgba(6, 214, 160, 0.14); box-shadow: 0 4px 20px rgba(6, 214, 160, 0.25); }
 
-  .stat .value.bump { animation: bump 0.3s ease; }
-
-  @keyframes bump {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.3); color: var(--success); }
+  .controls { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .chip {
+    border: 2px solid var(--panel-border); background: rgba(255, 255, 255, 0.06);
+    color: var(--text); padding: 8px 16px; border-radius: 999px; cursor: pointer;
+    font-weight: 600; font-size: 0.9rem; transition: all 0.2s ease;
   }
+  .chip:hover { transform: translateY(-2px); }
+  .chip.active { background: var(--accent); color: #1a1a2e; border-color: var(--accent); }
 
-  .stat .value.ticking { animation: tick 1s ease infinite; }
-
-  @keyframes tick {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.55; }
+  /* Versus scoreboard */
+  .versus { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+  .vs-side {
+    display: flex; align-items: center; gap: 8px; padding: 8px 16px;
+    border-radius: 14px; background: rgba(255, 255, 255, 0.06);
+    border: 2px solid var(--panel-border); font-weight: 700; transition: all 0.25s ease;
   }
+  .vs-side .ava { font-size: 1.4rem; }
+  .vs-side b { color: var(--accent); font-size: 1.35rem; font-variant-numeric: tabular-nums; }
+  .vs-side.lead { border-color: var(--accent2); background: rgba(6, 214, 160, 0.16); box-shadow: 0 0 18px rgba(6, 214, 160, 0.3); }
+  .vs-mid { font-weight: 800; color: var(--muted); letter-spacing: 1px; }
+
+  .bot-line { margin-top: 10px; font-size: 0.92rem; color: var(--muted); }
+  .bot-line b.good { color: var(--accent2); }
+  .bot-line b.bad { color: #ffb3c4; }
+
+  .streak-pill { background: linear-gradient(135deg, #f77f00, #ef476f) !important; border: none !important; color: #fff !important; animation: pop 0.3s ease; }
+  @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.18); } 100% { transform: scale(1); } }
+
+  .pointpop {
+    position: fixed; font-weight: 800; font-size: 1.7rem; color: var(--accent2);
+    pointer-events: none; z-index: 65; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    animation: floatUp 1s ease forwards;
+  }
+  @keyframes floatUp { to { transform: translateY(-70px); opacity: 0; } }
+
+  .winner-banner { text-align: center; font-size: 1.9rem; font-weight: 800; margin: 4px 0 2px; text-wrap: balance; }
+
+  .isian-wrap { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .isian-input {
+    flex: 1; min-width: 200px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid var(--panel-border);
+    border-radius: 14px; color: var(--text);
+    padding: 14px 18px; font-size: 1.05rem;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .isian-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.2); }
+  .isian-input.ok { border-color: var(--accent2); background: rgba(6, 214, 160, 0.16); }
+  .isian-input.no { border-color: var(--danger); background: rgba(239, 71, 111, 0.16); }
+  .q-card li.correct { word-break: break-word; }
 </style>
 </head>
 <body>
   <header>
-    <h1>🧠 MEMORIA</h1>
-    <p class="tagline">Temukan semua pasangan kartu secepat mungkin!</p>
+    <h1>📝 KUIS MASTER</h1>
+    <p class="tagline">Ubah kumpulan soal jadi kuis interaktif dalam sekejap!</p>
   </header>
 
-  <div class="controls">
-    <button class="btn active" data-level="easy">😊 Mudah (4×4)</button>
-    <button class="btn" data-level="medium">🤔 Sedang (4×5)</button>
-    <button class="btn" data-level="hard">🔥 Sulit (6×6)</button>
-    <button class="btn restart" id="restartBtn">🔄 Ulangi</button>
-  </div>
+  <button class="sound-toggle" id="soundToggle" title="Nyalakan / matikan suara" aria-label="Nyalakan atau matikan suara">🔊</button>
 
-  <div class="stats">
-    <div class="stat"><div class="label">Waktu</div><div class="value" id="timer">0:00</div></div>
-    <div class="stat"><div class="label">Langkah</div><div class="value" id="moves">0</div></div>
-    <div class="stat"><div class="label">Pasangan</div><div class="value" id="pairs">0/8</div></div>
-    <div class="stat"><div class="label">Rekor</div><div class="value" id="best">—</div></div>
-  </div>
-
-  <div class="board easy" id="board"></div>
-
-  <div class="overlay" id="overlay">
-    <div class="modal">
-      <span class="trophy">🏆</span>
-      <h2>Selamat, Kamu Menang!</h2>
-      <p id="resultText"></p>
-      <p id="recordText"></p>
-      <button class="btn restart" id="playAgainBtn">🎮 Main Lagi</button>
+  <div class="app">
+    <div class="tabs">
+      <button class="tab active" data-view="editor">✏️ Buat Soal</button>
+      <button class="tab" data-view="play">🎮 Mainkan</button>
+      <button class="tab" data-view="settings">⚙️ Pengaturan</button>
     </div>
+
+    <!-- ================= EDITOR ================= -->
+    <section class="view active" id="view-editor">
+      <div class="panel">
+        <h2>Tulis atau tempel soal kamu</h2>
+        <p class="hint">Ketik soal, beri pilihan jawaban dengan huruf (A, B, C, …), dan tandai jawaban benar dengan tanda bintang <code>*</code>. Pisahkan antar soal dengan baris kosong.</p>
+
+        <textarea id="soalInput" placeholder="1. Ibu kota Indonesia adalah...&#10;A. Bandung&#10;B. Jakarta*&#10;C. Surabaya&#10;D. Medan&#10;&#10;2. Hasil dari 5 + 7 adalah...&#10;A. 10&#10;B. 12*&#10;C. 14"></textarea>
+
+        <div class="row">
+          <button class="btn primary" id="parseBtn">⚡ Ubah Jadi Kuis</button>
+          <button class="btn" id="bankBtn">🧬 Bank Protein (75)</button>
+          <button class="btn" id="bankBtn2">🍞 Bank Karbohidrat (85)</button>
+          <button class="btn" id="bankBtn3">🔬 Bank Bioenergetika (90)</button>
+          <button class="btn" id="bankBtn4">🧈 Bank Lipid (100)</button>
+          <button class="btn" id="bankBtn5">💧 Bank Pondasi Biokimia (100)</button>
+          <button class="btn" id="bankBtn6">🧫 Bank Membran Sel (100)</button>
+          <button class="btn" id="bankBtn6s">🧱 Membran: Struktur (76)</button>
+          <button class="btn" id="sampleBtn">📄 Isi Contoh</button>
+          <button class="btn warn" id="clearBtn">🗑️ Bersihkan</button>
+        </div>
+
+        <div class="msg" id="parseMsg"></div>
+
+        <details class="guide">
+          <summary>📖 Panduan format soal</summary>
+<pre>Format pilihan ganda (tandai jawaban benar dengan <code>*</code>):
+
+  1. Pertanyaan kamu di sini?
+  A. Pilihan salah
+  B. Pilihan benar*
+  C. Pilihan salah
+
+Alternatif — pakai baris kunci jawaban:
+
+  Siapa presiden pertama Indonesia?
+  A. Soeharto
+  B. Soekarno
+  C. Habibie
+  Jawaban: B
+
+Soal isian (jawaban DIKETIK) — tulis pertanyaan + baris Jawaban, TANPA pilihan:
+
+  Ibu kota Indonesia adalah...
+  Jawaban: Jakarta
+
+Jawaban alternatif dipisah dengan garis miring (/):
+
+  Organ pemompa darah adalah...
+  Jawaban: jantung / hati (salah)   ← contoh, pakai yang benar saja
+
+Catatan:
+  • Nomor soal (1. / 2.) boleh ada atau tidak.
+  • Label pilihan boleh A. A) a. 1. dsb.
+  • Pisahkan tiap soal dengan satu baris kosong.
+  • Pilihan ganda: minimal 2 pilihan, satu ditandai benar (*).
+  • Isian: tanpa pilihan, cukup baris "Jawaban: ...".
+    Pengecekan tidak peka huruf besar/kecil; beberapa jawaban
+    alternatif dipisah dengan tanda "/".</pre>
+        </details>
+
+        <div class="preview" id="preview"></div>
+      </div>
+    </section>
+
+    <!-- ================= PLAY ================= -->
+    <section class="view" id="view-play">
+      <div class="panel" id="playPanel">
+        <div class="empty" id="playEmpty">
+          <span class="big">🗒️</span>
+          Belum ada kuis. Buat soal dulu di tab <b>Buat Soal</b>, lalu tekan <b>Ubah Jadi Kuis</b>.
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SETTINGS ================= -->
+    <section class="view" id="view-settings">
+      <div class="panel">
+        <h2>Pengaturan Kuis</h2>
+        <p class="hint">Atur bagaimana kuis dimainkan. Perubahan berlaku saat kamu mulai kuis berikutnya.</p>
+        <div class="settings">
+          <div class="setting-row">
+            <div class="label"><b>Musik latar (backsound)</b><small>Musik lembut mengalun selama mengerjakan kuis</small></div>
+            <label class="switch"><input type="checkbox" id="setMusic"><span class="slider"></span></label>
+          </div>
+          <div class="setting-row">
+            <div class="label"><b>Efek suara</b><small>Bunyi saat menjawab benar/salah &amp; saat selesai</small></div>
+            <label class="switch"><input type="checkbox" id="setSfx" checked><span class="slider"></span></label>
+          </div>
+          <div class="setting-row">
+            <div class="label"><b>Volume</b><small>Keras-pelan musik &amp; efek suara</small></div>
+            <input type="range" id="setVolume" min="0" max="100" value="70" style="width:130px;">
+          </div>
+          <div class="setting-row">
+            <div class="label"><b>Acak urutan soal</b><small>Soal muncul dengan urutan berbeda tiap main</small></div>
+            <label class="switch"><input type="checkbox" id="setShuffleQ" checked><span class="slider"></span></label>
+          </div>
+          <div class="setting-row">
+            <div class="label"><b>Acak pilihan jawaban</b><small>Posisi A/B/C/D diacak tiap soal</small></div>
+            <label class="switch"><input type="checkbox" id="setShuffleO" checked><span class="slider"></span></label>
+          </div>
+          <div class="setting-row">
+            <div class="label"><b>Umpan balik langsung</b><small>Tampilkan benar/salah setelah memilih</small></div>
+            <label class="switch"><input type="checkbox" id="setInstant" checked><span class="slider"></span></label>
+          </div>
+          <div class="setting-row">
+            <div class="label"><b>Batas waktu per soal</b><small>Hitung mundur; 0 = tanpa batas</small></div>
+            <input type="number" id="setTimer" min="0" max="300" value="0" style="width:80px;background:rgba(0,0,0,0.25);border:1px solid var(--panel-border);border-radius:8px;color:var(--text);padding:8px;text-align:center;font-size:1rem;">
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 
-  <footer>Dibuat dengan ❤️ — klik kartu untuk membaliknya, cocokkan emoji yang sama!</footer>
+  <footer>Dibuat dengan ❤️ — semua berjalan di browser kamu, tanpa server &amp; tanpa instalasi.</footer>
 
 <script>
 (function () {
-  const EMOJIS = ['🐶','🐱','🦊','🐼','🐨','🦁','🐸','🐵','🦄','🐙','🦋','🐢','🍕','🍩','🍉','🌈','⚽','🎸'];
-  const LEVELS = { easy: 8, medium: 10, hard: 18 };
+  "use strict";
 
-  const board = document.getElementById('board');
-  const timerEl = document.getElementById('timer');
-  const movesEl = document.getElementById('moves');
-  const pairsEl = document.getElementById('pairs');
-  const bestEl = document.getElementById('best');
-  const overlay = document.getElementById('overlay');
-  const resultText = document.getElementById('resultText');
-  const recordText = document.getElementById('recordText');
+  // ---------- State ----------
+  let questions = [];          // parsed source questions
+  let quiz = [];               // active quiz (possibly shuffled)
+  let current = 0;
+  let answers = [];            // user's chosen original-index per question
+  let locked = [];             // whether question already answered (instant mode)
+  let countdownId = null;
 
-  let level = 'easy';
-  let firstCard = null;
-  let lock = false;
-  let moves = 0;
-  let matched = 0;
-  let seconds = 0;
-  let timerId = null;
-  let started = false;
+  // ---------- Mode & bot ----------
+  let mode = 'solo';           // 'solo' | 'bot'
+  let botLevel = 'sedang';     // 'mudah' | 'sedang' | 'sulit'
+  let botScore = 0, botAnswers = [], youScore = 0, streak = 0, bestStreak = 0;
+  const BOT = {
+    mudah:  { p: 0.50, name: 'Bot Santai',   emoji: '😴' },
+    sedang: { p: 0.72, name: 'Bot Seimbang', emoji: '🙂' },
+    sulit:  { p: 0.90, name: 'Bot Jenius',   emoji: '🔥' }
+  };
+  const instantOn = () => settings.instant || mode === 'bot';
 
-  function formatTime(s) {
-    return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  function botAnswer(q) {
+    const ci = q.options.findIndex(o => o.correct);
+    if (Math.random() < BOT[botLevel].p) return ci;
+    const wrong = q.options.map((o, idx) => idx).filter(idx => idx !== ci);
+    return wrong.length ? wrong[Math.floor(Math.random() * wrong.length)] : ci;
   }
 
-  function getBest() {
-    const v = localStorage.getItem('memoria-best-' + level);
-    return v ? JSON.parse(v) : null;
+  function pointPop(text, color) {
+    const el = document.createElement('div');
+    el.className = 'pointpop';
+    el.textContent = text;
+    if (color) el.style.color = color;
+    el.style.left = (42 + Math.random() * 16) + 'vw';
+    el.style.top = '48vh';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1000);
   }
 
-  function showBest() {
-    const b = getBest();
-    bestEl.textContent = b ? formatTime(b.time) : '—';
-  }
+  const settings = {
+    shuffleQ: true,
+    shuffleO: true,
+    instant: true,
+    timer: 0,
+    music: false,
+    sfx: true,
+    volume: 0.7,
+    muted: false
+  };
 
-  function startTimer() {
-    if (timerId) return;
-    timerEl.classList.add('ticking');
-    timerId = setInterval(() => {
-      seconds++;
-      timerEl.textContent = formatTime(seconds);
-    }, 1000);
-  }
+  // ---------- Sound (Web Audio, tanpa file eksternal) ----------
+  const Sound = (function () {
+    let ctx = null, master = null, musicGain = null, musicTimer = null, chordIdx = 0;
+    let enabledSfx = true, enabledMusic = false, muted = false, vol = 0.7;
+    // Progresi akor lembut (Am – F – C – G) untuk musik latar
+    const CHORDS = [
+      [220.00, 261.63, 329.63],
+      [174.61, 220.00, 261.63],
+      [261.63, 329.63, 392.00],
+      [196.00, 246.94, 293.66]
+    ];
 
-  function stopTimer() {
-    clearInterval(timerId);
-    timerId = null;
-    timerEl.classList.remove('ticking');
-  }
-
-  function shuffle(arr) {
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
+    function ensure() {
+      if (!ctx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        ctx = new AC();
+        master = ctx.createGain();
+        master.gain.value = muted ? 0 : vol;
+        master.connect(ctx.destination);
+        musicGain = ctx.createGain();
+        musicGain.gain.value = 0.5;
+        musicGain.connect(master);
+      }
+      if (ctx.state === 'suspended') ctx.resume();
+      return ctx;
     }
-    return arr;
+
+    function beep(freq, dur, type, gain, at, glideTo) {
+      if (muted || !enabledSfx) return;
+      if (!ensure()) return;
+      const t = ctx.currentTime + (at || 0);
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type || 'sine';
+      o.frequency.setValueAtTime(freq, t);
+      if (glideTo) o.frequency.exponentialRampToValueAtTime(glideTo, t + dur);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(gain || 0.2, t + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(master);
+      o.start(t); o.stop(t + dur + 0.03);
+    }
+
+    function playChord() {
+      if (!ctx || !enabledMusic || muted) return;
+      const chord = CHORDS[chordIdx % CHORDS.length]; chordIdx++;
+      const t = ctx.currentTime;
+      chord.forEach((f, idx) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = idx === 0 ? 'triangle' : 'sine';
+        o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(0.09, t + 0.9);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 3.7);
+        o.connect(g); g.connect(musicGain);
+        o.start(t); o.stop(t + 3.85);
+      });
+    }
+
+    function startMusic() {
+      if (!enabledMusic || muted) return;
+      if (!ensure()) return;
+      if (musicTimer) return;
+      chordIdx = 0;
+      playChord();
+      musicTimer = setInterval(playChord, 3600);
+    }
+    function stopMusic() {
+      if (musicTimer) { clearInterval(musicTimer); musicTimer = null; }
+    }
+
+    return {
+      initGesture() { ensure(); },
+      correct() { [523.25, 659.25, 783.99].forEach((f, i) => beep(f, 0.18, 'triangle', 0.22, i * 0.07)); },
+      wrong() { beep(220, 0.32, 'sawtooth', 0.16, 0, 110); },
+      click() { beep(660, 0.05, 'square', 0.06); },
+      finish(good) {
+        const notes = good ? [523.25, 659.25, 783.99, 1046.50] : [392.00, 440.00, 466.16];
+        notes.forEach((f, i) => beep(f, 0.26, 'triangle', 0.2, i * 0.12));
+      },
+      combo(n) {
+        const base = 523.25;
+        for (let i = 0; i < Math.min(n, 5); i++) beep(base * Math.pow(1.122, i), 0.09, 'square', 0.13, i * 0.05);
+      },
+      win() {
+        [523.25, 659.25, 783.99, 1046.50, 783.99, 1046.50, 1318.51].forEach((f, i) => beep(f, 0.22, 'triangle', 0.22, i * 0.11));
+      },
+      setSfx(v) { enabledSfx = v; },
+      setMusicEnabled(v) { enabledMusic = v; if (!v) stopMusic(); },
+      setVolume(v) { vol = v; if (master && !muted) master.gain.setTargetAtTime(vol, ctx.currentTime, 0.02); },
+      setMuted(v) {
+        muted = v;
+        if (master) master.gain.setTargetAtTime(muted ? 0 : vol, ctx.currentTime, 0.02);
+        if (muted) stopMusic();
+      },
+      isMuted() { return muted; },
+      startMusic, stopMusic,
+      isPlaying() { return !!musicTimer; }
+    };
+  })();
+
+  // ---------- Elements ----------
+  const $ = (id) => document.getElementById(id);
+  const soalInput = $('soalInput');
+  const preview = $('preview');
+  const parseMsg = $('parseMsg');
+  const playPanel = $('playPanel');
+
+  // ---------- Persistence ----------
+  function save() {
+    try {
+      localStorage.setItem('kuis-master', JSON.stringify({
+        text: soalInput.value,
+        questions,
+        settings,
+        mode,
+        botLevel
+      }));
+    } catch (e) {}
+  }
+  function load() {
+    try {
+      const raw = localStorage.getItem('kuis-master');
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      if (data.text) soalInput.value = data.text;
+      if (Array.isArray(data.questions)) questions = data.questions;
+      if (data.settings) Object.assign(settings, data.settings);
+      if (data.mode) mode = data.mode;
+      if (data.botLevel) botLevel = data.botLevel;
+    } catch (e) {}
   }
 
-  function newGame() {
-    stopTimer();
-    firstCard = null;
-    lock = false;
-    moves = 0;
-    matched = 0;
-    seconds = 0;
-    started = false;
-    timerEl.textContent = '0:00';
-    movesEl.textContent = '0';
-    overlay.classList.remove('show');
+  // ---------- Parser ----------
+  // Returns { questions, errors }
+  function parseSoal(text) {
+    const blocks = text.replace(/\r/g, '').split(/\n\s*\n/);
+    const out = [];
+    const errors = [];
 
-    const pairCount = LEVELS[level];
-    pairsEl.textContent = '0/' + pairCount;
-    showBest();
+    const optRe = /^\s*(?:([A-Za-z])|(\d+))\s*[.)\-:]\s+(.*)$/;
+    const keyRe = /^\s*(?:jawaban|kunci|answer|jawab)\s*[:.\-]?\s*(.+)$/i;
 
-    const deck = shuffle(
-      shuffle(EMOJIS.slice()).slice(0, pairCount).flatMap(e => [e, e])
-    );
+    blocks.forEach((block, bi) => {
+      const lines = block.split('\n').map(l => l.trimEnd()).filter(l => l.trim() !== '');
+      if (lines.length === 0) return;
 
-    board.className = 'board ' + level;
-    board.innerHTML = '';
-    deck.forEach((emoji, i) => {
+      const qLines = [];
+      const options = [];
+      let keyLine = null;
+
+      lines.forEach(line => {
+        const k = line.match(keyRe);
+        if (k) { keyLine = k[1].trim(); return; }
+        const m = line.match(optRe);
+        if (m && options.length < 26 && (options.length > 0 || qLines.length > 0)) {
+          // treat as an option only after we have a question stem
+          let label = (m[1] || m[2]);
+          let val = m[3];
+          let correct = false;
+          if (/\*\s*$/.test(val) || /^\s*\*/.test(val)) { correct = true; val = val.replace(/\*/g, '').trim(); }
+          if (/\(?(benar|correct)\)?\s*$/i.test(val)) { correct = true; val = val.replace(/\(?(benar|correct)\)?\s*$/i, '').trim(); }
+          options.push({ label: label.toString().toUpperCase(), text: val.trim(), correct });
+        } else {
+          qLines.push(line.replace(/^\s*\d+\s*[.)\-:]\s*/, '').trim());
+        }
+      });
+
+      const qText = qLines.join(' ').trim();
+
+      if (!qText && options.length === 0) return;
+
+      // Soal isian (jawaban diketik): tidak ada pilihan, tetapi ada baris Jawaban
+      if (options.length === 0) {
+        if (keyLine) {
+          const answersList = keyLine.split(/\s*[\/;]\s*/).map(a => a.trim()).filter(Boolean);
+          out.push({ text: qText || '(tanpa teks pertanyaan)', type: 'isian', answers: answersList, displayAnswer: keyLine.trim() });
+        } else {
+          errors.push(`Soal #${bi + 1} dilewati: tidak ada pilihan maupun baris "Jawaban:".`);
+        }
+        return;
+      }
+
+      if (options.length < 2) {
+        errors.push(`Soal #${bi + 1} dilewati: butuh minimal 2 pilihan jawaban (atau gunakan baris "Jawaban:" tanpa pilihan untuk soal isian).`);
+        return;
+      }
+
+      // Resolve correct answer via key line if provided
+      if (keyLine) {
+        const byLetter = keyLine.trim().toUpperCase();
+        let idx = options.findIndex(o => o.label === byLetter);
+        if (idx === -1) {
+          // maybe key is the full answer text
+          idx = options.findIndex(o => o.text.toLowerCase() === keyLine.trim().toLowerCase());
+        }
+        if (idx !== -1) { options.forEach(o => o.correct = false); options[idx].correct = true; }
+      }
+
+      const correctCount = options.filter(o => o.correct).length;
+      if (correctCount === 0) {
+        errors.push(`Soal #${bi + 1} ("${qText.slice(0, 30)}…") dilewati: tidak ada jawaban benar yang ditandai.`);
+        return;
+      }
+      if (correctCount > 1) {
+        // keep only first correct to keep single-answer semantics
+        let seen = false;
+        options.forEach(o => { if (o.correct) { if (seen) o.correct = false; else seen = true; } });
+      }
+
+      out.push({
+        text: qText || '(tanpa teks pertanyaan)',
+        type: 'mcq',
+        options: options.map(o => ({ text: o.text, correct: o.correct }))
+      });
+    });
+
+    return { questions: out, errors };
+  }
+
+  // ---------- Editor actions ----------
+  function showMsg(el, text, ok) {
+    el.textContent = text;
+    el.className = 'msg show ' + (ok ? 'ok' : 'err');
+  }
+
+  function renderPreview() {
+    preview.innerHTML = '';
+    if (questions.length === 0) return;
+    const head = document.createElement('h2');
+    head.style.marginTop = '4px';
+    head.textContent = `Pratinjau — ${questions.length} soal`;
+    preview.appendChild(head);
+
+    questions.forEach((q, i) => {
       const card = document.createElement('div');
-      card.className = 'card';
-      card.dataset.emoji = emoji;
-      card.style.setProperty('--deal-delay', (i * 0.04) + 's');
+      card.className = 'q-card';
+      let body;
+      if (q.type === 'isian') {
+        body = `<ul><li class="correct">✍️ Jawaban (diketik): ${escapeHtml(q.displayAnswer)}</li></ul>`;
+      } else {
+        const ul = q.options.map(o =>
+          `<li class="${o.correct ? 'correct' : ''}">${escapeHtml(o.text)}</li>`).join('');
+        body = `<ul>${ul}</ul>`;
+      }
       card.innerHTML =
-        '<div class="card-face card-front"></div>' +
-        '<div class="card-face card-back">' + emoji + '</div>';
-      card.addEventListener('click', () => flip(card));
-      board.appendChild(card);
+        `<div><span class="q-num">${i + 1}.</span><span class="q-text">${escapeHtml(q.text)}</span></div>` +
+        body;
+      preview.appendChild(card);
     });
   }
 
-  function flip(card) {
-    if (lock || card.classList.contains('flipped')) return;
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
 
-    if (!started) { started = true; startTimer(); }
-
-    card.classList.add('flipped');
-
-    if (!firstCard) {
-      firstCard = card;
+  $('parseBtn').addEventListener('click', () => {
+    const { questions: parsed, errors } = parseSoal(soalInput.value);
+    if (parsed.length === 0) {
+      showMsg(parseMsg, '❌ Tidak ada soal valid yang terbaca. ' + (errors[0] || 'Periksa format soalmu.'), false);
+      questions = [];
+      renderPreview();
+      renderPlay();
+      save();
       return;
     }
+    questions = parsed;
+    let m = `✅ Berhasil! ${parsed.length} soal siap dimainkan.`;
+    if (errors.length) m += ` (${errors.length} soal dilewati)`;
+    showMsg(parseMsg, m, true);
+    renderPreview();
+    renderPlay();
+    save();
+  });
 
-    moves++;
-    movesEl.textContent = moves;
-    bump(movesEl);
+  // Bank soal bawaan: Struktur, Fungsi & Metabolisme Protein (Bagian A, 75 butir)
+  // Format: [pertanyaan, [pilihan...], indeksJawabanBenar(0-based)]
+  const BANK = [
+    ['Kata "protein" berasal dari kata protos/proteos yang berarti…', ['akhir','pertama atau utama','pembangun','rantai panjang'], 1],
+    ['Protein merupakan polimer dari monomer…', ['monosakarida','asam lemak','asam amino','nukleotida'], 2],
+    ['Ikatan yang menghubungkan antar monomer penyusun protein adalah…', ['ikatan glikosidik','ikatan ester','ikatan peptida','ikatan fosfodiester'], 2],
+    ['Berikut ini yang bukan merupakan bagian dari struktur asam amino adalah…', ['gugus karboksil (–COOH)','gugus amina (–NH₂)','gugus fosfat (–PO₄)','rantai samping (R)'], 2],
+    ['Atom karbon pusat pada asam amino disebut…', ['karbon β','karbon α','karbon γ','karbon anomerik'], 1],
+    ['Bagian asam amino yang membedakan satu asam amino dengan asam amino lainnya adalah…', ['gugus karboksil','gugus amina','rantai samping (gugus R)','atom karbon pusat'], 2],
+    ['Asam amino yang tidak memiliki stereoisomer adalah…', ['serin','alanin','glisin','valin'], 2],
+    ['Alasan asam amino tersebut tidak memiliki stereoisomer adalah…', ['tidak memiliki gugus amina','atom C pusatnya tidak mengikat empat gugus yang berbeda','tidak memiliki gugus karboksil','rantai sampingnya aromatik'], 1],
+    ['Jika gugus NH₃⁺ terletak di sebelah kanan, maka asam amino diberi awalan…', ['L','D','α','β'], 1],
+    ['Semua asam amino yang terdapat dalam protein memiliki konfigurasi…', ['D','L','campuran D dan L','rasemik'], 1],
+    ['Asam D-alanin dan D-glutamat merupakan komponen penyusun…', ['membran sel hewan','dinding sel bakteri tertentu','inti sel tumbuhan','mitokondria'], 1],
+    ['Penulisan singkat 20 asam amino umum menggunakan…', ['1 huruf saja','2 huruf','3 huruf','4 huruf'], 2],
+    ['Reaksi pembentukan ikatan peptida antar asam amino disebut reaksi…', ['hidrolisis','kondensasi','oksidasi','reduksi'], 1],
+    ['Molekul yang dilepaskan pada reaksi kondensasi asam amino adalah…', ['CO₂','NH₃','H₂O','ATP'], 2],
+    ['Reaksi kondensasi merupakan reaksi antara…', ['gugus karboksilat dengan gugus amino','gugus amino dengan gugus amino','gugus R dengan gugus R','gugus karboksilat dengan gugus karboksilat'], 0],
+    ['Dua asam amino yang terikat secara kovalen membentuk…', ['oligopeptida','dipeptida','polipeptida','multimer'], 1],
+    ['Molekul yang tersusun atas 2 hingga 20 asam amino disebut…', ['dipeptida','oligopeptida','polipeptida','protein globular'], 1],
+    ['Rangkaian yang melebihi 20 asam amino disebut…', ['oligopeptida','tripeptida','polipeptida','multimer'], 2],
+    ['Asam amino esensial adalah asam amino yang…', ['dapat diproduksi sendiri oleh tubuh','tidak dapat diproduksi sendiri oleh tubuh dan diperoleh dari makanan','hanya terdapat pada tumbuhan','tidak dibutuhkan oleh tubuh'], 1],
+    ['Berikut ini yang termasuk asam amino esensial adalah…', ['alanin','serin','lisin','glisin'], 2],
+    ['Berikut ini yang termasuk asam amino non-esensial adalah…', ['valin','tirosin','triptofan','metionin'], 1],
+    ['Penggolongan asam amino berdasarkan gugus R dibagi menjadi … kelompok', ['3','4','5','6'], 2],
+    ['Asam amino berikut termasuk golongan R alifatik non polar, kecuali…', ['valin','leusin','serin','isoleusin'], 2],
+    ['Asam amino yang memiliki gugus thioeter non polar adalah…', ['sistein','metionin','treonin','glutamin'], 1],
+    ['Asam amino non polar yang memiliki rantai samping alifatik dengan struktur siklik adalah…', ['prolin','alanin','glisin','leusin'], 0],
+    ['Semakin hidrofobik suatu asam amino, maka posisinya dalam molekul protein cenderung…', ['di permukaan luar protein','di bagian dalam molekul protein','berada di ujung amino','berada di ujung karboksil'], 1],
+    ['Sifat asam amino dengan gugus R polar tak bermuatan adalah…', ['hidrofobik','hidrofilik, mudah larut dalam air','selalu bermuatan negatif','tidak dapat berinteraksi dengan air'], 1],
+    ['Asam amino dengan gugus R polar tak bermuatan umumnya terletak di…', ['inti protein','kulit luar protein','membran lipid','sisi aktif enzim saja'], 1],
+    ['Kepolaran serin dan treonin ditentukan oleh gugus…', ['sulfhidril','amida','hidroksil','karboksil'], 2],
+    ['Kepolaran sistein ditentukan oleh gugus…', ['hidroksil','sulfhidril (–SH)','amida','imidazol'], 1],
+    ['Kepolaran asparagin dan glutamin ditentukan oleh gugus…', ['amida','hidroksil','karboksil','guanidin'], 0],
+    ['Gugus R pada asam amino polar tak bermuatan dapat terionisasi pada pH tinggi (pH ± 8,3) sehingga dapat mengalami oksidasi dan membentuk ikatan…', ['peptida','hidrogen','disulfida','ionik'], 2],
+    ['Pasangan asam amino dengan gugus R bermuatan negatif (bersifat asam) adalah…', ['lisin dan arginin','aspartat dan glutamat','serin dan treonin','fenilalanin dan tirosin'], 1],
+    ['Asam amino bermuatan negatif bersifat asam karena…', ['menyerap proton pada pH netral','memiliki gugus karboksil pada rantai samping yang melepaskan H⁺ pada pH netral','memiliki gugus amina bebas','memiliki cincin aromatik'], 1],
+    ['Asam amino dengan gugus R bermuatan positif (bersifat basa) adalah…', ['lisin, arginin, histidin','aspartat, glutamat, serin','glisin, alanin, valin','triptofan, tirosin, fenilalanin'], 0],
+    ['Histidin dapat bermuatan positif pada pH netral karena gugus NH₂ dan NH-nya…', ['melepaskan proton','menyerap proton','membentuk ikatan disulfida','teroksidasi'], 1],
+    ['Kelompok asam amino aromatik terdiri atas…', ['fenilalanin, tirosin, triptofan','lisin, arginin, histidin','prolin, glisin, alanin','serin, sistein, treonin'], 0],
+    ['Asam amino aromatik mampu menyerap sinar UV pada panjang gelombang…', ['260 nm','280 nm','340 nm','540 nm'], 1],
+    ['Cincin yang terdapat pada triptofan adalah cincin…', ['imidazol','pirolidin','indol','benzena tersubstitusi OH'], 2],
+    ['Cincin pirolidin terdapat pada asam amino…', ['prolin','histidin','triptofan','tirosin'], 0],
+    ['Cincin imidazol terdapat pada asam amino…', ['prolin','histidin','arginin','lisin'], 1],
+    ['Struktur protein primer merupakan…', ['lilitan heliks yang distabilkan ikatan hidrogen','urutan asam amino pada rantai lurus protein yang disatukan ikatan peptida','susunan tiga dimensi hasil interaksi gugus R','pengaturan beberapa subunit protein'], 1],
+    ['Sifat ikatan peptida pada struktur primer adalah…', ['non-kovalen dan mudah putus','kovalen, sangat stabil, dan tidak dipengaruhi pH ataupun pelarut','ionik dan bergantung pH','hidrogen dan lemah'], 1],
+    ['Struktur sekunder protein terbentuk akibat adanya…', ['ikatan disulfida','ikatan hidrogen antar asam amino','interaksi ionik','ikatan peptida'], 1],
+    ['Berdasarkan polanya, struktur sekunder protein terbagi menjadi…', ['globular dan fibrilar','alfa-heliks dan beta-sheet','monomer dan multimer','primer dan tersier'], 1],
+    ['Pada struktur alfa-heliks, jumlah residu per putaran adalah…', ['2,0','3,6','4,5','6,2'], 1],
+    ['Pada struktur alfa-heliks, posisi rantai samping asam amino adalah…', ['menghadap ke dalam heliks','menghadap keluar','berikatan dengan rantai lain','tegak lurus terhadap sumbu'], 1],
+    ['Istilah "alpha" pada alfa-heliks berarti bahwa ulirannya terlihat…', ['berlawanan arah jarum jam','searah jarum jam','lurus tanpa ulir','berlipat-lipat'], 1],
+    ['Pada struktur beta-sheet, ikatan hidrogen terbentuk antara…', ['dua gugus –SH','atom oksigen karboksil suatu ikatan peptida dengan nitrogen dari ikatan peptida lainnya','gugus R bermuatan positif dan negatif','dua cincin aromatik'], 1],
+    ['Ikatan hidrogen pada beta-sheet dapat terbentuk antara…', ['hanya dua rantai polipeptida yang terpisah','hanya satu rantai yang melipat sendiri','dua rantai polipeptida terpisah atau dua daerah dari satu rantai tunggal yang melipat','rantai polipeptida dengan molekul air'], 2],
+    ['Struktur tersier protein terbentuk dari…', ['urutan linear asam amino','lipatan komponen struktur sekunder membentuk konfigurasi tiga dimensi','gabungan beberapa rantai polipeptida','ikatan peptida antar asam amino'], 1],
+    ['Interaksi ionik pada struktur tersier terjadi antara…', ['dua gugus samping bermuatan positif','gugus samping bermuatan positif dan gugus samping bermuatan negatif','dua gugus hidroksil','dua cincin aromatik'], 1],
+    ['Jembatan disulfida pada struktur tersier terbentuk akibat adanya asam amino…', ['metionin','sistein','serin','treonin'], 1],
+    ['Ikatan disulfida lebih kuat dibandingkan ikatan lain pada struktur tersier karena bersifat…', ['ionik','hidrogen','kovalen','van der Waals'], 2],
+    ['Gaya dispersi Van der Waals terjadi antara dua asam amino yang…', ['bermuatan berlawanan','rantai karbonnya cukup panjang dan memiliki nilai dipol yang berlawanan','memiliki gugus –SH','memiliki cincin aromatik'], 1],
+    ['Struktur kuartener protein menggambarkan…', ['urutan asam amino','lilitan alfa-heliks','pengaturan subunit protein dalam ruang dengan dua atau lebih rantai polipeptida','lipatan tiga dimensi satu rantai'], 2],
+    ['Ikatan yang mengikat subunit-subunit pada struktur kuartener adalah…', ['ikatan kovalen peptida','ikatan non-kovalen (elektrostatis, hidrogen, hidrofobik)','ikatan disulfida saja','ikatan glikosidik'], 1],
+    ['Protein kompleks fungsional yang tersusun atas dua atau lebih subunit disebut…', ['monomer','dimer semu','multimer','oligopeptida'], 2],
+    ['Protein yang berfungsi sebagai monomer…', ['selalu memiliki struktur kuartener','tidak memiliki struktur kuartener','tidak memiliki struktur tersier','tidak memiliki struktur primer'], 1],
+    ['Contoh protein yang memiliki struktur kuartener dengan rantai alfa dan beta adalah…', ['keratin','hemoglobin','kolagen','fibroin'], 1],
+    ['Denaturasi protein adalah…', ['pemecahan protein menjadi asam amino','perubahan struktur dan bentuk sehingga protein kehilangan fungsinya','penambahan gugus fosfat pada protein','pembentukan ikatan peptida baru'], 1],
+    ['Berikut ini merupakan faktor penyebab denaturasi protein, kecuali…', ['pH','suhu','kekuatan ionik','jumlah ribosom'], 3],
+    ['Pernyataan yang benar mengenai renaturasi adalah…', ['selalu mudah terjadi pada semua protein','pada umumnya protein terdenaturasi sangat sulit untuk direnaturasi','renaturasi menghilangkan fungsi protein','renaturasi hanya terjadi pada struktur primer'], 1],
+    ['Berikut ini contoh protein struktural, kecuali…', ['kolagen','keratin','fibroin','insulin'], 3],
+    ['Protein yang ditemukan pada rambut dan kuku serta melindungi jaringan epitel adalah…', ['kolagen','keratin','tubulin','elastin'], 1],
+    ['Protein struktural yang memperkuat tulang, kartilago, tendon, ligamen, dan kulit serta mencapai hampir seperempat protein total tubuh adalah…', ['keratin','kolagen','fibroin','MaSp'], 1],
+    ['Protein yang digunakan ulat sutra untuk membentuk kepompong adalah…', ['fibroin','tubulin','kolagen','kasein'], 0],
+    ['Tubulin membentuk tabung hollow yang disebut…', ['mikrofilamen','mikrotubul','filamen intermediet','sentromer'], 1],
+    ['MaSp (major ampullate spidroin protein) berperan dalam pembentukan…', ['kepompong ulat sutra','jaring laba-laba','rambut mamalia','cangkang telur'], 1],
+    ['Enzim ribonuklease mampu mengakselerasi reaksi kimia spesifik hingga…', ['10 ribu kali lebih cepat','10 juta kali lebih cepat','10 miliar kali lebih cepat','100 kali lebih cepat'], 2],
+    ['Contoh enzim pencernaan yang disebutkan dalam materi adalah…', ['pepsin dan tripsin','insulin dan glukagon','aktin dan miosin','kasein dan gluten'], 0],
+    ['Hormon adalah protein yang disekresi oleh…', ['kelenjar eksokrin','kelenjar endokrin','hati','ginjal'], 1],
+    ['Protein transport dalam darah yang membawa oksigen dari paru-paru ke seluruh jaringan tubuh adalah…', ['albumin','transferin','hemoglobin','lipoprotein'], 2],
+    ['Protein pada mitokondria yang memindahkan elektron dari satu protein kompleks ke protein kompleks lain adalah…', ['sitokrom c','mioglobin','GLUT-1','katenin'], 0],
+    ['Protein penyimpan (cadangan energi) pada air susu mamalia adalah…', ['ovalbumin','kasein','gluten','zein'], 1]
+  ];
 
-    if (firstCard.dataset.emoji === card.dataset.emoji) {
-      firstCard.classList.add('matched');
-      card.classList.add('matched');
-      firstCard = null;
-      matched++;
-      pairsEl.textContent = matched + '/' + LEVELS[level];
-      bump(pairsEl);
-      if (matched === LEVELS[level]) win();
-    } else {
-      lock = true;
-      const a = firstCard;
-      firstCard = null;
-      setTimeout(() => {
-        a.classList.add('wrong');
-        card.classList.add('wrong');
-      }, 350);
-      setTimeout(() => {
-        a.classList.remove('flipped', 'wrong');
-        card.classList.remove('flipped', 'wrong');
-        lock = false;
-      }, 900);
+  function bankToText(bank) {
+    return bank.map(([q, opts, ans]) =>
+      q + '\n' + opts.map((o, i) =>
+        String.fromCharCode(65 + i) + '. ' + o + (i === ans ? '*' : '')
+      ).join('\n')
+    ).join('\n\n');
+  }
+
+  // Bank soal bawaan #2: Struktur, Fungsi & Metabolisme Karbohidrat (Bagian I, 85 butir)
+  const BANK2 = [
+    ['Secara kimia, karbohidrat didefinisikan sebagai:', ['Polihidroksi alkohol','Polihidroksi aldehida atau keton','Polihidroksi asam karboksilat','Polimer asam amino','Ester asam lemak dengan gliserol'], 1],
+    ['Kata "saccharide" berasal dari bahasa Yunani sakcharon yang berarti:', ['Manis','Energi','Gula','Pati','Serat'], 2],
+    ['Rumus umum monosakarida adalah:', ['CnH2nOn','Cn(H2O)n','CnH2nO','C6H12O6 saja','Cn(HO)2n'], 1],
+    ['Karbohidrat disintesis dari CO₂ dan H₂O melalui proses:', ['Respirasi seluler','Glikolisis','Fermentasi','Fotosintesis','Glukoneogenesis'], 3],
+    ['Gula pentosa yang menjadi kerangka struktural DNA adalah:', ['Ribosa','Deoksiribosa','Xilosa','Arabinosa','Ribulosa'], 1],
+    ['Karbohidrat yang tersusun dari lebih dari 10 unit monosakarida disebut:', ['Monosakarida','Disakarida','Oligosakarida','Polisakarida','Glikosida'], 3],
+    ['Monosakarida terkecil memiliki jumlah atom karbon:', ['2','3','4','5','6'], 1],
+    ['Dihidroksiaseton digolongkan sebagai ketosa karena mengandung gugus:', ['Aldehid','Keton','Karboksil','Amino','Sulfat'], 1],
+    ['Monosakarida dengan jumlah karbon n = 5 disebut:', ['Triosa','Tetrosa','Pentosa','Heksosa','Heptosa'], 2],
+    ['Monosakarida dengan n = 7 disebut:', ['Pentosa','Heksosa','Heptosa','Oktosa','Tetrosa'], 2],
+    ['Dalam proyeksi Fischer, atom yang terikat pada karbon asimetris melalui ikatan horizontal berada:', ['Di belakang bidang halaman','Di depan bidang halaman','Sejajar bidang halaman','Tegak lurus ke bawah','Tidak dapat ditentukan'], 1],
+    ['Penentuan konfigurasi D dan L pada monosakarida didasarkan pada konfigurasi absolut atom karbon asimetris yang:', ['Paling dekat dengan gugus aldehid/keto','Terjauh dari gugus aldehid atau keto','Berada di tengah rantai','Mengikat gugus CH₂OH pertama','Mengikat dua gugus hidroksil'], 1],
+    ['Dua molekul yang merupakan bayangan cermin satu sama lain dan tidak dapat ditumpangtindihkan disebut:', ['Epimer','Anomer','Enansiomer','Isomer struktural','Tautomer'], 2],
+    ['Penamaan D dan L pada gula juga berkaitan dengan kemampuannya:', ['Larut dalam air','Memutar bidang polarisasi cahaya','Mereduksi ion logam','Membentuk ikatan glikosidik','Mengalami hidrolisis'], 1],
+    ['Monosakarida utama yang terdapat dalam darah dan menjadi sumber ATP dalam respirasi seluler adalah:', ['Fruktosa','Galaktosa','Glukosa','Manosa','Ribosa'], 2],
+    ['Gula yang banyak terdapat dalam madu dan buah-buahan serta merupakan hasil hidrolisis sukrosa adalah:', ['Glukosa','Fruktosa','Galaktosa','Laktosa','Maltosa'], 1],
+    ['Galaktosa dikenal sebagai gula susu karena merupakan bagian dari:', ['Sukrosa','Maltosa','Laktosa','Selulosa','Glikogen'], 2],
+    ['Monosakarida yang merupakan konstituen asam ribonukleat (RNA) adalah:', ['D-Ribosa','2-D-Deoksiribosa','D-Xilosa','L-Arabinosa','D-Manosa'], 0],
+    ['Monosakarida yang banyak ditemukan pada material berkayu (woody materials) dan menjadi konstituen polisakarida tumbuhan adalah:', ['D-Galaktosa','D-Xilosa','D-Manosa','D-Ribosa','D-Fruktosa'], 1],
+    ['D-Sedoheptulosa merupakan intermediat pada:', ['Glikolisis dan siklus Krebs','Siklus Calvin dan jalur pentosa fosfat','Glukoneogenesis','Jalur asam uronat','Glikogenolisis'], 1],
+    ['Ikatan yang menghubungkan antar unit monosakarida disebut:', ['Ikatan peptida','Ikatan ester','Ikatan glikosidik','Ikatan hidrogen','Ikatan disulfida'], 2],
+    ['Ikatan glikosidik terbentuk melalui reaksi:', ['Hidrolisis','Eliminasi air (kondensasi)','Oksidasi','Reduksi','Fosforilasi'], 1],
+    ['Rumus disakarida C₁₂H₂₂O₁₁ diperoleh dari:', ['2 C₆H₁₂O₆ + H₂O','2 C₆H₁₂O₆ − H₂O','C₆H₁₂O₆ + C₆H₁₀O₅','2 C₆H₁₂O₆ − 2 H₂O','C₆H₁₂O₆ × 2'], 1],
+    ['Maltosa tersusun dari:', ['Glukosa + fruktosa, ikatan α1→2','Dua glukosa, ikatan α1→4','Galaktosa + glukosa, ikatan β1→4','Dua galaktosa, ikatan β1→4','Glukosa + manosa, ikatan α1→6'], 1],
+    ['Enzim yang menghidrolisis maltosa adalah:', ['Laktase','Sukrase','Maltase','Amilase','Invertase'], 2],
+    ['Sukrosa tersusun dari glukosa dan fruktosa dengan ikatan:', ['C1α glu – C2β fru','C1β gal – C4 glu','α1→4 glukosidik','β1→4 glukosidik','α1→6 glukosidik'], 0],
+    ['Enzim yang menghidrolisis sukrosa disebut juga:', ['Laktase','Invertase','Maltase','Amilase','Selulase'], 1],
+    ['Laktosa tersusun dari:', ['Dua glukosa','Glukosa dan fruktosa','Galaktosa dan glukosa','Galaktosa dan fruktosa','Manosa dan glukosa'], 2],
+    ['Enzim yang menghidrolisis laktosa dikenal juga sebagai:', ['α-glukosidase','β-galaktosidase','α-amilase','Invertase','Fosforilase'], 1],
+    ['Disakarida yang dikenal sebagai "gula meja" dan diperoleh dari tebu serta bit adalah:', ['Maltosa','Laktosa','Sukrosa','Selobiosa','Trehalosa'], 2],
+    ['Maltosa merupakan hasil hidrolisis dari:', ['Selulosa','Pati','Kitin','Glikogen otot saja','Laktosa'], 1],
+    ['Polisakarida yang tersusun hanya dari satu jenis monomer disebut:', ['Heteropolisakarida','Homopolisakarida','Proteoglikan','Glikoprotein','Oligosakarida'], 1],
+    ['Bentuk pati yang tidak bercabang dan tersusun dari residu glukosa dengan ikatan α-1,4 adalah:', ['Amilopektin','Amilosa','Glikogen','Selulosa','Kitin'], 1],
+    ['Ikatan yang membentuk percabangan pada amilopektin dan glikogen adalah:', ['α1→4','α1→6','β1→4','β1→6','α1→2'], 1],
+    ['Dibandingkan amilopektin, glikogen memiliki ciri:', ['Percabangan lebih sedikit dan rantai lebih panjang','Percabangan lebih banyak (tiap ± 8 residu) dan rantai lebih pendek','Tidak bercabang sama sekali','Ikatan β1→4','Monomernya galaktosa'], 1],
+    ['Ikatan antar residu glukosa pada selulosa adalah:', ['α1→4','α1→6','β1→4','β1→6','α1→2'], 2],
+    ['Monomer penyusun kitin adalah:', ['D-glukosa','D-galaktosa','N-asetil-β-D-glukosamin','N-asetil-D-galaktosamin','Asam glukuronat'], 2],
+    ['Kitin terutama menyusun:', ['Dinding sel tumbuhan','Eksoskeleton moluska dan artropoda','Membran sel bakteri','Matriks tulang','Kapsul virus'], 1],
+    ['Enzim yang menghidrolisis pati dengan cepat dan disekresikan oleh kelenjar ludah serta pankreas adalah:', ['β-amilase','α-amilase','Selulase','Glukosidase','Fosforilase'], 1],
+    ['Glikogen disimpan terutama di dalam:', ['Otak dan ginjal','Hati dan otot','Jaringan lemak dan limpa','Pankreas dan usus','Kulit dan paru'], 1],
+    ['Pada setiap residu glukosa selulosa, pita yang terbentuk saling berputar sebesar:', ['45°','90°','120°','180°','360°'], 3],
+    ['Glikosaminoglikan selalu bermuatan negatif karena adanya gugus:', ['Amino dan hidroksil','Karboksilat dan sulfat','Fosfat dan amino','Metil dan asetil','Keton dan aldehid'], 1],
+    ['Yang bukan termasuk glikosaminoglikan utama adalah:', ['Kondroitin sulfat','Keratan sulfat','Heparin','Dermatan sulfat','Amilopektin'], 4],
+    ['Proteoglikan berfungsi sebagai:', ['Pembawa oksigen dalam darah','Pelumas sendi dan komponen struktural jaringan ikat','Katalis reaksi glikolisis','Sumber utama ATP','Reseptor hormon steroid'], 1],
+    ['Hormon glikoprotein yang disekresikan oleh ginjal dan merangsang produksi sel darah merah adalah:', ['Insulin','Glukagon','Eritropoietin','Tiroksin','Epinefrin'], 2],
+    ['Lektin adalah:', ['Karbohidrat yang mengikat lipid','Protein yang mengikat karbohidrat secara spesifik','Enzim pemecah glikogen','Polisakarida struktural bakteri','Hormon pengatur glukosa darah'], 1],
+    ['Fungsi utama lektin pada hewan adalah:', ['Menyimpan energi','Memfasilitasi kontak antar sel','Mengkatalisis fosforilasi glukosa','Membentuk eksoskeleton','Mengangkut oksigen'], 1],
+    ['Enzim yang bertanggung jawab atas pembentukan antigen golongan darah A, B, dan O adalah:', ['Glikosidase','Glikosiltransferase','Fosforilase','Transaminase','Dehidrogenase'], 1],
+    ['Gula yang membedakan antigen A dari antigen O adalah:', ['Fukosa (Fuc)','Galaktosa (Gal)','N-asetilgalaktosamin (GalNAc)','N-asetilglukosamin (GlcNAc)','Manosa'], 2],
+    ['Jalur metabolisme yang berupa sintesis senyawa dan molekul yang lebih besar dan kompleks disebut:', ['Katabolik','Anabolik','Amfibolik','Hidrolitik','Oksidatif'], 1],
+    ['Siklus asam sitrat merupakan contoh jalur:', ['Anabolik murni','Katabolik murni','Amfibolik','Fermentatif','Anaerob'], 2],
+    ['Pencernaan karbohidrat dimulai di:', ['Lambung','Mulut','Duodenum','Ileum','Kolon'], 1],
+    ['Produk kerja amilase saliva terhadap polisakarida adalah:', ['Hanya glukosa','Dekstrin, maltosa, dan sedikit glukosa','Asam amino dan peptida','Asam lemak dan gliserol','Laktosa dan galaktosa'], 1],
+    ['Amilase pankreas menghidrolisis dekstrin menjadi:', ['Maltosa dan glukosa','Sukrosa dan fruktosa','Laktosa dan galaktosa','Selulosa dan pati','Piruvat dan laktat'], 0],
+    ['Karbohidrat yang tidak dapat dicerna manusia dan diekskresikan melalui usus besar adalah:', ['Pati','Glikogen','Selulosa','Maltosa','Sukrosa'], 2],
+    ['Tiga jalur utama pemanfaatan glukosa dalam sel adalah:', ['Glikolisis, β-oksidasi, dan siklus urea','Penyimpanan (glikogen/pati/sukrosa), glikolisis, dan jalur pentosa fosfat','Glikolisis, lipogenesis, dan ketogenesis','Glukoneogenesis, glikogenolisis, dan proteolisis','Fermentasi, respirasi, dan fotosintesis'], 1],
+    ['Glikolisis berlangsung di dalam:', ['Matriks mitokondria','Sitoplasma (sitosol)','Membran dalam mitokondria','Retikulum endoplasma','Nukleus'], 1],
+    ['Jumlah tahapan reaksi glikolisis adalah:', ['5','8','10','12','15'], 2],
+    ['Produk akhir jalur glikolisis adalah:', ['Dua molekul asetil-KoA','Dua molekul piruvat (3 karbon)','Satu molekul laktat','Enam molekul CO₂','Dua molekul oksaloasetat'], 1],
+    ['Pada fase persiapan (preparatory phase, reaksi 1–5) glikolisis:', ['Dihasilkan 4 ATP','Digunakan 2 ATP','Digunakan 2 NADH','Dihasilkan 2 piruvat','Tidak terjadi perubahan energi'], 1],
+    ['Hasil bersih (net) glikolisis per molekul glukosa adalah:', ['2 ATP dan 2 NADH','4 ATP dan 4 NADH','38 ATP','2 ATP dan 4 NADH','1 ATP dan 1 NADH'], 0],
+    ['Enzim yang mengkatalisis reaksi pertama glikolisis adalah:', ['Fosfofruktokinase','Heksokinase','Aldolase','Enolase','Piruvat kinase'], 1],
+    ['Heksokinase dihambat oleh kadar tinggi:', ['ATP','AMP','Glukosa-6-fosfat','Fruktosa-1,6-bisfosfat','Asetil-KoA'], 2],
+    ['Enzim alosterik pada glikolisis yang dihambat oleh ATP tinggi dan diaktivasi oleh ADP serta AMP tinggi adalah:', ['Heksokinase','Fosfofruktokinase','Piruvat kinase','Fosfogliserat mutase','Triosa fosfat isomerase'], 1],
+    ['Piruvat kinase dihambat ketika kadar tinggi:', ['ADP dan AMP','ATP atau asetil-KoA','Glukosa-6-fosfat','NAD⁺','Fosfat anorganik'], 1],
+    ['Enzim aldolase memecah fruktosa-1,6-bisfosfat menjadi:', ['Dua molekul gliseraldehid-3-fosfat','Gliseraldehid-3-fosfat dan dihidroksiaseton fosfat','Piruvat dan laktat','Glukosa dan fruktosa','Dua molekul 1,3-bisfosfogliserat'], 1],
+    ['Enzim yang mengubah dihidroksiaseton fosfat menjadi gliseraldehid-3-fosfat adalah:', ['Aldolase','Triosa fosfat isomerase','Fosfoheksosa isomerase','Enolase','Fosfogliserat mutase'], 1],
+    ['Reaksi glikolisis yang menghasilkan NADH dikatalisis oleh:', ['Piruvat kinase','Fosfogliserat kinase','Gliseraldehid-3-fosfat dehidrogenase','Enolase','Heksokinase'], 2],
+    ['Enzim enolase mengubah 2-fosfogliserat menjadi fosfoenolpiruvat dengan melepaskan:', ['CO₂','H₂O','NADH','ATP','Fosfat anorganik'], 1],
+    ['Pembentukan ATP pada reaksi 7 dan 10 glikolisis merupakan contoh:', ['Fosforilasi oksidatif','Fotofosforilasi','Fosforilasi tingkat substrat','Fosforilasi alosterik','Transfosforilasi'], 2],
+    ['Galaktosa memasuki jalur glikolisis pada titik:', ['Glukosa-6-fosfat','Fruktosa-6-fosfat','Fruktosa-1,6-bisfosfat','Gliseraldehid-3-fosfat','Piruvat'], 0],
+    ['Fruktosa di jaringan adiposa memasuki glikolisis sebagai:', ['Glukosa-6-fosfat','Fruktosa-6-fosfat','DHAP','1,3-bisfosfogliserat','Oksaloasetat'], 1],
+    ['Dalam kondisi aerob, piruvat akan mengalami:', ['Reduksi menjadi laktat','Dekarboksilasi menjadi asetil-KoA dan CO₂','Karboksilasi menjadi oksaloasetat oleh laktat dehidrogenase','Konversi menjadi etanol','Fosforilasi menjadi PEP'], 1],
+    ['Dalam kondisi anaerob, piruvat diubah menjadi laktat oleh enzim:', ['Piruvat dekarboksilase','Laktat dehidrogenase','Alkohol dehidrogenase','Piruvat karboksilase','Piruvat kinase'], 1],
+    ['Tujuan utama reduksi piruvat menjadi laktat pada kondisi anaerob adalah:', ['Menghasilkan ATP tambahan','Mengoksidasi NADH kembali menjadi NAD⁺ agar glikolisis berlanjut','Menghasilkan CO₂','Menyimpan energi dalam bentuk lemak','Membentuk asetil-KoA'], 1],
+    ['Enzim yang mengkatalisis dekarboksilasi piruvat pada fermentasi alkohol dan membutuhkan koenzim tiamin pirofosfat adalah:', ['Alkohol dehidrogenase','Piruvat dekarboksilase','Laktat dehidrogenase','Piruvat karboksilase','Aldolase'], 1],
+    ['Jaringan yang sangat tergantung pada keadaan aerob sehingga berbahaya bila terjadi iskemia adalah:', ['Otot rangka','Otot jantung','Eritrosit','Jaringan lemak','Kulit'], 1],
+    ['Pada sel kanker, proses glikolisis berlangsung lebih cepat daripada kebutuhan siklus asam sitrat sehingga terjadi:', ['Penumpukan asetil-KoA','Pembentukan laktat berlebihan','Defisiensi NADPH','Penurunan konsumsi glukosa','Peningkatan glukoneogenesis'], 1],
+    ['Glikogenesis diaktivasi oleh hormon:', ['Glukagon','Epinefrin','Insulin','Kortisol','Tiroksin'], 2],
+    ['Bentuk glukosa aktif yang digunakan untuk sintesis glikogen adalah:', ['Glukosa-6-fosfat','Glukosa-1-fosfat','UDP-glukosa','ADP-glukosa','Fruktosa-6-fosfat'], 2],
+    ['Enzim yang menambahkan unit glukosa dari UDP-glukosa ke rantai glikogen adalah:', ['Glikogen fosforilase','Glikogen sintase','Fosfoglukomutase','UDPGlc pirofosforilase','Glukokinase'], 1],
+    ['Glikogenolisis di hati diaktivasi oleh glukagon dan di otot oleh epinefrin, serta dihambat oleh:', ['Kortisol','Insulin','Tiroksin','cAMP','Somatostatin'], 1],
+    ['Produk pertama pemecahan glikogen oleh glikogen fosforilase adalah:', ['Glukosa bebas','Glukosa-1-fosfat','Glukosa-6-fosfat','UDP-glukosa','Fruktosa-6-fosfat'], 1],
+    ['Enzim yang mengubah glukosa-1-fosfat menjadi glukosa-6-fosfat adalah:', ['Fosfoglukomutase','Glukokinase','Heksokinase','Glukosa-6-fosfatase','Fosfofruktokinase'], 0],
+    ['Enzim glukosa-6-fosfatase yang memungkinkan pelepasan glukosa bebas ke dalam darah hanya terdapat di:', ['Otot rangka dan otak','Hati dan ginjal','Jaringan lemak dan limpa','Eritrosit dan otot jantung','Semua jaringan tubuh'], 1]
+  ];
+
+  $('bankBtn').addEventListener('click', () => {
+    soalInput.value = bankToText(BANK);
+    $('parseBtn').click();
+    preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  $('bankBtn2').addEventListener('click', () => {
+    soalInput.value = bankToText(BANK2);
+    $('parseBtn').click();
+    preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // Bank soal bawaan #3: Bioenergetika, Siklus Krebs & Fosforilasi Oksidatif (90 butir)
+  const BANK3 = [
+    ['Bioenergetika (termodinamika biokimia) adalah ilmu tentang:', ['Perubahan energi yang menyertai reaksi biokimia','Struktur tiga dimensi protein','Laju reaksi enzimatik','Sintesis DNA','Transpor melintasi membran'], 0],
+    ['Sistem biologis pada dasarnya bersifat ... dan menggunakan energi kimia untuk menjalankan proses kehidupan.', ['isobarik','isotermik','isokorik','adiabatik','isotonik'], 1],
+    ['Bentuk malnutrisi akibat habisnya cadangan energi yang disebutkan dalam materi adalah:', ['Kwashiorkor','Marasmus','Obesitas','Anemia','Rakitis'], 1],
+    ['Hormon yang mengontrol laju pembebasan energi (laju metabolik) adalah:', ['Insulin','Hormon tiroid','Glukagon','Kortisol','Adrenalin'], 1],
+    ['Kelebihan simpanan energi menyebabkan ... yang menjadi faktor risiko penyakit kardiovaskular dan DM tipe 2.', ['Marasmus','Obesitas','Hipertiroid','Anemia','Osteoporosis'], 1],
+    ['Dalam suatu sistem, energi bebas adalah:', ['Energi total sistem','Energi yang bermanfaat/dapat melakukan kerja','Energi yang hilang sebagai panas','Energi ikatan kovalen','Energi kinetik molekul'], 1],
+    ['Perubahan energi bebas Gibbs (ΔG) juga dikenal sebagai:', ['Entalpi','Entropi','Potensial kimia','Energi aktivasi','Kalor jenis'], 2],
+    ['Hukum pertama termodinamika menyatakan bahwa energi total suatu sistem (termasuk sekitarnya):', ['Selalu meningkat','Selalu menurun','Tetap konstan','Menjadi nol','Berubah acak'], 2],
+    ['Hukum kedua termodinamika menyatakan bahwa jika suatu proses terjadi spontan, maka ... total sistem pasti meningkat.', ['Entalpi','Entropi','Energi bebas','Suhu','Tekanan'], 1],
+    ['Entropi adalah:', ['Jumlah energi bermanfaat','Tingkat kekacauan atau ketidakteraturan sistem','Panas yang dilepas','Potensial redoks','Energi aktivasi'], 1],
+    ['Entropi menjadi maksimal ketika sistem:', ['Baru mulai bereaksi','Mendekati keseimbangan','Membeku','Kehilangan semua energi','Dipanaskan'], 1],
+    ['Persamaan yang menggabungkan kedua hukum termodinamika adalah:', ['ΔG = ΔH + TΔS','ΔG = ΔH − TΔS','ΔG = TΔS − ΔH','ΔG = ΔH × TΔS','ΔG = ΔS − TΔH'], 1],
+    ['Dalam persamaan ΔG = ΔH − TΔS, ΔH menyatakan:', ['Perubahan entropi','Perubahan entalpi (panas)','Suhu mutlak','Energi bebas','Potensial redoks'], 1],
+    ['Jika ΔG bernilai negatif, reaksi berlangsung:', ['Spontan dan bersifat eksergonik','Tidak spontan dan endergonik','Seimbang','Irreversibel dan endergonik','Spontan dan endergonik'], 0],
+    ['Jika ΔG bernilai positif, reaksi bersifat ... dan hanya berjalan bila memperoleh energi bebas.', ['Eksergonik','Endergonik','Spontan','Isotermik','Katabolik'], 1],
+    ['Jika ΔG bernilai nol, sistem berada dalam keadaan:', ['Eksergonik','Endergonik','Seimbang (equilibrium)','Irreversibel','Spontan'], 2],
+    ['Jika ΔG berukuran besar, reaksi berjalan menuju penyelesaian dan bersifat:', ['Reversibel','Irreversibel','Seimbang','Endergonik','Isotermik'], 1],
+    ['Suatu proses endergonik dapat berlangsung dengan cara:', ['Berdiri sendiri','Digabungkan (coupling) dengan proses eksergonik','Menurunkan suhu','Meningkatkan entropi saja','Melepas panas'], 1],
+    ['Reaksi eksergonik (penguraian/oksidasi molekul bahan bakar) secara umum disebut:', ['Anabolisme','Katabolisme','Glukoneogenesis','Lipogenesis','Transaminasi'], 1],
+    ['Reaksi sintesis yang membentuk zat disebut:', ['Katabolisme','Anabolisme','Oksidasi','Hidrolisis','Fermentasi'], 1],
+    ['Zat antara (pembawa) berenergi-tinggi yang utama di dalam sel hidup adalah:', ['ADP','AMP','ATP','GTP','NADH'], 2],
+    ['ATP adalah nukleotida yang terdiri dari adenosin (adenin + ribosa) dan ... gugus fosfat.', ['satu','dua','tiga','empat','lima'], 2],
+    ['Dalam reaksi di dalam sel, ATP berfungsi sebagai kompleks dengan ion:', ['Ca²⁺','Na⁺','Mg²⁺','K⁺','Fe²⁺'], 2],
+    ['ATP mengandung ... gugus fosfat berenergi tinggi.', ['satu','dua','tiga','empat','nol'], 1],
+    ['ADP mengandung ... gugus fosfat berenergi tinggi.', ['nol','satu','dua','tiga','empat'], 1],
+    ['Fosfat dalam AMP tergolong berenergi rendah karena merupakan:', ['Ikatan anhidrida','Ikatan ester normal','Ikatan glikosidik','Ikatan peptida','Ikatan hidrogen'], 1],
+    ['Siklus ATP/ADP menghubungkan proses yang menghasilkan ~P dengan proses yang:', ['Menyimpan lemak','Menggunakan ~P','Membentuk DNA','Memecah protein','Mengangkut oksigen'], 1],
+    ['Kompartemen ATP/ADP total sangat kecil sehingga hanya cukup mempertahankan jaringan aktif selama:', ['Beberapa jam','Beberapa menit','Beberapa detik','Beberapa hari','Seminggu'], 2],
+    ['Sumber ~P yang secara kuantitatif terbanyak dalam organisme aerobik adalah:', ['Glikolisis','Siklus asam sitrat','Fosforilasi oksidatif','Fermentasi','Fotosintesis'], 2],
+    ['Pada fosforilasi oksidatif, ATP dihasilkan di ... seketika O₂ direduksi menjadi H₂O.', ['Sitosol','Matriks mitokondria','Retikulum endoplasma','Nukleus','Membran plasma'], 1],
+    ['Glikolisis menghasilkan pembentukan netto ... ~P per molekul glukosa.', ['satu','dua','tiga','empat','enam'], 1],
+    ['Dua reaksi glikolisis penghasil ~P dikatalisis oleh fosfogliserat kinase dan:', ['Heksokinase','Piruvat kinase','Aldolase','Enolase','Fosfofruktokinase'], 1],
+    ['Dalam siklus asam sitrat, satu ~P dihasilkan langsung pada tahap:', ['Sitrat sintase','Akonitase','Suksinil tiokinase','Fumarase','Malat dehidrogenase'], 2],
+    ['Fosfagen berfungsi sebagai ... fosfat berenergi tinggi.', ['Bentuk pengangkut','Bentuk simpanan','Bentuk pembuangan','Katalisator','Akseptor elektron'], 1],
+    ['Fosfagen yang terdapat di otot rangka, jantung, spermatozoa, dan otak vertebrata adalah:', ['Arginin fosfat','Kreatin fosfat','Glukosa-6-fosfat','Fosfoenolpiruvat','AMP'], 1],
+    ['Fosfagen yang terdapat pada otot invertebrata adalah:', ['Kreatin fosfat','Arginin fosfat','Kreatinin','Karbamil fosfat','ATP'], 1],
+    ['Enzim adenilil kinase memungkinkan AMP diperoleh kembali menjadi ADP melalui:', ['Hidrolisis','Refosforilasi','Oksidasi','Deaminasi','Transaminasi'], 1],
+    ['Peningkatan AMP saat ATP berkurang memungkinkan AMP menjadi sinyal metabolik (alosterik) untuk:', ['Menghambat semua reaksi','Meningkatkan laju reaksi katabolik','Menurunkan produksi ATP','Menghentikan glikolisis','Memecah protein'], 1],
+    ['ATP disebut sebagai ... sel yang memindahkan energi bebas dari zat berpotensi tinggi ke zat berpotensi rendah.', ['"pabrik energi"','"alat tukar energi (energy currency)"','"gudang lemak"','"pembawa oksigen"','"cetak biru genetik"'], 1],
+    ['Secara kimiawi, oksidasi didefinisikan sebagai:', ['Penambahan elektron','Pengeluaran elektron','Penambahan proton','Pengeluaran air','Penambahan oksigen saja'], 1],
+    ['Reduksi didefinisikan sebagai:', ['Pengeluaran elektron','Penambahan elektron','Pengeluaran proton','Penambahan oksigen','Pengeluaran hidrogen'], 1],
+    ['Respirasi adalah proses sel memperoleh energi (ATP) dari reaksi terkendali ... dengan oksigen membentuk air.', ['karbon','hidrogen','nitrogen','sulfur','fosfor'], 1],
+    ['Potensial redoks untuk sistem biologis (E′₀) biasanya dinyatakan pada pH:', ['0,0','4,0','7,0','10,0','14,0'], 2],
+    ['Pada sistem biologis (pH 7,0), potensial elektroda hidrogen sebesar:', ['0,0 volt','−0,42 volt','+0,42 volt','+1,1 volt','−1,1 volt'], 1],
+    ['Enzim yang berperan dalam oksidasi dan reduksi disebut:', ['Transferase','Oksidoreduktase','Hidrolase','Liase','Isomerase'], 1],
+    ['Oksidoreduktase diklasifikasikan menjadi empat kelompok: oksidase, dehidrogenase, hidroperoksidase, dan:', ['Transaminase','Oksigenase','Kinase','Fosfatase','Sintase'], 1],
+    ['Oksidase menggunakan ... sebagai akseptor hidrogen.', ['NAD⁺','FAD','Oksigen','Air','Hidrogen peroksida'], 2],
+    ['Produk reaksi oksidase adalah air atau:', ['Karbon dioksida','Hidrogen peroksida','Amonia','Metana','Asam laktat'], 1],
+    ['Sitokrom oksidase adalah komponen terminal rantai respiratorik yang memindahkan elektron ke akseptor akhir, yaitu:', ['NAD⁺','Koenzim Q','Oksigen','Sitokrom c','Air'], 2],
+    ['Enzim flavoprotein mengandung gugus prostetik:', ['NAD⁺ atau NADP⁺','FMN atau FAD','Heme','Biotin','Tiamin pirofosfat'], 1],
+    ['FMN dan FAD dibentuk dalam tubuh dari vitamin:', ['Niasin','Riboflavin','Tiamin','Asam pantotenat','Piridoksin'], 1],
+    ['Xantin oksidase (mengandung molibdenum) berperan mengubah basa purin menjadi:', ['Urea','Asam urat','Amonia','Kreatinin','Bilirubin'], 1],
+    ['Dehidrogenase ... sebagai akseptor hidrogen.', ['Selalu menggunakan oksigen','Tidak dapat menggunakan oksigen','Hanya menggunakan air','Menggunakan CO₂','Menggunakan hidrogen peroksida'], 1],
+    ['Banyak dehidrogenase menggunakan koenzim nikotinamid (NAD⁺/NADP⁺) yang dibentuk dari vitamin:', ['Riboflavin','Niasin','Tiamin','Biotin','Asam folat'], 1],
+    ['Dalam reaksi, FAD menerima ... membentuk FADH₂.', ['1 elektron dan 1 H⁺','2 elektron dan 2 H⁺','4 elektron','2 H⁺ saja','1 elektron saja'], 1],
+    ['Dua jenis enzim yang termasuk hidroperoksidase adalah peroksidase dan:', ['Oksidase','Katalase','Dehidrogenase','Oksigenase','Sitokrom'], 1],
+    ['Hidroperoksidase berperan penting melindungi tubuh terhadap efek berbahaya dari:', ['Asam laktat','Spesies oksigen reaktif (ROS)','Amonia','Radikal karbon','Ion logam'], 1],
+    ['Katalase menggunakan hidrogen peroksida sebagai:', ['Hanya donor elektron','Hanya akseptor elektron','Donor sekaligus akseptor elektron','Substrat oksigenase','Koenzim'], 2],
+    ['Oksigenase mengatalisis pemindahan langsung dan penggabungan ... ke dalam molekul substrat.', ['Hidrogen','Oksigen','Elektron','Proton','Air'], 1],
+    ['Dioksigenase menggabungkan ... atom oksigen molekular ke dalam substrat.', ['satu','kedua (dua)','tiga','empat','nol'], 1],
+    ['Monooksigenase (hidroksilase) hanya memasukkan ... atom oksigen molekular ke dalam substrat.', ['satu','dua','tiga','empat','nol'], 0],
+    ['Menurut ringkasan, oksigenase memerantarai ... obat dan steroid.', ['Oksidasi sempurna','Hidroksilasi','Reduksi','Fosforilasi','Deaminasi'], 1],
+    ['Nama lain siklus asam sitrat adalah siklus Krebs atau siklus:', ['Asam dikarboksilat','Asam trikarboksilat','Asam monokarboksilat','Pentosa fosfat','Glioksilat'], 1],
+    ['Siklus asam sitrat berlangsung di:', ['Sitosol','Mitokondria (matriks)','Nukleus','Retikulum endoplasma','Lisosom'], 1],
+    ['Siklus asam sitrat mengoksidasi gugus asetil pada asetil-KoA menjadi:', ['H₂O','CO₂','Laktat','Etanol','Glukosa'], 1],
+    ['Siklus asam sitrat adalah jalur bersama terakhir untuk oksidasi:', ['Hanya karbohidrat','Hanya lipid','Karbohidrat, lipid, dan protein','Hanya protein','Asam nukleat'], 2],
+    ['Metabolit akhir bersama karbohidrat, lipid, dan protein yang masuk ke siklus adalah:', ['Piruvat','Asetil-KoA','Oksaloasetat','Sitrat','Laktat'], 1],
+    ['Dalam siklus, asetil-KoA bereaksi dengan ... untuk membentuk sitrat.', ['Malat','Oksaloasetat','Fumarat','Suksinat','α-ketoglutarat'], 1],
+    ['Satu putaran siklus asam sitrat menghasilkan ... ATP.', ['dua','empat','sepuluh','dua belas','tiga puluh delapan'], 2],
+    ['Per satu putaran siklus (per asetil-KoA) dihasilkan:', ['1 NADH dan 1 FADH₂','3 NADH dan 1 FADH₂','2 NADH dan 2 FADH₂','4 NADH saja','3 FADH₂ dan 1 NADH'], 1],
+    ['Setiap molekul NADH menghasilkan sekitar ... ATP.', ['1,5','2,5','3,0','4,0','10'], 1],
+    ['Setiap FADH₂ menghasilkan sekitar ... ATP.', ['1,0','1,5','2,5','3,0','4,0'], 1],
+    ['Dalam siklus, 1 ATP (atau GTP) terbentuk melalui fosforilasi tingkat-substrat yang dikatalisis oleh:', ['Sitrat sintase','Akonitase','Suksinat tiokinase','Fumarase','Isositrat dehidrogenase'], 2],
+    ['Empat vitamin B esensial dalam siklus asam sitrat adalah riboflavin, niasin, tiamin, dan:', ['Biotin','Asam pantotenat','Asam folat','Piridoksin','Kobalamin'], 1],
+    ['Riboflavin (dalam bentuk FAD) merupakan kofaktor untuk enzim:', ['Isositrat dehidrogenase','Suksinat dehidrogenase','Malat dehidrogenase','Sitrat sintase','Akonitase'], 1],
+    ['Tiamin (tiamin difosfat) menjadi koenzim untuk dekarboksilasi pada reaksi:', ['Isositrat dehidrogenase','α-ketoglutarat dehidrogenase','Malat dehidrogenase','Suksinat dehidrogenase','Fumarase'], 1],
+    ['Asam pantotenat berperan sebagai bagian dari:', ['FAD','NAD','Koenzim A','Tiamin difosfat','Biotin'], 2],
+    ['Siklus asam sitrat bersifat amfibolik karena:', ['Hanya menghasilkan ATP','Berperan dalam oksidasi sekaligus penyediaan bahan untuk sintesis (glukoneogenesis, sintesis asam lemak, interkonversi asam amino)','Hanya memecah lemak','Hanya terjadi di sitosol','Tidak memerlukan oksigen'], 1],
+    ['Sebagian besar fosforilasi oksidatif berlangsung di mitokondria yang disebut sebagai ... sel.', ['"dapur"','"powerhouse" (pabrik energi)','"otak"','"gudang"','"pos jaga"'], 1],
+    ['Membran mitokondria yang bersifat permeabel selektif adalah membran:', ['Luar','Dalam','Tengah','Krista luar','Plasma'], 1],
+    ['Rantai respiratorik, selain mengoksidasi ekuivalen pereduksi, juga bertindak sebagai:', ['Pompa natrium','Pompa proton','Pompa kalsium','Saluran klorida','Reseptor hormon'], 1],
+    ['Komponen rantai respiratorik terkandung dalam ... kompleks protein besar pada membran dalam mitokondria.', ['dua','tiga','empat','lima','enam'], 2],
+    ['Elektron mengalir melalui rantai respiratorik pada potensial redoks ... dari NAD⁺/NADH ke O₂/2H₂O.', ['0,42 V','1,1 V','2,5 V','0,0 V','7,0 V'], 1],
+    ['Teori kemiosmotik yang menjelaskan penggandengan transpor elektron dengan pembentukan ATP dikemukakan oleh:', ['Hans Krebs (1937)','Peter Mitchell (1961)','Otto Warburg (1931)','Albert Lehninger (1950)','Fritz Lipmann (1941)'], 1],
+    ['Kompleks I rantai respiratorik disebut ... tempat elektron dipindahkan dari NADH ke koenzim Q.', ['Suksinat-Q reduktase','NADH-Q oksidoreduktase','Sitokrom c oksidase','ATP sintase','Q-sitokrom c oksidoreduktase'], 1],
+    ['Koenzim Q pada rantai respiratorik disebut juga:', ['Sitokrom c','Ubikuinon','Flavin','Heme','Plastokuinon'], 1],
+    ['Kompleks yang menuntaskan rantai dengan memindahkan elektron ke O₂ (membentuk H₂O) adalah:', ['Kompleks I','Kompleks II','Kompleks III','Sitokrom c oksidase (Kompleks IV)','ATP sintase'], 3],
+    ['Substrat seperti suksinat menyalurkan elektron ke Q melalui ... (bukan Kompleks I).', ['Kompleks I','Suksinat-Q reduktase (Kompleks II)','Kompleks III','Kompleks IV','ATP sintase'], 1],
+    ['Kompleks rantai respiratorik yang bekerja sebagai pompa proton adalah:', ['Kompleks I dan II','Kompleks II dan III','Kompleks I, III, dan IV','Hanya Kompleks IV','Semua kompleks I–IV'], 2],
+    ['ATP sintase di membran dalam mitokondria berfungsi sebagai:', ['Pompa natrium','Motor pemutar untuk membentuk ATP','Enzim pemecah ATP','Kanal proton pasif saja','Reseptor ADP'], 1]
+  ];
+
+  $('bankBtn3').addEventListener('click', () => {
+    soalInput.value = bankToText(BANK3);
+    $('parseBtn').click();
+    preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // Bank soal bawaan #4: Metabolisme Lipid (100 butir)
+  const BANK4 = [
+    ['Lipid dapat diartikan sebagai senyawa yang:', ['Mudah larut dalam air','Sukar larut dalam air tetapi mudah larut dalam pelarut organik','Larut dalam air maupun pelarut organik','Tidak larut dalam apa pun'], 1],
+    ['Berikut adalah pelarut organik tempat lipid mudah larut, KECUALI:', ['Etanol','Kloroform','Aseton','Air'], 3],
+    ['Secara garis besar, lipid dibedakan atas ... golongan.', ['2','3','4','5'], 1],
+    ['Tiga golongan besar lipid adalah lipid sederhana, lipid majemuk, dan lipid:', ['Turunan','Kompleks','Netral','Polar'], 0],
+    ['Lipid sederhana adalah ester asam lemak dengan gliserol atau:', ['Asam amino','Alkohol berantai panjang','Glukosa','Fosfat'], 1],
+    ['Ester asam lemak dengan gliserol disebut:', ['Asilgliserol (triasilgliserol)','Lilin','Fosfolipid','Steroid'], 0],
+    ['Ester asam lemak dengan alkohol berantai panjang disebut:', ['Asilgliserol','Lilin (malam/wax)','Fosfolipid','Sfingolipid'], 1],
+    ['Lipid majemuk (compound) jika dihidrolisis akan menghasilkan:', ['Hanya asam lemak','Molekul senyawa lain (non-lipid)','Gliserol saja','Glukosa'], 1],
+    ['Berikut termasuk lipid majemuk, KECUALI:', ['Fosfolipid','Glikolipid','Lipoprotein','Kolesterol'], 3],
+    ['Lipid turunan (derived lipid) adalah senyawa lipid yang merupakan:', ['Ester gliserol','Hasil penguraian senyawa lipid lainnya','Senyawa mengandung fosfat','Gabungan lipid dan protein'], 1],
+    ['Berikut contoh lipid turunan, KECUALI:', ['Asam lemak','Alkohol berantai panjang','Kolesterol','Fosfolipid'], 3],
+    ['Asam lemak merupakan hasil hidrolisis dari:', ['Malam/wax','Asilgliserol','Fosfat','Sfingosin'], 1],
+    ['Salah satu fungsi lipid adalah sebagai penyusun struktur:', ['Dinding sel','Membran sel','Inti sel','Ribosom'], 1],
+    ['Sebagai penyusun membran, lipid berperan sebagai:', ['Katalis reaksi','Barier sel yang mengatur aliran material','Sumber DNA','Pigmen darah'], 1],
+    ['Lipid sebagai cadangan energi disimpan sebagai jaringan:', ['Otot','Adiposa','Saraf','Epitel'], 1],
+    ['Selain struktur dan cadangan energi, lipid juga berfungsi sebagai:', ['Enzim dan asam nukleat','Hormon dan vitamin','Antibodi','Pigmen darah'], 1],
+    ['Berikut termasuk contoh struktur lipid, KECUALI:', ['Asam lemak','Triasilgliserol','Fosfolipid','Asam amino'], 3],
+    ['Asam lemak adalah asam karboksilat dengan rantai C terdiri dari ... atau lebih atom C.', ['2','4','6','10'], 1],
+    ['Asam lemak jenuh adalah asam lemak yang:', ['Mempunyai 1 ikatan rangkap','Tidak mempunyai ikatan rangkap','Mempunyai 2 ikatan rangkap','Bercabang'], 1],
+    ['Berikut contoh asam lemak jenuh, KECUALI:', ['Asam palmitat','Asam stearat','Asam arakhidat','Asam oleat'], 3],
+    ['Asam palmitat memiliki jumlah atom C sebanyak:', ['14','16','18','20'], 1],
+    ['Asam stearat memiliki jumlah atom C sebanyak:', ['16','18','20','22'], 1],
+    ['Asam arakhidat memiliki jumlah atom C sebanyak:', ['16','18','20','22'], 2],
+    ['Asam lemak tak jenuh (esensial) adalah asam lemak yang:', ['Tidak mempunyai ikatan rangkap','Mempunyai ikatan rangkap','Jumlah C-nya ganjil','Bercabang'], 1],
+    ['Asam oleat (C18) memiliki ... ikatan rangkap.', ['1','2','3','4'], 0],
+    ['Asam linoleat (C18) memiliki ... ikatan rangkap.', ['1','2','3','4'], 1],
+    ['Asam linolenat (C18) memiliki ... ikatan rangkap.', ['1','2','3','4'], 2],
+    ['Senyawa lipid yang paling banyak dan luas penyebarannya di alam adalah:', ['Lilin','Triasilgliserol','Sfingolipid','Steroid'], 1],
+    ['Triasilgliserol disebut juga:', ['Lemak netral (trigliserida)','Fosfogliserida','Lipoprotein','Sterol'], 0],
+    ['Triasilgliserol yang banyak mengandung asam lemak tak jenuh memiliki konsistensi:', ['Lebih padat','Lebih cair','Berbentuk kristal','Berbentuk gas'], 1],
+    ['Hidrolisis triasilgliserol akan menghasilkan:', ['Glukosa dan asam amino','Gliserol dan asam lemak bebas','Fosfat dan kolin','Sfingosin'], 1],
+    ['Lilin (malam) adalah ester asam lemak dengan alkohol alifatik berantai panjang berukuran ... atom C.', ['4–8','10–14','16–22','24–30'], 2],
+    ['Contoh senyawa lilin (malam) adalah:', ['Asetil-KoA','Mirisil palmitat','Lesitin','Kolesterol'], 1],
+    ['Fosfolipid (fosfogliserida) adalah senyawa lipid yang mengandung gugus:', ['Amino','Fosfat','Sulfat','Karboksil'], 1],
+    ['Fosfolipid bersifat:', ['Hidrofobik total','Amfifatik (amfipatik)','Ionik penuh','Nonpolar total'], 1],
+    ['Pada fosfolipid, bagian hidrofobik ("ekor") adalah:', ['Gugus fosfat','Rantai atom karbon yang panjang','Gugus amino','Gliserol'], 1],
+    ['Pada fosfolipid, bagian hidrofilik ("kepala") adalah:', ['Rantai karbon panjang','Gugus fosfat','Asam lemak','Sfingosin'], 1],
+    ['Fungsi fosfolipid antara lain sebagai komponen membran sel dan sebagai:', ['Pigmen','Agen emulsi','Enzim','Hormon'], 1],
+    ['Sfingolipid tidak mengandung gliserol, tetapi mengandung:', ['Kolesterol','Sfingosin','Fosfat saja','Glukosa'], 1],
+    ['Sfingosin adalah suatu:', ['Asam lemak jenuh','Alkohol amino berantai C panjang','Gula pentosa','Asam empedu'], 1],
+    ['Sfingomielin adalah fosfolipid yang banyak terdapat pada:', ['Hati dan ginjal','Otak dan jaringan saraf','Otot dan tulang','Kulit'], 1],
+    ['Lipoprotein adalah gabungan antara lipid dengan:', ['Karbohidrat','Protein','Asam nukleat','Fosfat'], 1],
+    ['Terdapat ... kelas mayor lipoprotein plasma.', ['2','3','4','5'], 2],
+    ['Lipoprotein yang mengangkut trigliserida dari usus ke jaringan lain adalah:', ['Kilomikron','VLDL','LDL','HDL'], 0],
+    ['Kilomikron mengangkut trigliserida dari usus ke seluruh jaringan, KECUALI:', ['Hati','Ginjal','Otot','Jaringan lemak'], 1],
+    ['Lipoprotein yang mengikat trigliserida di hati dan mengangkutnya ke jaringan lemak adalah:', ['Kilomikron','VLDL','LDL','HDL'], 1],
+    ['Lipoprotein yang berperan mengangkut kolesterol ke jaringan perifer adalah:', ['Kilomikron','VLDL','LDL','HDL'], 2],
+    ['Lipoprotein yang mengikat kolesterol plasma dan mengangkutnya ke hati adalah:', ['Kilomikron','VLDL','LDL','HDL'], 3],
+    ['Kepanjangan VLDL adalah:', ['Very low-density lipoprotein','Variable low-density lipoprotein','Very light-density lipoprotein','Ventral lipoprotein'], 0],
+    ['Berbeda dengan lipid lain, steroid tidak dapat mengalami:', ['Oksidasi','Saponifikasi (tidak tersaponifikasi)','Hidrolisis','Esterifikasi'], 1],
+    ['Steroid adalah senyawa yang memiliki inti:', ['Benzena','Siklopentano-perhidrofenantren','Imidazol','Purin'], 1],
+    ['Berikut termasuk senyawa steroid, KECUALI:', ['Kolesterol','Hormon seks','Asam empedu','Asam palmitat'], 3],
+    ['Vitamin yang tergolong lipid (larut lemak) adalah:', ['B dan C','A, D, E, K','B kompleks','C dan K'], 1],
+    ['Vitamin A, D, E, K dimasukkan golongan lipid karena:', ['Larut dalam air','Sukar larut air namun mudah larut pelarut organik','Berbentuk gas','Mengandung logam'], 1],
+    ['Gliserol hasil hidrolisis lipid (trigliserida) dapat menjadi:', ['Pigmen','Sumber energi','Hormon','Enzim'], 1],
+    ['Gliserol yang ditambah 1 gugus fosfat dari ATP akan membentuk:', ['Gliserol 3-fosfat','Piruvat','Asetil-KoA','Malonil-KoA'], 0],
+    ['Gliserol 3-fosfat diubah menjadi dihidroksiaseton fosfat yang merupakan produk jalur:', ['Siklus Krebs','Glikolisis','Oksidasi beta','Fosforilasi oksidatif'], 1],
+    ['Sebelum dioksidasi, asam lemak harus diaktifkan menjadi:', ['Malonil-KoA','Asil-KoA','Asetil-KoA','Asil karnitin'], 1],
+    ['Aktivasi asam lemak menjadi asil-KoA memerlukan ATP dan:', ['NADPH','Koenzim A','Biotin','Karnitin'], 1],
+    ['Enzim yang mengaktifkan asam lemak menjadi asil-KoA adalah:', ['Tiolase','Asil-KoA sintetase (tiokinase)','Karnitin transferase','Hidratase'], 1],
+    ['Jalur katabolisme lipid yang paling penting adalah oksidasi:', ['Alfa','Beta','Omega','Gamma'], 1],
+    ['Selain oksidasi beta, asam lemak dapat dioksidasi melalui jalur:', ['Alfa dan omega','Gamma dan delta','Glikolisis','Pentosa fosfat'], 0],
+    ['Enzim-enzim oksidasi beta asam lemak berada di dalam:', ['Sitosol','Mitokondria','Nukleus','Retikulum endoplasma'], 1],
+    ['Karena tidak dapat menembus membran mitokondria, asam lemak diangkut melalui sistem:', ['Karnitin','Biotin','NADPH','Gliserol'], 0],
+    ['Transport asam lemak ke matriks mitokondria berlangsung melalui ... tahap reaksi.', ['2','3','4','5'], 1],
+    ['Aktivasi asam lemak menjadi asil-KoA berlangsung di:', ['Matriks mitokondria','Sitosol','Nukleus','Lisosom'], 1],
+    ['Enzim yang mengubah asil-KoA menjadi asil karnitin adalah:', ['Karnitin-asil transferase I','Karnitin-asil transferase II','Translokase','Tiolase'], 0],
+    ['Pemindahan asil karnitin ke dalam matriks mitokondria dilakukan oleh:', ['Karnitin-asil transferase I','Karnitin-asilkarnitin translokase','Tiokinase','Hidratase'], 1],
+    ['Di dalam matriks, asil karnitin diubah kembali menjadi asil-KoA oleh enzim:', ['Karnitin-asil transferase I','Karnitin-asil transferase II','Translokase','Tiolase'], 1],
+    ['Oksidasi beta asam lemak berlangsung dalam ... tahap reaksi.', ['3','4','5','6'], 1],
+    ['Tahap pertama oksidasi beta dikatalisis oleh asil-KoA dehidrogenase yang mengandung gugus prostetik:', ['NAD','FAD','Biotin','Heme'], 1],
+    ['Pada tahap pertama oksidasi beta, FAD berperan sebagai:', ['Donor karbon','Akseptor proton (elektron)','Sumber ATP','Katalis air'], 1],
+    ['Tahap kedua oksidasi beta (reaksi hidrasi) dikatalisis oleh enzim:', ['Tiolase','Enoil-KoA hidratase','Asil-KoA dehidrogenase','Tiokinase'], 1],
+    ['Tahap keempat oksidasi beta (pengeluaran asetil-KoA) dikatalisis oleh enzim:', ['Hidratase','Tiolase (asetil KoA-asetil transferase)','Sintetase','Translokase'], 1],
+    ['Setiap satu putaran oksidasi beta mengeluarkan 1 asetil-KoA dan mengurangi rantai sebanyak ... atom C.', ['1','2','3','4'], 1],
+    ['Oksidasi beta berlangsung berulang sampai seluruh rantai asil teroksidasi menjadi:', ['Malonil-KoA','Asetil-KoA','Gliserol','Piruvat'], 1],
+    ['Untuk mengaktivasi asam lemak menjadi asil-KoA dibutuhkan:', ['1 ATP','2 ATP','5 ATP','12 ATP'], 1],
+    ['Frekuensi (jumlah putaran) oksidasi beta dihitung dengan rumus:', ['(½ × jumlah atom C)','(½ × jumlah atom C) − 1','jumlah atom C − 1','2 × jumlah atom C'], 1],
+    ['Jumlah energi yang didapat tiap satu kali oksidasi beta adalah:', ['2 ATP','5 ATP','12 ATP','17 ATP'], 1],
+    ['Jumlah asetil-KoA yang dihasilkan dari suatu asam lemak adalah:', ['jumlah atom C','½ × jumlah atom C','(½ × jumlah atom C) − 1','2 × jumlah atom C'], 1],
+    ['Setiap asetil-KoA yang masuk siklus Krebs menghasilkan:', ['5 ATP','10 ATP','12 ATP','2 ATP'], 2],
+    ['Untuk asam lemak dengan 10 atom C, jumlah putaran oksidasi beta adalah:', ['3','4','5','6'], 1],
+    ['Untuk asam lemak dengan 10 atom C, jumlah asetil-KoA yang terbentuk adalah:', ['4','5','6','10'], 1],
+    ['Total energi bersih metabolisme asam lemak dengan 10 atom C adalah:', ['60 ATP','72 ATP','78 ATP','80 ATP'], 2],
+    ['Untuk asam palmitat (C16), jumlah putaran oksidasi beta adalah:', ['6','7','8','9'], 1],
+    ['Untuk asam palmitat (C16), jumlah asetil-KoA yang terbentuk adalah:', ['7','8','9','16'], 1],
+    ['Biosintesis lipid berlangsung di luar mitokondria, yaitu di sitosol dan:', ['Nukleus','Mikrosom (retikulum endoplasma)','Lisosom','Membran plasma'], 1],
+    ['Dalam tubuh manusia, biosintesis lipid berlangsung terutama di jaringan adiposa, hati, dan kelenjar mammae saat:', ['Tidur','Laktasi','Puasa','Berolahraga'], 1],
+    ['Di dalam tubuh, asam-asam lemak disintesis dari:', ['Malonil-KoA','Asetil-KoA','Gliserol','Piruvat'], 1],
+    ['Sebagian besar asam lemak yang terdapat di alam mempunyai jumlah atom C:', ['Ganjil','Genap','Prima','Kelipatan tiga'], 1],
+    ['Pernyataan yang benar tentang biosintesis asam lemak adalah:', ['Merupakan kebalikan langsung oksidasi beta','Bukan kebalikan oksidasi beta dan memakai enzim yang berbeda','Memakai enzim yang sama dengan oksidasi beta','Berlangsung di dalam mitokondria'], 1],
+    ['Biosintesis asam lemak de novo dikatalisis oleh kompleks enzim:', ['Asil-KoA dehidrogenase','Sintase asam lemak','Tiolase','Tiokinase'], 1],
+    ['Berikut adalah kofaktor biosintesis asam lemak de novo, KECUALI:', ['NADPH','Biotin','HCO₃⁻','FAD'], 3],
+    ['Sumber CO₂ pada biosintesis asam lemak de novo adalah:', ['O₂','HCO₃⁻ (bikarbonat)','Karbonat padat','CO dalam darah'], 1],
+    ['Senyawa pembawa atom C untuk perpanjangan rantai pada biosintesis asam lemak adalah:', ['Asetil-KoA','Malonil-KoA','Asil karnitin','Suksinil-KoA'], 1],
+    ['Malonil-KoA disintesis dari asetil-KoA dan:', ['NADPH','HCO₃⁻','Gliserol','ATP saja'], 1],
+    ['Asam lemak terpanjang yang dihasilkan biosintesis de novo adalah:', ['Asam palmitat (C16)','Asam stearat (C18)','Asam arakhidat (C20)','Asam oleat (C18)'], 0],
+    ['Perpanjangan rantai asam lemak (>C16) dari asam palmitat dikatalisis oleh sistem enzim:', ['Tiolase','ELOVL (fatty acid elongation system)','Asil-KoA sintetase','Karnitin transferase'], 1],
+    ['Biosintesis triasilgliserol diawali dengan pengaktifan gliserol menjadi gliserol-3-fosfat oleh enzim:', ['Gliserokinase','Heksokinase','Tiokinase','Lipase'], 0],
+    ['Prekursor biosintesis kolesterol adalah asetil-KoA, yang diangkut dari mitokondria ke sitosol melalui:', ['Sistem karnitin','Acetyl-group shuttle','Translokase ADP/ATP','Difusi bebas'], 1]
+  ];
+
+  $('bankBtn4').addEventListener('click', () => {
+    soalInput.value = bankToText(BANK4);
+    $('parseBtn').click();
+    preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // Bank soal bawaan #5: Pondasi Biokimiawi (100 butir)
+  const BANK5 = [
+    ['Biokimia adalah ilmu yang mempelajari:', ['Hanya struktur tulang manusia','Hubungan molekul dalam sel hidup, reaksi kimianya, dan regulasi proses metabolik','Pergerakan benda mati','Klasifikasi hewan'], 1],
+    ['Biokimia disebut bahasa dasar semua ilmu biologi karena:', ['Kehidupan bergantung pada reaksi biokimia','Mudah dipelajari','Tidak membutuhkan alat','Hanya berupa teori'], 0],
+    ['Komponen terbesar makhluk hidup ditempati oleh:', ['Protein','Air','Lipid','Karbohidrat'], 1],
+    ['Selain air, makhluk hidup tersusun atas senyawa:', ['Organik saja','Anorganik saja','Organik dan anorganik','Logam saja'], 2],
+    ['Berikut adalah gugus fungsi pada senyawa organik, KECUALI:', ['Metil (-CH₃)','Hidroksil (-OH)','Karboksil (-COOH)','Natrium (-Na)'], 3],
+    ['Gugus fungsi -CH₃ disebut:', ['Metil','Hidroksil','Karboksil','Amino'], 0],
+    ['Gugus fungsi -OH disebut:', ['Metil','Hidroksil','Karboksil','Amino'], 1],
+    ['Gugus fungsi -COOH disebut:', ['Metil','Hidroksil','Karboksil','Amino'], 2],
+    ['Gugus fungsi -NH₂ disebut:', ['Metil','Hidroksil','Karboksil','Amino'], 3],
+    ['Contoh ikatan kimia yang menghubungkan gugus pada senyawa organik adalah:', ['Ester dan fosfomonoester','Ikatan logam','Ikatan van der Waals saja','Ikatan ionik saja'], 0],
+    ['Tujuan umum pembelajaran ini adalah memahami pondasi dasar yang menopang fungsi:', ['Tumbuhan','Sel, jaringan, dan organ manusia','Bakteri','Virus'], 1],
+    ['Berikut termasuk tujuan khusus pembelajaran, KECUALI:', ['Menjelaskan komponen anorganik tubuh','Menjelaskan struktur dan sifat air','Menjelaskan konsep asam, basa, dan pH','Menjelaskan teknik kloning DNA'], 3],
+    ['Unsur utama penyusun dasar molekul makhluk hidup adalah:', ['C, H, O, dan N','Na, K, Ca, dan Cl','Fe, Zn, Cu, dan Mg','Au, Ag, Pt, dan Pb'], 0],
+    ['Unsur utama C, H, O, N menyusun sekitar ... dari tubuh.', ['50%','75%','99,4%','25%'], 2],
+    ['Sisa penyusun tubuh selain unsur utama merupakan:', ['Air','Lemak','Mineral dalam bentuk kation dan anion','Protein'], 2],
+    ['Berikut termasuk kation utama makhluk hidup, KECUALI:', ['Na','K','Ca','Cl'], 3],
+    ['Kation utama makhluk hidup adalah Na, K, Ca, Mg, dan:', ['Fe','Cl','SO₄','PO₄'], 0],
+    ['Selain kation utama, berikut termasuk kation lain pada tubuh:', ['Zn dan Cu','Cl dan SO₄','HCO₃ dan PO₄','H₂PO₄ dan Cl'], 0],
+    ['Berikut termasuk anion tubuh, KECUALI:', ['Cl','HCO₃','PO₄','Ca'], 3],
+    ['Kadar anion tubuh dipengaruhi oleh faktor:', ['Makanan, penyakit, dan umur','Hanya suhu','Hanya tekanan','Hanya cahaya'], 0],
+    ['Ca (kalsium) di dalam tubuh berperan sebagai:', ['Kation','Anion','Gugus fungsi','Gas'], 0],
+    ['Cl (klorida) di dalam tubuh berperan sebagai:', ['Kation','Anion','Logam berat','Gas mulia'], 1],
+    ['Kelompok berikut yang semuanya merupakan anion tubuh adalah:', ['Na, K, Ca, Mg','HCO₃, H₂PO₄, SO₄, Cl','Fe, Zn, Cu, Na','Ca, Mg, K, Fe'], 1],
+    ['Pernyataan yang benar tentang unsur di alam adalah:', ['Semua unsur penting bagi makhluk hidup','Tidak semua unsur penting bagi makhluk hidup','Semua unsur bersifat racun','Hanya logam yang penting'], 1],
+    ['Fe (besi) di dalam tubuh tergolong:', ['Kation','Anion','Gas','Gugus fungsi'], 0],
+    ['SO₄ (sulfat) di dalam tubuh tergolong:', ['Kation','Anion','Unsur utama','Gugus metil'], 1],
+    ['Senyawa makromolekul pada makhluk hidup terdiri atas karbohidrat, protein, lipid, dan:', ['Asam nukleat','Air','Mineral','Vitamin'], 0],
+    ['Berikut termasuk makromolekul makhluk hidup, KECUALI:', ['Karbohidrat','Protein','Lipid','Air'], 3],
+    ['Contoh biomolekul dalam bentuk terstruktur adalah:', ['Fosfolipid, protein, dan glikolipid','Glukosa bebas','Ion Na','Air'], 0],
+    ['Biomolekul dalam bentuk tidak berstruktur berfungsi sebagai:', ['Makanan cadangan dan senyawa antara metabolisme','Dinding sel','Pigmen','Enzim tunggal'], 0],
+    ['Fosfolipid dan glikolipid merupakan contoh biomolekul bentuk:', ['Terstruktur','Tidak berstruktur','Anorganik','Gas'], 0],
+    ['Empat golongan makromolekul utama makhluk hidup adalah:', ['Karbohidrat, protein, lipid, asam nukleat','Air, mineral, vitamin, enzim','Na, K, Ca, Fe','Metil, hidroksil, karboksil, amino'], 0],
+    ['Asam nukleat termasuk golongan ... makhluk hidup.', ['Makromolekul','Ion','Gas','Mineral'], 0],
+    ['Senyawa cadangan makanan tergolong biomolekul bentuk:', ['Terstruktur','Tidak berstruktur','Anorganik','Ionik'], 1],
+    ['Komponen kimia utama dalam organisme hidup adalah:', ['Protein','Air','Lipid','Glukosa'], 1],
+    ['Air disebut pelarut biologik ideal karena mampu melarutkan:', ['Hanya komponen organik','Hanya komponen anorganik','Komponen organik dan anorganik','Hanya logam'], 2],
+    ['Berikut termasuk fungsi air dalam tubuh, KECUALI:', ['Mengangkut nutrisi ke sel','Menentukan volume sel','Membuang limbah melalui urine','Menyimpan informasi genetik'], 3],
+    ['Air membuang produk limbah tubuh terutama melalui:', ['Keringat saja','Urine','Napas','Rambut'], 1],
+    ['Air bertindak sebagai pendingin tubuh melalui cara:', ['Buang air besar','Berkeringat','Menggigil','Bernapas cepat'], 1],
+    ['Air menentukan volume sel melalui:', ['Pembekuan','Pengangkutannya masuk dan keluar sel','Penguapan total','Pembakaran'], 1],
+    ['Molekul air membentuk:', ['Ion tunggal','Dipol','Logam','Gas mulia'], 1],
+    ['Struktur molekul air digambarkan sebagai:', ['Garis lurus','Tetrahedron yang agak miring dengan oksigen di tengah','Lingkaran sempurna','Kubus'], 1],
+    ['Pada molekul air, atom yang berada di tengah struktur tetrahedron adalah:', ['Hidrogen','Oksigen','Karbon','Nitrogen'], 1],
+    ['Ikatan hidrogen pada air terbentuk ketika nukleus hidrogen berinteraksi dengan:', ['Inti atom karbon','Pasangan elektron bebas pada atom oksigen lain','Ion natrium','Gugus metil'], 1],
+    ['Dalam air cair, secara rata-rata satu molekul air berikatan hidrogen dengan ... molekul lain.', ['1,5','2,5','3,5','5,0'], 2],
+    ['Ikatan hidrogen memungkinkan air melarutkan biomolekul organik yang mengandung:', ['Logam berat','Gugus fungsional yang dapat membentuk ikatan hidrogen','Gas mulia','Ion tunggal'], 1],
+    ['Atom hidrogen dalam molekul air berikatan dengan oksigen melalui ikatan:', ['Ionik','Kovalen','Logam','Hidrogen'], 1],
+    ['Atom oksigen pada molekul air bersifat ... elektron.', ['Penarik','Pendonor','Netral terhadap','Penolak'], 0],
+    ['Sifat dipol air disebabkan oleh distribusi muatan yang:', ['Merata sempurna','Tidak merata (ada kutub positif dan negatif)','Netral total','Acak'], 1],
+    ['Kemampuan air melarutkan banyak zat menjadikannya:', ['Pelarut biologik ideal','Pigmen','Katalis enzim','Gas'], 0],
+    ['Istilah pH diperkenalkan pada tahun:', ['1889','1909','1929','1961'], 1],
+    ['Istilah pH diperkenalkan oleh:', ['Sorensen','Peter Mitchell','Hans Krebs','Harper'], 0],
+    ['Sorensen mendefinisikan pH sebagai:', ['Log positif konsentrasi ion hidrogen','Log negatif konsentrasi ion hidrogen','Konsentrasi ion OH⁻','Jumlah total proton'], 1],
+    ['Rumus pH adalah:', ['pH = log[H⁺]','pH = −log[H⁺]','pH = [H⁺]','pH = −[OH⁻]'], 1],
+    ['Nilai pH yang rendah sesuai dengan konsentrasi H⁺ yang:', ['Rendah','Tinggi','Nol','Tetap'], 1],
+    ['Nilai pH yang tinggi sesuai dengan konsentrasi H⁺ yang:', ['Tinggi','Rendah','Sangat tinggi','Tak berubah'], 1],
+    ['Menurut definisi, asam adalah:', ['Donor proton','Akseptor proton','Donor elektron','Akseptor elektron'], 0],
+    ['Menurut definisi, basa adalah:', ['Donor proton','Akseptor proton','Donor elektron','Akseptor elektron'], 1],
+    ['pH adalah derajat keasaman yang menyatakan:', ['Suhu larutan','Tingkat keasaman atau kebasaan suatu larutan','Warna larutan','Massa jenis larutan'], 1],
+    ['Semakin tinggi konsentrasi ion H⁺, maka larutan akan semakin:', ['Basa','Asam (pH turun)','Netral','Tidak berubah'], 1],
+    ['Proton yang dimaksud dalam definisi asam-basa adalah ion:', ['OH⁻','H⁺','Na⁺','Cl⁻'], 1],
+    ['Suatu zat yang menerima proton berperan sebagai:', ['Asam','Basa','Garam','Buffer'], 1],
+    ['Suatu zat yang melepaskan proton berperan sebagai:', ['Asam','Basa','Garam','Ion'], 0],
+    ['Hubungan antara pH dan [H⁺] bersifat:', ['Berbanding lurus','Berbanding terbalik (logaritmik negatif)','Tidak berhubungan','Kuadratik'], 1],
+    ['Jika [H⁺] = 1×10⁻³ M, maka pH = ...', ['2','3','4','7'], 1],
+    ['Jika [H⁺] = 1×10⁻⁷ M, maka pH = ...', ['5','6','7','8'], 2],
+    ['Jika [H⁺] = 1×10⁻⁹ M, maka pH = ...', ['7','8','9','10'], 2],
+    ['Jika [H⁺] = 1×10⁻¹ M, maka pH = ...', ['1','2','3','0'], 0],
+    ['Jika [H⁺] = 1×10⁻⁵ M, maka pH = ...', ['3','4','5','6'], 2],
+    ['Jika [H⁺] = 1×10⁻¹¹ M, maka pH = ...', ['9','10','11','12'], 2],
+    ['Larutan dengan pH = 7 bersifat:', ['Asam','Netral','Basa','Garam'], 1],
+    ['Larutan dengan pH = 3 bersifat:', ['Asam','Netral','Basa','Buffer'], 0],
+    ['Larutan dengan pH = 10 bersifat:', ['Asam','Netral','Basa','Tidak dapat ditentukan'], 2],
+    ['Jika [H⁺] = 1×10⁻⁴ M, maka pH = ...', ['3','4','5','6'], 1],
+    ['Jika [H⁺] = 1×10⁻⁸ M, maka pH = ...', ['6','7','8','9'], 2],
+    ['Larutan A memiliki pH 2 dan larutan B memiliki pH 5. Maka:', ['A lebih basa daripada B','A lebih asam daripada B','Keduanya sama','B lebih asam daripada A'], 1],
+    ['Semakin kecil nilai pH suatu larutan, larutan tersebut semakin:', ['Basa','Asam','Netral','Encer'], 1],
+    ['Jika [H⁺] = 1×10⁻¹² M, maka pH = ...', ['10','11','12','13'], 2],
+    ['Larutan dengan [H⁺] = 1×10⁻⁶ M memiliki pH ... dan bersifat ...', ['6 dan asam','6 dan basa','8 dan asam','8 dan basa'], 0],
+    ['Larutan dengan pH lebih besar dari 7 memiliki konsentrasi H⁺ yang ... dibanding larutan netral.', ['Lebih tinggi','Lebih rendah','Sama','Nol'], 1],
+    ['Rentang pH tubuh (darah) yang normal adalah:', ['7,0 – 7,2','7,35 – 7,45','6,8 – 7,0','7,5 – 7,8'], 1],
+    ['Jika pH darah < 7,35 maka kondisi ini disebut:', ['Alkalosis','Asidosis','Normal','Netral'], 1],
+    ['Jika pH darah > 7,45 maka kondisi ini disebut:', ['Asidosis','Alkalosis','Normal','Hipoksia'], 1],
+    ['pH darah 7,40 tergolong:', ['Asidosis','Normal','Alkalosis','Kritis'], 1],
+    ['pH darah 7,30 tergolong:', ['Asidosis','Normal','Alkalosis','Netral'], 0],
+    ['pH darah 7,50 tergolong:', ['Asidosis','Normal','Alkalosis','Netral'], 2],
+    ['pH darah 7,20 tergolong:', ['Asidosis','Normal','Alkalosis','Netral'], 0],
+    ['pH darah 7,48 tergolong:', ['Asidosis','Normal','Alkalosis','Netral'], 2],
+    ['Dalam menjaga keseimbangan asam-basa, kadar H⁺ yang diserap harus ... kadar H⁺ yang dilepaskan.', ['Lebih besar dari','Lebih kecil dari','Setara dengan','Tidak berhubungan dengan'], 2],
+    ['Di dalam tubuh, pH dijaga keseimbangannya secara:', ['Longgar','Ketat','Acak','Berubah-ubah bebas'], 1],
+    ['Kondisi pH darah 7,10 menunjukkan:', ['Alkalosis','Asidosis','Normal','Netral'], 1],
+    ['Kondisi pH darah 7,55 menunjukkan:', ['Asidosis','Alkalosis','Normal','Netral'], 1],
+    ['Pengaturan keseimbangan asam-basa dilakukan melalui pengaturan ion:', ['Natrium','Hidrogen (H⁺)','Kalium','Klorida'], 1],
+    ['Keseimbangan asam-basa tubuh dikoordinasi oleh ... sistem.', ['2','3','4','5'], 1],
+    ['Tiga sistem pengatur keseimbangan asam-basa adalah paru, ginjal, dan:', ['Jantung','Sistem buffer','Hati','Limpa'], 1],
+    ['Sistem yang bereaksi paling cepat (beberapa detik) dalam mengatur asam-basa adalah:', ['Paru','Ginjal','Sistem buffer','Kulit'], 2],
+    ['Sistem buffer bereaksi dalam waktu:', ['Beberapa detik','Beberapa menit sampai jam','Beberapa jam sampai hari','Beberapa minggu'], 0],
+    ['Paru mengatur keseimbangan asam-basa dalam waktu:', ['Beberapa detik','Beberapa menit sampai jam','Beberapa hari','Beberapa minggu'], 1],
+    ['Ginjal mengatur keseimbangan asam-basa dalam waktu:', ['Beberapa detik','Beberapa menit','Beberapa jam sampai beberapa hari','Seketika'], 2],
+    ['Urutan kecepatan reaksi sistem pengatur asam-basa dari tercepat ke terlambat adalah:', ['Ginjal → paru → buffer','Buffer → paru → ginjal','Paru → buffer → ginjal','Ginjal → buffer → paru'], 1]
+  ];
+
+  $('bankBtn5').addEventListener('click', () => {
+    soalInput.value = bankToText(BANK5);
+    $('parseBtn').click();
+    preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // Bank soal bawaan #6: Membran Sel (100 butir) — soal & kunci dari pengguna
+  const BANK6 = [
+    ['Membran sel adalah selaput tipis, halus, dan elastis yang…', ['menyusun inti sel','menyelubungi permukaan sel hidup dan memisahkan sitoplasma dari lingkungan luar','hanya ada pada sel tumbuhan','menggantikan dinding sel'], 1],
+    ['Sifat transpor membran sel adalah…', ['bebas','selektif','acak','tidak terbatas'], 1],
+    ['Komponen membran sel yang jumlahnya paling sedikit adalah…', ['lipid','protein','karbohidrat','air'], 2],
+    ['Berikut fungsi membran sel, KECUALI…', ['pembatas mekanik dan kimiawi','transduksi sinyal','sintesis protein pada ribosom bebas','regulasi transpor zat'], 2],
+    ['Fungsi membran menjaga keutuhan bentuk sel disebut…', ['kompartmentalisasi','mempertahankan integritas sel','adhesi','eksositosis'], 1],
+    ['Enzim membran berperan pada proses berikut, KECUALI…', ['biosintesis lipid','metabolisme xenobiotik','fosforilasi oksidatif','replikasi DNA'], 3],
+    ['Pengaturan keluar-masuk zat untuk menjaga homeostasis berlangsung melalui…', ['pori, saluran (channel), dan transporter','ribosom','nukleolus','sentriol'], 0],
+    ['Membran yang membungkus mitokondria dengan susunan berbeda dari membran plasma menunjukkan fungsi…', ['proteksi','kompartmentalisasi sel','adhesi','sekresi'], 1],
+    ['Fungsi membran yang berperan dalam pembentukan jaringan adalah…', ['kontak dengan sel lain','difusi','osmosis','katalisis'], 0],
+    ['Kemampuan membran menerima sekaligus menghasilkan sinyal disebut…', ['endositosis','transduksi sinyal','kompartmentalisasi','permeabilitas'], 1],
+    ['Komposisi utama membran sel adalah…', ['lipid, protein, karbohidrat','lipid, asam nukleat, air','protein, mineral, air','karbohidrat, vitamin, lipid'], 0],
+    ['Komponen yang berperan penting dalam struktur dan sifat dinamis membran adalah…', ['protein','lipid','karbohidrat','mineral'], 1],
+    ['Komponen yang berperan penting dalam fungsi membran adalah…', ['lipid','protein','glikolipid','air'], 1],
+    ['Dominasi lipid atau protein pada suatu membran bergantung pada…', ['usia sel','jenis membran selnya','suhu tubuh','jumlah air'], 1],
+    ['Lipid membran diklasifikasikan berdasarkan…', ['warnanya','strukturnya','beratnya','kelarutannya dalam air'], 1],
+    ['Tiga kelompok besar lipid membran polar adalah…', ['fosfolipid, glikolipid, lipid eter arkhebakteri','trigliserida, kolesterol, protein','asam lemak, gliserol, fosfat','steroid, terpen, vitamin'], 0],
+    ['Lipid utama penyusun membran sel adalah…', ['sfingomielin','kolesterol','gliserofosfolipid','gangliosida'], 2],
+    ['Backbone gliserofosfolipid adalah…', ['sfingosin','gliserol','kolin','inositol'], 1],
+    ['Pada gliserofosfolipid, posisi C1 umumnya ditempati…', ['asam lemak jenuh','asam lemak tak jenuh','gugus fosfat','karbohidrat'], 0],
+    ['Posisi C2 gliserofosfolipid umumnya ditempati…', ['asam lemak jenuh','asam lemak tak jenuh','kolin','gliserol'], 1],
+    ['Yang menentukan nama dan jenis gliserofosfolipid adalah…', ['panjang rantai asam lemak','gugus fungsional (R)','jumlah karbon gliserol','suhu'], 1],
+    ['Sifat amfipatik berarti molekul memiliki…', ['dua ekor jenuh','bagian hidrofilik dan hidrofobik sekaligus','muatan netral','dua gugus fosfat'], 1],
+    ['Gliserofosfolipid dengan gugus X berupa kolin disebut…', ['fosfatidilserin','fosfatidilkolin','fosfatidiletanolamin','kardiolipin'], 1],
+    ['Gliserofosfolipid dengan gugus X berupa serin disebut…', ['fosfatidilserin','fosfatidilinositol','asam fosfatidat','sfingomielin'], 0],
+    ['Gugus X pada kardiolipin adalah…', ['kolin','etanolamin','fosfatidilgliserol','glukosa'], 2],
+    ['Gliserofosfolipid tanpa gugus X (X = —H) disebut…', ['asam fosfatidat','seramida','sfingomielin','gangliosida'], 0],
+    ['Backbone sfingolipid adalah…', ['gliserol','kolesterol','sfingosin, suatu amino alkohol','asam fosfatidat'], 2],
+    ['Perbedaan utama sfingolipid dengan gliserofosfolipid terletak pada…', ['sifat amfipatiknya','backbone-nya','jumlah ekornya','muatannya'], 1],
+    ['Sfingolipid dengan gugus X fosfokolin adalah…', ['seramida','sfingomielin','glukosilserebrosida','gangliosida GM2'], 1],
+    ['Sfingolipid yang menjadi penyusun utama membran sel saraf (myelin) adalah…', ['gangliosida','sfingomielin','laktosilseramida','kardiolipin'], 1],
+    ['Kolesterol merupakan lipid utama ke- … di dalam membran.', ['pertama','kedua','ketiga','keempat'], 2],
+    ['Daerah polar kolesterol terletak pada…', ['C-3 (gugus hidroksil)','C-17','cincin B','rantai alkil'], 0],
+    ['Daerah non-polar kolesterol berada pada…', ['gugus hidroksil','gugus samping hidrokarbon (C-17)','cincin A','gugus fosfat'], 1],
+    ['Fungsi kolesterol dalam membran sel adalah…', ['menambah permeabilitas air','mengubah fluiditas dan mengurangi permeabilitas','mensintesis protein','mengikat DNA'], 1],
+    ['Kolesterol membran terutama ditemukan pada sel…', ['bakteri','hewan/eukariot','virus','arkhea'], 1],
+    ['Makin banyak kolesterol pada membran, maka permeabilitas terhadap air…', ['meningkat','menurun','tetap','hilang total'], 1],
+    ['Contoh jaringan dengan permeabilitas air rendah akibat kandungan kolesterol tinggi adalah…', ['alveolus','tubuli distal ginjal','mukosa lambung','eritrosit'], 1],
+    ['Pada suhu rendah, kolesterol berperan…', ['mempercepat pemadatan','mencegah solidifikasi membran','melarutkan fosfolipid','tidak berpengaruh'], 1],
+    ['Pada suhu moderat, kolesterol…', ['menurunkan fluiditas membran','menaikkan fluiditas','memecah bilayer','menetralkan muatan'], 0],
+    ['Gugus hidroksil C-3 kolesterol dapat berkondensasi dengan asam lemak membentuk…', ['trigliserida','ester sterol','fosfolipid','glikolipid'], 1],
+    ['Fungsi protein membran meliputi hal berikut, KECUALI…', ['menjaga struktur membran','reseptor pengikat hormon','fasilitator transportasi zat','menyimpan informasi genetik'], 3],
+    ['Protein membran diklasifikasikan berdasarkan…', ['ukurannya','kemampuannya memisahkan diri dari membran','muatannya','warnanya'], 1],
+    ['Protein integral terletak…', ['hanya di permukaan luar','di dalam membran','di sitosol bebas','di dalam nukleus'], 1],
+    ['Peran protein integral meliputi…', ['pengikatan ligan, aktivitas katalitik, dan transportasi','hanya transduksi sinyal','hanya struktural','replikasi DNA'], 0],
+    ['Contoh protein integral adalah…', ['integrin dan glikoforin','albumin dan globulin','aktin dan miosin','kolagen dan elastin'], 0],
+    ['Protein perifer terletak…', ['menembus bilayer','pada permukaan membran','di inti bilayer','dalam lisosom'], 1],
+    ['Protein perifer mudah terlepas karena…', ['berukuran besar','hanya berinteraksi di permukaan membran','bermuatan positif','terikat DNA'], 1],
+    ['Peran utama protein perifer adalah…', ['aktivitas transduksi sinyal','transpor aktif','sintesis lipid','pembentukan pori'], 0],
+    ['Protein yang menembus membran dari sisi luar ke dalam disebut protein…', ['perifer','transmembran','sitosolik','sekretorik'], 1],
+    ['Polisakarida pada membran ditemukan dalam bentuk…', ['amilum dan glikogen','glikoprotein dan glikolipid','selulosa','kitin'], 1],
+    ['Rantai oligosakarida glikoprotein membran plasma terpapar pada sisi…', ['sitoplasmik','ekstraselular','inti bilayer','dalam mitokondria'], 1],
+    ['Protein membran dapat berfungsi sebagai berikut, KECUALI…', ['pompa dan saluran ion','carrier','enzim','cadangan energi utama'], 3],
+    ['Struktur dasar membran sel adalah…', ['monolayer lipid','lipid bilayer','jala protein','lapisan karbohidrat'], 1],
+    ['Pada bilayer, kepala polar fosfolipid menghadap ke…', ['inti bilayer','sisi ekstraselular dan sitoplasma','hanya ke luar sel','hanya ke dalam sel'], 1],
+    ['Ekor non-polar fosfolipid pada bilayer…', ['menghadap keluar','saling berhadapan di inti bilayer','mengikat air','bermuatan negatif'], 1],
+    ['Susunan bilayer menyebabkan membran bersifat…', ['permeabel zat polar, impermeabel zat non-polar','impermeabel zat polar, permeabel zat non-polar','permeabel semua zat','impermeabel semua zat'], 1],
+    ['Secara keseluruhan, membran bersifat predominan…', ['polar','non-polar','bermuatan','netral total'], 1],
+    ['Model struktur membran yang berlaku saat ini adalah…', ['sandwich model','fluid mosaic model','unit membrane statis','lattice model'], 1],
+    ['Pada fluid mosaic model, rantai asil lemak di interior membentuk…', ['region hidrofilik padat','region hidrofobik yang fluid','saluran air','lapisan karbohidrat'], 1],
+    ['Protein integral dipertahankan di dalam bilayer terutama oleh…', ['ikatan ion','interaksi hidrofobik dengan rantai samping asam amino non-polar','ikatan hidrogen','gaya elektrostatik kepala polar'], 1],
+    ['Pada membran, protein dan lipid…', ['tidak dapat bergerak sama sekali','bebas bergerak lateral dalam bidang bilayer','bebas berpindah antar-lapisan tanpa hambatan','hanya bergerak vertikal'], 1],
+    ['Perpindahan lipid atau protein dari satu sisi bilayer ke sisi lainnya bersifat…', ['bebas','terbatas/restriksi','sangat cepat','spontan terus-menerus'], 1],
+    ['Protein integral dapat berupa…', ['single transmembrane helix atau multiple transmembrane helices','hanya rantai lurus','hanya bentuk globular bebas','hanya β-sheet'], 0],
+    ['Protein perifer dapat melekat pada membran melalui…', ['ikatan kovalen dengan lipid','penetrasi ke inti bilayer','ikatan dengan DNA','gaya gravitasi'], 0],
+    ['Sterol pada membran terletak…', ['di antara molekul fosfolipid dalam bilayer','di luar membran','di dalam nukleus','di sitosol bebas'], 0],
+    ['Distribusi karbohidrat yang hanya pada satu sisi membran menunjukkan sifat…', ['simetri membran','asimetri membran','fluiditas','permeabilitas'], 1],
+    ['Faktor yang mempengaruhi fluiditas membran adalah…', ['kandungan asam lemak dan kolesterol','jumlah ribosom','kadar DNA','tebal dinding sel'], 0],
+    ['Asam lemak jenuh menyebabkan kepadatan membran karena…', ['rantai bengkok','struktur lurus menaikkan gaya Van der Waals','mengikat air','menolak protein'], 1],
+    ['Asam lemak tak jenuh cis meningkatkan fluiditas karena…', ['rantai lurus rapat','rantai bengkok membuat kedudukan molekul renggang','bermuatan','mengikat kolesterol'], 1],
+    ['Membran dengan banyak asam lemak jenuh akan bersifat…', ['lebih fluid','lebih viskos/padat','tidak stabil','permeabel penuh'], 1],
+    ['Istilah "unsaturated tails prevent packing" berarti…', ['ekor tak jenuh mencegah penyusunan rapat','ekor tak jenuh memadatkan membran','ekor jenuh mencegah pengemasan','kolesterol memutus bilayer'], 0],
+    ['Efek kolesterol terhadap fluiditas…', ['selalu menaikkan','selalu menurunkan tanpa syarat','menurunkan pada suhu moderat, mencegah solidifikasi pada suhu rendah','tidak ada efek'], 2],
+    ['Sifat amfipatik gliserofosfolipid merupakan…', ['sifat utama membran sel','sifat sementara','sifat khusus bakteri','sifat kolesterol saja'], 0],
+    ['Membran bersifat selektif permeabel artinya…', ['semua zat bebas lewat','hanya zat tertentu dapat melewatinya','tidak ada zat yang lewat','hanya air yang lewat'], 1],
+    ['Zat yang paling mudah menembus bilayer secara langsung adalah…', ['ion Na⁺','glukosa','gas non-polar seperti O₂ dan CO₂','protein'], 2],
+    ['Sifat "elastis" membran terutama ditopang oleh…', ['dinding sel','sifat fluid lipid bilayer','rantai DNA','mikrotubulus ekstrasel'], 1],
+    ['Berdasarkan penggunaan protein, transportasi dibagi menjadi…', ['aktif dan pasif','facilitated dan free transport','difusi dan osmosis','endositosis dan eksositosis'], 1],
+    ['Free transport adalah…', ['lewatnya zat tanpa bantuan protein','transpor dengan ATP','transpor lewat vesikel','transpor lewat pompa'], 0],
+    ['Channel protein memiliki…', ['pori polar tempat ion dan zat hidrofilik lewat','inti hidrofobik','gugus karbohidrat','aktivitas ATPase wajib'], 0],
+    ['Transporter memindahkan molekul melalui…', ['perubahan konformasi','pemotongan membran','difusi bebas','endositosis'], 0],
+    ['Aquaporin berfungsi mengatur…', ['keluar-masuknya glukosa','keluar-masuknya air di tubulus ginjal','transpor ion Na⁺','transpor protein'], 1],
+    ['Kerja aquaporin dipengaruhi oleh hormon…', ['insulin','ADH (antidiuretic hormone)','glukagon','tiroksin'], 1],
+    ['GLUT-1 berfungsi mengatur keluar-masuknya…', ['air','glukosa','natrium','asam amino'], 1],
+    ['Voltage-gated Na⁺ channel membuka dan menutup tergantung…', ['kadar glukosa','potensial membran','suhu','pH darah'], 1],
+    ['Masuknya ion Na⁺ melalui voltage-gated channel menyebabkan…', ['hiperpolarisasi','depolarisasi sel','apoptosis','lisis sel'], 1],
+    ['Contoh transpor pasif berupa difusi sederhana adalah…', ['difusi CO₂ dan O₂','absorbsi glukosa usus halus','pompa Na-K','fagositosis'], 0],
+    ['Contoh difusi terfasilitasi adalah…', ['difusi O₂','transport glukosa ke dalam sel','osmosis air','eksositosis'], 1],
+    ['Absorbsi air di usus halus merupakan contoh…', ['osmosis','transpor aktif','fagositosis','pinositosis'], 0],
+    ['Absorbsi glukosa oleh sel usus halus merupakan contoh…', ['transpor pasif','transpor aktif (membutuhkan energi)','difusi sederhana','osmosis'], 1],
+    ['Endositosis adalah proses…', ['penggabungan molekul besar ke dalam sel melalui vesikel','pengeluaran zat dari sel','difusi ion','sintesis protein'], 0],
+    ['Fagositosis hanya dapat dilakukan oleh…', ['semua sel','sel imun (makrofag dan granulosit)','sel saraf','eritrosit'], 1],
+    ['Pinositosis dapat dilakukan oleh…', ['hanya makrofag','semua sel','hanya neuron','hanya sel ginjal'], 1],
+    ['Pengambilan kembali protein dari filtrat urin oleh sel ginjal terjadi melalui…', ['fagositosis','pinositosis','eksositosis','osmosis'], 1],
+    ['Pengeluaran neurotransmitter oleh neuron merupakan contoh…', ['endositosis','eksositosis','difusi','transpor aktif primer'], 1],
+    ['Urutan tahap komunikasi sel yang benar adalah…', ['transduksi–resepsi–respons','resepsi–transduksi–respons','respons–resepsi–transduksi','resepsi–respons–transduksi'], 1],
+    ['Second messenger adalah senyawa…', ['berberat molekul besar dan tidak larut','berberat molekul rendah, bersifat diffusible','protein transmembran','asam nukleat'], 1],
+    ['Reseptor yang memiliki kanal ion teraktivasi ligan dan berperan pada transmisi cepat adalah…', ['ligand-gated ion channel','GPCR','kinase-linked receptor','nuclear receptor'], 0],
+    ['Reseptor yang membutuhkan G-protein karena tidak memiliki aktivitas katalitik adalah…', ['reseptor ionotropik','G-protein coupled receptor','reseptor tirosin kinase','reseptor inti'], 1],
+    ['Reseptor kinase-linked memulai kaskade sinyal dengan cara…', ['membuka kanal ion','fosforilasi','endositosis','hidrolisis GTP'], 1],
+    ['Reseptor inti kelas I umumnya berada di sitoplasma, membentuk homodimer, lalu bermigrasi ke nukleus; ligannya sebagian besar berupa…', ['neurotransmitter','hormon steroid','ion','gas terlarut'], 1]
+  ];
+
+  $('bankBtn6').addEventListener('click', () => {
+    soalInput.value = bankToText(BANK6);
+    $('parseBtn').click();
+    preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // Membran Sel — hanya bagian struktur (soal 1-76: pengertian, komposisi, struktur & sifat membran)
+  $('bankBtn6s').addEventListener('click', () => {
+    soalInput.value = bankToText(BANK6.slice(0, 76));
+    $('parseBtn').click();
+    preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  $('sampleBtn').addEventListener('click', () => {
+    soalInput.value =
+`1. Ibu kota Indonesia adalah...
+A. Bandung
+B. Jakarta*
+C. Surabaya
+D. Medan
+
+2. Hasil dari 5 + 7 adalah...
+A. 10
+B. 12*
+C. 14
+D. 11
+
+3. Planet terdekat dengan Matahari adalah...
+A. Venus
+B. Bumi
+C. Merkurius*
+D. Mars
+
+4. Siapa penulis novel "Laskar Pelangi"?
+A. Andrea Hirata
+B. Tere Liye
+C. Pramoedya Ananta Toer
+Jawaban: A
+
+5. Lambang kimia untuk emas adalah...
+A. Ag
+B. Au*
+C. Fe
+D. Gd`;
+    parseMsg.className = 'msg';
+    preview.innerHTML = '';
+  });
+
+  $('clearBtn').addEventListener('click', () => {
+    soalInput.value = '';
+    questions = [];
+    parseMsg.className = 'msg';
+    preview.innerHTML = '';
+    renderPlay();
+    save();
+  });
+
+  // ---------- Quiz player ----------
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
     }
+    return a;
   }
 
-  function bump(el) {
-    el.classList.remove('bump');
-    void el.offsetWidth;
-    el.classList.add('bump');
+  function renderPlay() {
+    stopCountdown();
+    if (questions.length === 0) {
+      playPanel.innerHTML =
+        `<div class="empty"><span class="big">🗒️</span>Belum ada kuis. Buat soal dulu di tab <b>Buat Soal</b>, lalu tekan <b>Ubah Jadi Kuis</b>.</div>`;
+      return;
+    }
+    playPanel.innerHTML =
+      `<div class="empty">
+        <span class="big">🎯</span>
+        <h2 style="margin-bottom:4px;">Siap bertanding?</h2>
+        <p style="color:var(--muted);margin-bottom:8px;">${questions.length} soal menanti. Pilih mode:</p>
+        <div class="mode-cards">
+          <button class="mode-card ${mode === 'solo' ? 'active' : ''}" data-mode="solo">🧘 Latihan<small>Santai, kerjakan sendiri</small></button>
+          <button class="mode-card ${mode === 'bot' ? 'active' : ''}" data-mode="bot">🤖 Lawan Bot<small>Adu skor melawan bot</small></button>
+        </div>
+        <div id="botOpts" ${mode === 'bot' ? '' : 'hidden'} style="margin-bottom:6px;">
+          <p style="color:var(--muted);margin-bottom:8px;">Tingkat kecerdasan lawan:</p>
+          <div class="controls">
+            <button class="chip ${botLevel === 'mudah' ? 'active' : ''}" data-bot="mudah">😴 Santai</button>
+            <button class="chip ${botLevel === 'sedang' ? 'active' : ''}" data-bot="sedang">🙂 Seimbang</button>
+            <button class="chip ${botLevel === 'sulit' ? 'active' : ''}" data-bot="sulit">🔥 Jenius</button>
+          </div>
+        </div>
+        <button class="btn primary" id="startBtn" style="margin-top:8px;">🚀 Mulai ${mode === 'bot' ? 'Bertanding' : 'Kuis'}</button>
+      </div>`;
+    playPanel.querySelectorAll('[data-mode]').forEach(b =>
+      b.addEventListener('click', () => { mode = b.dataset.mode; save(); renderPlay(); }));
+    playPanel.querySelectorAll('[data-bot]').forEach(b =>
+      b.addEventListener('click', () => { botLevel = b.dataset.bot; save(); renderPlay(); }));
+    $('startBtn').addEventListener('click', startQuiz);
   }
 
-  function win() {
-    stopTimer();
-
-    const cards = document.querySelectorAll('.card');
-    cards.forEach((c, i) => {
-      setTimeout(() => {
-        c.classList.add('wave');
-        setTimeout(() => c.classList.remove('wave'), 650);
-      }, i * 60);
+  function startQuiz() {
+    quiz = questions.map(q => {
+      if (q.type === 'isian') {
+        return { text: q.text, type: 'isian', answers: q.answers.slice(), displayAnswer: q.displayAnswer };
+      }
+      const opts = q.options.map((o, i) => ({ ...o, oi: i }));
+      return { text: q.text, type: 'mcq', options: settings.shuffleO ? shuffle(opts) : opts };
     });
-    const overlayDelay = cards.length * 60 + 700;
+    if (settings.shuffleQ) quiz = shuffle(quiz);
 
-    resultText.innerHTML =
-      'Kamu menyelesaikannya dalam <span class="highlight">' + formatTime(seconds) +
-      '</span> dengan <span class="highlight">' + moves + ' langkah</span>.';
+    current = 0;
+    answers = new Array(quiz.length).fill(null);
+    locked = new Array(quiz.length).fill(false);
+    botScore = 0; youScore = 0; streak = 0; bestStreak = 0;
+    botAnswers = new Array(quiz.length).fill(null);
+    Sound.initGesture();
+    if (settings.music && !settings.muted) { Sound.startMusic(); updateSoundBtn(); }
+    renderQuestion();
+  }
 
-    const best = getBest();
-    if (!best || seconds < best.time) {
-      localStorage.setItem('memoria-best-' + level, JSON.stringify({ time: seconds, moves }));
-      recordText.textContent = '🎉 Rekor baru untuk level ini!';
-    } else {
-      recordText.textContent = 'Rekor terbaikmu: ' + formatTime(best.time) + ' (' + best.moves + ' langkah)';
+  function normalizeAns(s) {
+    return String(s).toLowerCase().trim().replace(/\s+/g, ' ').replace(/[.,;:!?]+$/, '');
+  }
+  function isCorrect(i) {
+    const q = quiz[i], ans = answers[i];
+    if (q.type === 'isian') {
+      if (ans == null || ans === '') return false;
+      const n = normalizeAns(ans);
+      return q.answers.some(a => normalizeAns(a) === n);
     }
-    showBest();
+    return ans !== null && q.options[ans] && q.options[ans].correct;
+  }
+  // Jawaban bot: untuk isian mengembalikan boolean benar; untuk pilihan ganda indeks opsi
+  function botRespond(q) {
+    if (q.type === 'isian') return Math.random() < BOT[botLevel].p;
+    const ci = q.options.findIndex(o => o.correct);
+    if (Math.random() < BOT[botLevel].p) return ci;
+    const wrong = q.options.map((o, i) => i).filter(i => i !== ci);
+    return wrong.length ? wrong[Math.floor(Math.random() * wrong.length)] : ci;
+  }
 
-    setTimeout(() => overlay.classList.add('show'), overlayDelay);
-    launchConfetti();
+  function renderQuestion() {
+    stopCountdown();
+    const q = quiz[current];
+    const answered = locked[current];
+    const chosen = answers[current];
+    const isIsian = q.type === 'isian';
+    const botMode = mode === 'bot';
+
+    let answerAreaHtml;
+    if (isIsian) {
+      const val = (answered && answers[current] != null) ? escapeHtml(answers[current]) : '';
+      const okCls = answered ? (isCorrect(current) ? 'ok' : 'no') : '';
+      answerAreaHtml =
+        `<div class="isian-wrap">
+          <input type="text" id="isianInput" class="isian-input ${okCls}" placeholder="Ketik jawabanmu…" value="${val}" ${answered ? 'disabled' : ''} autocomplete="off" autocapitalize="off" spellcheck="false">
+          ${(!answered && instantOn()) ? '<button class="btn primary" id="checkBtn">✓ Periksa</button>' : ''}
+        </div>`;
+    } else {
+      const optsHtml = q.options.map((o, i) => {
+        const key = String.fromCharCode(65 + i);
+        let cls = 'option';
+        if (answered) {
+          cls += ' locked';
+          if (o.correct) cls += ' correct';
+          else if (chosen === i) cls += ' wrong';
+        } else if (chosen === i) {
+          cls += ' selected';
+        }
+        return `<button class="${cls}" data-i="${i}"><span class="key">${key}</span><span>${escapeHtml(o.text)}</span></button>`;
+      }).join('');
+      answerAreaHtml = `<div class="options" id="options">${optsHtml}</div>`;
+    }
+
+    const pct = Math.round((current) / quiz.length * 100);
+
+    let feedbackHtml = '';
+    if (answered && instantOn()) {
+      const ok = isCorrect(current);
+      if (isIsian) {
+        feedbackHtml = ok
+          ? `<div class="feedback ok show">✅ Benar!</div>`
+          : `<div class="feedback no show">❌ Kurang tepat. Jawaban: <b>${escapeHtml(q.displayAnswer)}</b></div>`;
+      } else {
+        feedbackHtml = ok
+          ? `<div class="feedback ok show">✅ Tepat sekali!</div>`
+          : `<div class="feedback no show">❌ Kurang tepat. Jawaban benar ditandai hijau.</div>`;
+      }
+    }
+
+    let botLineHtml = '';
+    if (answered && botMode && botAnswers[current] != null) {
+      const r = botAnswers[current];
+      if (isIsian) {
+        const bok = r === true;
+        botLineHtml = `<div class="bot-line">${BOT[botLevel].emoji} ${BOT[botLevel].name} menjawab — <b class="${bok ? 'good' : 'bad'}">${bok ? 'benar' : 'salah'}</b></div>`;
+      } else {
+        const bok = q.options[r] && q.options[r].correct;
+        botLineHtml = `<div class="bot-line">${BOT[botLevel].emoji} ${BOT[botLevel].name} memilih <b>${String.fromCharCode(65 + r)}</b> — <b class="${bok ? 'good' : 'bad'}">${bok ? 'benar' : 'salah'}</b></div>`;
+      }
+    }
+
+    let versusHtml = '';
+    if (botMode) {
+      const youLead = youScore > botScore, botLead = botScore > youScore;
+      versusHtml =
+        `<div class="versus">
+          <div class="vs-side ${youLead ? 'lead' : ''}"><span class="ava">👤</span> Kamu <b>${youScore}</b></div>
+          <div class="vs-mid">VS</div>
+          <div class="vs-side ${botLead ? 'lead' : ''}"><span class="ava">${BOT[botLevel].emoji}</span> ${BOT[botLevel].name} <b>${botScore}</b></div>
+        </div>`;
+    }
+
+    const timerPill = settings.timer > 0
+      ? `<div class="pill">⏱️ <span class="accent" id="cd">${settings.timer}</span>s</div>` : '';
+    const streakPill = streak >= 2 ? `<div class="pill streak-pill">🔥 Beruntun x${streak}</div>` : '';
+
+    playPanel.innerHTML =
+      versusHtml +
+      `<div class="quiz-top">
+        <div class="pill">Soal <span class="accent">${current + 1}</span> / ${quiz.length}</div>
+        ${streakPill}
+        ${timerPill}
+        <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></div>
+      </div>
+      <div class="question-text">${escapeHtml(q.text)}</div>
+      ${answerAreaHtml}
+      ${feedbackHtml}
+      ${botLineHtml}
+      <div class="quiz-nav">
+        <button class="btn" id="prevBtn" ${(current === 0 || botMode) ? 'disabled' : ''}>← Sebelumnya</button>
+        <button class="btn primary" id="nextBtn">${current === quiz.length - 1 ? '🏁 Selesai' : 'Berikutnya →'}</button>
+      </div>`;
+
+    if (!answered) {
+      if (isIsian) {
+        const inp = $('isianInput');
+        if (inp) {
+          inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); submitIsian(); } });
+          setTimeout(() => inp.focus(), 40);
+        }
+        const cb = $('checkBtn');
+        if (cb) cb.addEventListener('click', submitIsian);
+      } else {
+        $('options').querySelectorAll('.option').forEach(btn => {
+          btn.addEventListener('click', () => choose(parseInt(btn.dataset.i, 10)));
+        });
+      }
+    }
+    $('prevBtn').addEventListener('click', () => { if (current > 0) { captureIsian(); current--; renderQuestion(); } });
+    $('nextBtn').addEventListener('click', next);
+
+    if (settings.timer > 0 && !answered) startCountdown();
+  }
+
+  // Simpan jawaban isian yang sedang diketik (agar tidak hilang saat pindah soal)
+  function captureIsian() {
+    const q = quiz[current];
+    if (q && q.type === 'isian' && !locked[current]) {
+      const inp = $('isianInput');
+      if (inp) answers[current] = inp.value;
+    }
+  }
+
+  // Kunci soal saat ini, beri skor, efek suara, dan jawaban bot (hanya dipanggil pada mode instan)
+  function lockAndScore() {
+    locked[current] = true;
+    stopCountdown();
+    if (isCorrect(current)) {
+      youScore++; streak++; if (streak > bestStreak) bestStreak = streak;
+      Sound.correct(); pointPop('+1');
+      if (streak >= 3) { Sound.combo(streak); pointPop('🔥 x' + streak, '#f77f00'); }
+    } else {
+      streak = 0; Sound.wrong();
+    }
+    if (mode === 'bot') {
+      const r = botRespond(quiz[current]);
+      botAnswers[current] = r;
+      const bok = quiz[current].type === 'isian' ? r === true : (quiz[current].options[r] && quiz[current].options[r].correct);
+      if (bok) botScore++;
+    }
+  }
+
+  function choose(i) {
+    if (locked[current] || quiz[current].type === 'isian') return;
+    answers[current] = i;
+    if (instantOn()) lockAndScore();
+    else Sound.click();
+    renderQuestion();
+  }
+
+  function submitIsian() {
+    if (locked[current]) return;
+    const inp = $('isianInput');
+    const val = inp ? inp.value.trim() : '';
+    if (!val) { if (inp) inp.focus(); return; }
+    answers[current] = val;
+    if (instantOn()) lockAndScore();
+    renderQuestion();
+  }
+
+  function next() {
+    captureIsian();
+    // in non-instant mode, lock on leaving so it counts
+    const a = answers[current];
+    if (!instantOn() && a !== null && a !== undefined && a !== '') locked[current] = true;
+    if (current === quiz.length - 1) {
+      finish();
+    } else {
+      current++;
+      renderQuestion();
+    }
+  }
+
+  function startCountdown() {
+    let t = settings.timer;
+    const cd = $('cd');
+    countdownId = setInterval(() => {
+      t--;
+      if (cd) cd.textContent = t;
+      if (t <= 0) {
+        stopCountdown();
+        // time up: lock as unanswered/wrong and reveal
+        locked[current] = true;
+        renderQuestion();
+      }
+    }, 1000);
+  }
+  function stopCountdown() {
+    if (countdownId) { clearInterval(countdownId); countdownId = null; }
+  }
+
+  function finish() {
+    stopCountdown();
+    Sound.stopMusic();
+    updateSoundBtn();
+    // hitung jawaban benar (pilihan ganda & isian)
+    let correct = 0;
+    quiz.forEach((q, i) => { if (isCorrect(i)) correct++; });
+    const total = quiz.length;
+    const pct = Math.round(correct / total * 100);
+
+    let title, emoji;
+    if (pct === 100) { title = 'Sempurna! Luar biasa!'; emoji = '🏆'; }
+    else if (pct >= 80) { title = 'Hebat sekali!'; emoji = '🌟'; }
+    else if (pct >= 60) { title = 'Bagus, terus berlatih!'; emoji = '👍'; }
+    else if (pct >= 40) { title = 'Lumayan, jangan menyerah!'; emoji = '💪'; }
+    else { title = 'Ayo coba lagi!'; emoji = '📚'; }
+
+    const reviewHtml = quiz.map((q, i) => {
+      const isRight = isCorrect(i);
+      const ans = answers[i];
+      let chosenText, keyText;
+      if (q.type === 'isian') {
+        chosenText = (ans != null && ans !== '') ? escapeHtml(ans) : '<i>tidak dijawab</i>';
+        keyText = escapeHtml(q.displayAnswer);
+      } else {
+        const correctOpt = q.options.find(o => o.correct);
+        chosenText = (ans !== null && ans !== undefined) ? escapeHtml(q.options[ans].text) : '<i>tidak dijawab</i>';
+        keyText = escapeHtml(correctOpt.text);
+      }
+      return `<div class="review-item">
+        <div class="r-q"><span class="badge ${isRight ? 'b-ok' : 'b-no'}">${isRight ? 'Benar' : 'Salah'}</span>${i + 1}. ${escapeHtml(q.text)}</div>
+        ${isRight
+          ? `<div class="r-line">Jawabanmu: <b class="good">${chosenText}</b></div>`
+          : `<div class="r-line">Jawabanmu: <b class="bad">${chosenText}</b> · Kunci: <b class="good">${keyText}</b></div>`}
+      </div>`;
+    }).join('');
+
+    const streakNote = bestStreak >= 3 ? ` Rentetan terbaik 🔥 ${bestStreak}.` : '';
+    let heroHtml, youWon;
+
+    if (mode === 'bot') {
+      let banner, bemoji;
+      if (correct > botScore) { banner = 'Kamu Menang!'; bemoji = '🎉'; youWon = true; }
+      else if (correct < botScore) { banner = 'Bot Menang'; bemoji = '🤖'; youWon = false; }
+      else { banner = 'Seri!'; bemoji = '🤝'; youWon = true; }
+      heroHtml =
+        `<div class="result-hero">
+          <div class="winner-banner">${bemoji} ${banner}</div>
+          <div class="versus" style="margin:10px 0 6px;">
+            <div class="vs-side ${correct >= botScore ? 'lead' : ''}"><span class="ava">👤</span> Kamu <b>${correct}</b></div>
+            <div class="vs-mid">VS</div>
+            <div class="vs-side ${botScore > correct ? 'lead' : ''}"><span class="ava">${BOT[botLevel].emoji}</span> ${BOT[botLevel].name} <b>${botScore}</b></div>
+          </div>
+          <p>Skormu ${pct}% (${correct}/${total} benar).${streakNote}</p>
+        </div>`;
+    } else {
+      youWon = pct >= 80;
+      heroHtml =
+        `<div class="result-hero">
+          <div class="score-ring" style="--pct:${pct}%"><span class="score-val">${pct}%</span><span class="score-lbl">${correct}/${total} benar</span></div>
+          <h2>${emoji} ${title}</h2>
+          <p>Kamu menjawab benar ${correct} dari ${total} soal.${streakNote}</p>
+        </div>`;
+    }
+
+    playPanel.innerHTML =
+      heroHtml +
+      `<div class="row" style="justify-content:center;">
+        <button class="btn primary" id="retryBtn">🔁 Main Lagi</button>
+        <button class="btn" id="editBtn">✏️ Ubah Soal</button>
+      </div>
+      <h2 style="margin:22px 0 4px;">Pembahasan</h2>
+      <div class="review">${reviewHtml}</div>`;
+
+    $('retryBtn').addEventListener('click', () => renderPlay());
+    $('editBtn').addEventListener('click', () => switchView('editor'));
+
+    if (mode === 'bot') {
+      if (youWon) { Sound.win(); launchConfetti(); }
+      else Sound.finish(false);
+    } else {
+      Sound.finish(pct >= 60);
+      if (pct >= 80) launchConfetti();
+    }
   }
 
   function launchConfetti() {
     const colors = ['#ffd166', '#ef476f', '#06d6a0', '#118ab2', '#b5179e', '#f77f00'];
-    for (let i = 0; i < 120; i++) {
+    for (let i = 0; i < 110; i++) {
       setTimeout(() => {
         const c = document.createElement('div');
         c.className = 'confetti';
@@ -534,33 +1875,92 @@
     }
   }
 
-  document.querySelectorAll('[data-level]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('[data-level]').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      level = btn.dataset.level;
-      newGame();
-    });
+  // ---------- Tabs ----------
+  function switchView(name) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.view === name));
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+    if (name !== 'play') { Sound.stopMusic(); updateSoundBtn(); }
+    if (name === 'play') renderPlay();
+  }
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => switchView(tab.dataset.view));
   });
 
-  document.getElementById('restartBtn').addEventListener('click', newGame);
-  document.getElementById('playAgainBtn').addEventListener('click', newGame);
+  // ---------- Settings wiring ----------
+  const setShuffleQ = $('setShuffleQ'), setShuffleO = $('setShuffleO'),
+        setInstant = $('setInstant'), setTimer = $('setTimer'),
+        setMusic = $('setMusic'), setSfx = $('setSfx'), setVolume = $('setVolume'),
+        soundBtn = $('soundToggle');
 
-  function spawnBubbles() {
-    for (let i = 0; i < 14; i++) {
-      const b = document.createElement('div');
-      b.className = 'bubble';
-      const size = 14 + Math.random() * 46;
-      b.style.width = b.style.height = size + 'px';
-      b.style.left = Math.random() * 100 + 'vw';
-      b.style.animationDuration = 12 + Math.random() * 18 + 's';
-      b.style.animationDelay = -Math.random() * 20 + 's';
-      document.body.appendChild(b);
-    }
+  function updateSoundBtn() {
+    soundBtn.textContent = settings.muted ? '🔇' : '🔊';
+    soundBtn.classList.toggle('muted', settings.muted);
+    soundBtn.classList.toggle('playing', !settings.muted && Sound.isPlaying());
   }
 
-  spawnBubbles();
-  newGame();
+  function applySettingsToUI() {
+    setShuffleQ.checked = settings.shuffleQ;
+    setShuffleO.checked = settings.shuffleO;
+    setInstant.checked = settings.instant;
+    setTimer.value = settings.timer;
+    setMusic.checked = settings.music;
+    setSfx.checked = settings.sfx;
+    setVolume.value = Math.round(settings.volume * 100);
+    Sound.setSfx(settings.sfx);
+    Sound.setMusicEnabled(settings.music);
+    Sound.setVolume(settings.volume);
+    Sound.setMuted(settings.muted);
+    updateSoundBtn();
+  }
+  setShuffleQ.addEventListener('change', () => { settings.shuffleQ = setShuffleQ.checked; save(); });
+  setShuffleO.addEventListener('change', () => { settings.shuffleO = setShuffleO.checked; save(); });
+  setInstant.addEventListener('change', () => { settings.instant = setInstant.checked; save(); });
+  setTimer.addEventListener('change', () => {
+    let v = parseInt(setTimer.value, 10);
+    if (isNaN(v) || v < 0) v = 0;
+    if (v > 300) v = 300;
+    settings.timer = v; setTimer.value = v; save();
+  });
+  setMusic.addEventListener('change', () => {
+    settings.music = setMusic.checked;
+    Sound.initGesture();
+    Sound.setMusicEnabled(settings.music);
+    if (settings.music && !settings.muted) Sound.startMusic(); else Sound.stopMusic();
+    updateSoundBtn();
+    save();
+  });
+  setSfx.addEventListener('change', () => {
+    settings.sfx = setSfx.checked;
+    Sound.setSfx(settings.sfx);
+    if (settings.sfx && !settings.muted) { Sound.initGesture(); Sound.click(); }
+    save();
+  });
+  setVolume.addEventListener('input', () => {
+    settings.volume = parseInt(setVolume.value, 10) / 100;
+    Sound.setVolume(settings.volume);
+    save();
+  });
+
+  soundBtn.addEventListener('click', () => {
+    settings.muted = !settings.muted;
+    Sound.initGesture();
+    Sound.setMuted(settings.muted);
+    if (!settings.muted && settings.music &&
+        document.getElementById('view-play').classList.contains('active') &&
+        document.querySelector('.question-text')) {
+      Sound.startMusic();
+    }
+    if (!settings.muted && settings.sfx) Sound.click();
+    updateSoundBtn();
+    save();
+  });
+
+  soalInput.addEventListener('input', save);
+
+  // ---------- Init ----------
+  load();
+  applySettingsToUI();
+  if (questions.length) renderPreview();
 })();
 </script>
 </body>

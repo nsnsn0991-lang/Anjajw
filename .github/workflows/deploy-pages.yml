@@ -1,0 +1,42 @@
+name: Deploy ke GitHub Pages
+
+# Deploy otomatis setiap ada push ke branch ini.
+on:
+  push:
+    branches:
+      - claude/soal-to-kuis-app-7re1uk
+  workflow_dispatch: {}
+
+# Izin yang dibutuhkan untuk mem-publish ke Pages.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Hanya satu deploy berjalan pada satu waktu.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout kode
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Unggah isi situs
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Seluruh isi repo (index.html ada di root).
+          path: .
+
+      - name: Deploy ke GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
