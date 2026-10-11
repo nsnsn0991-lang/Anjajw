@@ -400,6 +400,7 @@
           <button class="btn" id="bankBtn5">💧 Bank Pondasi Biokimia (100)</button>
           <button class="btn" id="bankBtn6">🧫 Bank Membran Sel (100)</button>
           <button class="btn" id="bankBtn6s">🧱 Membran: Struktur (76)</button>
+          <button class="btn" id="bankBtn7">🦴 Bank Tulang & Kartilago (100)</button>
           <button class="btn" id="sampleBtn">📄 Isi Contoh</button>
           <button class="btn warn" id="clearBtn">🗑️ Bersihkan</button>
         </div>
@@ -1449,6 +1450,116 @@ Catatan:
   // Membran Sel — hanya bagian struktur (soal 1-76: pengertian, komposisi, struktur & sifat membran)
   $('bankBtn6s').addEventListener('click', () => {
     soalInput.value = bankToText(BANK6.slice(0, 76));
+    $('parseBtn').click();
+    preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // Bank soal bawaan #7: Jaringan Tulang & Kartilago (Histologi) — 100 butir, 5 opsi
+  const BANK7 = [
+    ['Sel khas penyusun jaringan tulang rawan yang tersebar dan terisolasi di dalam matriks ekstraseluler disebut...', ['Fibroblas','Kondrosit','Osteosit','Adiposit','Osteoblas'], 1],
+    ['Berikut ini merupakan sifat tulang rawan, KECUALI...', ['Tidak mempunyai serat saraf','Mempunyai kekenyalan tertentu','Mempunyai pembuluh darah','Mempunyai kemampuan tumbuh sangat cepat','Terdapat banyak pada embrio'], 2],
+    ['Tulang rawan ditemukan dalam jumlah paling banyak pada...', ['Orang lanjut usia','Embrio','Orang dewasa','Remaja pascapubertas','Bayi pascalahir'], 1],
+    ['Yang BUKAN merupakan jenis tulang rawan adalah...', ['Tulang rawan hyalin','Tulang rawan elastis','Fibrokartilago','Tulang rawan retikular','Semua di atas merupakan jenis tulang rawan'], 3],
+    ['Jenis tulang rawan yang paling banyak dijumpai pada orang dewasa adalah...', ['Elastis','Fibrosa','Hyalin','Epifisiel','Artikular elastis'], 2],
+    ['Lokalisasi tulang rawan hyalin adalah sebagai berikut, KECUALI...', ['Ujung ventral iga','Trakea','Permukaan sendi tulang','Daun telinga','Lempeng epifisis anak yang sedang tumbuh'], 3],
+    ['Tulang rawan berasal dari jaringan embrional...', ['Ektoderm permukaan','Endoderm','Mesenkim','Krista neuralis saja','Notokorda'], 2],
+    ['Pada histogenesis tulang rawan, sel mesenkim menjadi bulat dan berkumpul membentuk...', ['Pusat osifikasi primer','Pusat kondrifikasi','Perikondrium','Lakuna sekunder','Matriks interteritorial'], 1],
+    ['Pada histogenesis, sel yang membesar menyekresi substansi dasar yang bersifat ... dan tropokolagen yang akan menjadi serat kolagen.', ['Asidofilik','Ortokromatik','Metakromatik','Eosinofilik','Argirofilik'], 2],
+    ['Rongga kecil di dalam matriks tempat kondrosit berada disebut...', ['Kanalikuli','Lakuna','Kanalis Havers','Lakuna Howship','Kanalis Volkmann'], 1],
+    ['Pada pertumbuhan aposisional, sel di lapisan dalam perikondrium (lapisan kondrogenik) disebut...', ['Fibroblas','Kondroblas','Osteoblas','Sel isogen','Fibrosit'], 1],
+    ['Pertumbuhan aposisional tulang rawan berlangsung...', ['Hanya pada masa embrio','Hanya sampai lahir','Dari fetus sampai dewasa','Hanya pada lempeng epifisis','Hanya saat penyembuhan fraktur'], 2],
+    ['Pertumbuhan tulang rawan melalui pembelahan kondrosit di dalam lakuna sehingga terbentuk kelompok sel isogen disebut pertumbuhan...', ['Aposisional','Interstisial','Radial','Intramembranosa','Enkondral'], 1],
+    ['Pertumbuhan interstisial tetap terjadi pada...', ['Daun telinga','Diskus epifisis tulang panjang','Simfisis pubis','Periosteum','Epiglotis'], 1],
+    ['Matriks yang mengelilingi kelompok sel isogen dan bersifat basofil disebut...', ['Matriks interteritorial','Matriks teritorial','Osteoid','Matriks amorf fibrosa','Matriks interstisial'], 1],
+    ['Matriks yang terdapat di antara kelompok sel isogen dan kurang basofil disebut...', ['Matriks teritorial','Matriks kapsular','Matriks interteritorial','Lakuna sekunder','Perikondrium'], 2],
+    ['Bila kondrosit membelah beberapa kali, sel-sel anak (2–4 sel) yang berada dalam satu lakuna primer disebut...', ['Kondroblas','Sel isogen (cell nest)','Osteon','Sel osteoprogenitor','Sel raksasa'], 1],
+    ['Kondrosit menyekresi substansi interseluler yang membentuk sekat tipis antar sel sehingga tiap sel terletak dalam...', ['Lakuna primer','Lakuna sekunder','Lakuna Howship','Kanalikuli','Kanalis Havers'], 1],
+    ['Pada preparat rutin, serat kolagen tulang rawan hyalin tidak dapat dibedakan dari zat amorf. Penyebabnya adalah sebagai berikut, KECUALI...', ['Ukuran serat sangat halus','Indeks bias serat sama dengan indeks bias zat amorf','Matriks tampak homogen dengan HE','Serat yang dominan adalah kolagen kasar tipe I','Serat tertanam dalam gel proteoglikan'], 3],
+    ['Glikosaminoglikan penyusun matriks tulang rawan hyalin adalah sebagai berikut, KECUALI...', ['Asam hialuronat','Kondroitin 4-sulfat','Kondroitin 6-sulfat','Keratan sulfat','Dermatan sulfat'], 4],
+    ['Glikosaminoglikan yang membentuk kompleks dengan protein disebut...', ['Glikoprotein','Proteoglikan','Tropokolagen','Kondronektin','Hidroksiapatit'], 1],
+    ['Serat kolagen yang paling banyak (90–95%) pada matriks tulang rawan hyalin adalah...', ['Tipe I','Tipe II','Tipe III','Tipe IV','Tipe V'], 1],
+    ['Diameter serat kolagen halus tipe II pada tulang rawan hyalin adalah sekitar...', ['1–5 nm','10–100 nm','200–500 nm','1–2 µm','4–12 µm'], 1],
+    ['Selain tipe II, serat kolagen lain di tulang rawan hyalin (5–10%) adalah...', ['Tipe I, III, V','Tipe IX, X, XI','Tipe IV dan VII','Tipe I dan V','Tipe III saja'], 1],
+    ['Proporsi kolagen di dalam matriks tulang rawan hyalin adalah sekitar...', ['5–10%','20–30%','40–70%','90–95%','99%'], 2],
+    ['Sekitar 50% komponen organik matriks berupa gel yang tersusun atas...', ['Hidroksiapatit','Proteoglikan hidrofilik kental','Serat elastin','Kolagen tipe I kasar','Glikogen'], 1],
+    ['Protein dalam matriks tulang rawan hyalin adalah sebagai berikut, KECUALI...', ['Kolagen tipe II','Kondronektin','Kondrokalsin','Osteokalsin','Semua termasuk protein matriks tulang rawan'], 3],
+    ['Kolagen tipe II dan proteoglikan pada matriks tulang rawan dihasilkan oleh...', ['Fibroblas perikondrium','Kondrosit','Osteoblas','Makrofag','Sel mast'], 1],
+    ['Dengan pewarnaan HE, matriks tulang rawan hyalin secara umum tampak...', ['Merah tua','Biru pucat (hampir tidak terpulas)','Hitam','Coklat keemasan','Hijau'], 1],
+    ['Daerah sekitar kondrosit yang tampak lebih gelap ("matriks teritorial" = "kapsular") memiliki sifat berikut, KECUALI...', ['Basofilik kuat','Metakromatik','Reaksi PAS positif','Asidofilik kuat','Kadar kondroitin sulfat tinggi'], 3],
+    ['Sifat basofilik kuat matriks teritorial disebabkan oleh tingginya kadar...', ['Kolagen tipe II','Kondroitin sulfat','Kalsium','Glikogen','Elastin'], 1],
+    ['Kandungan cairan jaringan pada tulang rawan hyalin adalah sekitar...', ['10–20%','30–40%','45–55%','65–80%','90–99%'], 3],
+    ['Pernyataan yang benar mengenai bentuk kondrosit adalah...', ['Kondrosit muda besar dan bulat; kondrosit matang gepeng','Kondrosit muda agak gepeng; kondrosit matang besar dan bulat','Semua kondrosit berbentuk kumparan','Kondrosit matang berinti banyak','Ukuran dan bentuk kondrosit selalu seragam'], 1],
+    ['Ciri sel tulang rawan (kondrosit) yang tepat adalah...', ['Inti pipih dengan kromatin sangat padat, tanpa nukleolus','Inti bulat dengan 1–2 nukleoli; sitoplasma kondrosit besar mengandung glikogen dan lemak','Inti banyak (5–50)','Sitoplasma asidofilik kaya lisosom','Memiliki juluran panjang dalam kanalikuli'], 1],
+    ['Lapisan dalam perikondrium yang sel-selnya menghasilkan kondroblas baru disebut lapisan...', ['Fibrosa','Kondrogenik','Osteogenik','Sinovial','Sirkumferensial'], 1],
+    ['Lapisan luar perikondrium...', ['Disebut lapisan kondrogenik dan menghasilkan kondroblas','Disebut lapisan fibrosa; selnya berdiferensiasi menjadi fibroblas penghasil kolagen','Mengandung osteoblas aktif','Hanya terdapat pada fibrokartilago','Mengandung serat Sharpey'], 1],
+    ['Distribusi tulang rawan elastis meliputi berikut ini, KECUALI...', ['Daun telinga','Dinding meatus akustikus eksternus','Tuba auditiva Eustachius','Epiglotis','Simfisis pubis'], 4],
+    ['Sediaan jaringan dari epiglotis yang diwarnai pulasan perak memperlihatkan serat-serat berwarna gelap di antara kondrosit. Jenis tulang rawan ini adalah...', ['Hyalin','Elastis','Fibrosa','Epifisiel','Artikular'], 1],
+    ['Komponen serat matriks tulang rawan elastis adalah...', ['Kolagen tipe I kasar saja','Kolagen tipe II dan serat elastis yang sangat banyak','Serat retikular saja','Kolagen tipe I dan dermatan sulfat','Hanya serat elastis tanpa kolagen'], 1],
+    ['Pewarnaan pada mikrograf tulang rawan elastis daun telinga yang tergolong pewarnaan khusus jaringan elastis adalah...', ['Hematoksilin-eosin','Orsein','PAS','Giemsa','Sudan III'], 1],
+    ['Pernyataan yang benar mengenai tulang rawan elastis adalah...', ['Tidak mempunyai perikondrium','Mempunyai perikondrium','Matriks utamanya kolagen tipe I','Terdapat pada anulus fibrosus','Tidak memiliki kondrosit'], 1],
+    ['Tulang rawan fibrosa terdapat pada...', ['Daun telinga','Trakea','Anulus fibrosus diskus intervertebralis','Epiglotis','Ujung ventral iga'], 2],
+    ['Jenis serat kolagen yang menyusun tulang rawan fibrosa adalah...', ['Kolagen halus tipe II','Kolagen kasar tipe I','Kolagen tipe IX','Kolagen tipe X','Kolagen tipe IV'], 1],
+    ['Matriks amorf tulang rawan fibrosa yang sedikit terdiri atas...', ['Asam hialuronat dan keratan sulfat','Kondroitin sulfat dan dermatan sulfat','Osteonektin dan osteokalsin','Hidroksiapatit','Heparan sulfat'], 1],
+    ['Ciri yang membedakan tulang rawan fibrosa dari dua jenis tulang rawan lainnya adalah...', ['Tidak mempunyai perikondrium','Mempunyai perikondrium tebal','Mempunyai serat elastis banyak','Matriks sangat basofilik','Tidak memiliki lakuna'], 0],
+    ['Pada tulang rawan fibrosa, sifat pewarnaan matriks secara umum adalah...', ['Sangat basofilik','Asidofil, dengan lakuna sedikit basofilik','Metakromatik kuat','Tidak terpulas sama sekali','Argirofilik'], 1],
+    ['Pada preparat diskus intervertebralis (HE), kondrosit tampak pipih dan tersusun berderet di antara berkas serat kolagen. Bentuk pipih ini disebabkan...', ['Kondrosit sedang bermitosis','Kondrosit terjepit di antara serat kolagen','Kondrosit mengalami hipertrofi','Kondrosit berubah menjadi fibroblas','Kondrosit mengalami kalsifikasi'], 1],
+    ['Seorang mahasiswa mengamati preparat dari daun telinga: tampak kondrosit dalam lakuna, kelompok isogen, perikondrium, dan banyak bahan fibrilar dalam matriks. Ciri pembeda utama jaringan ini dari hyalin adalah...', ['Tidak adanya perikondrium','Banyaknya serat elastis dalam matriks','Adanya kolagen kasar tipe I','Kondrosit tersusun berderet','Tidak adanya sel isogen'], 1],
+    ['Komponen tulang rawan yang memungkinkan kartilago menahan kompresi yang besar adalah...', ['Perikondrium','Matriks','Pembuluh darah','Serat saraf','Kanalikuli'], 1],
+    ['Kesanggupan pertumbuhan kartilago secara interstisial memungkinkan...', ['Penebalan tulang pipih','Pertumbuhan memanjang tulang tungkai','Pembentukan sistem Havers','Penyembuhan fraktur dengan woven bone','Resorpsi tulang oleh osteoklas'], 1],
+    ['Defisiensi vitamin C menyebabkan tidak ada produksi matriks tulang rawan sehingga timbul...', ['Rachitis','Scurvy','Osteoporosis','Akromegali','Lempeng epifisis menebal'], 1],
+    ['Defisiensi vitamin D menyebabkan absorpsi kalsium dan fosfat berkurang sehingga timbul...', ['Scurvy','Rachitis','Gigantisme','Osteopetrosis','Skorbut'], 1],
+    ['Pengaruh vitamin A pada pertumbuhan tulang rawan menurut materi kuliah adalah...', ['Lempeng epifisis menjadi tipis','Matriks tidak terbentuk','Absorpsi kalsium menurun','Perikondrium hilang','Osteoklas teraktivasi'], 0],
+    ['Hormon yang memengaruhi pertumbuhan tulang rawan adalah...', ['Insulin','Somatotrofin','Oksitosin','Prolaktin','Aldosteron'], 1],
+    ['Fungsi tulang adalah sebagai berikut, KECUALI...', ['Kerangka tubuh','Penyokong','Pelindung','Pembentuk darah','Penghasil insulin'], 4],
+    ['Matriks non-mineral tulang (osteoid) terdiri atas...', ['Hidroksiapatit dan sitrat','Serat kolagen/serat elastis dan glikosaminoglikan','Hanya garam kalsium','Kondroitin sulfat dan elastin saja','Asam hialuronat dan lipid'], 1],
+    ['Osteoid mengandung glikoprotein yang terikat kuat dengan kalsium, yaitu...', ['Kondronektin','Kondrokalsin','Osteokalsin','Fibronektin','Laminin'], 2],
+    ['Osteoid diproduksi oleh...', ['Osteoklas','Osteosit','Osteoblas','Kondroblas','Makrofag'], 2],
+    ['Sekitar 90% bahan organik tulang berupa...', ['Kolagen tipe II','Kolagen tipe I dengan sedikit tipe V','Kolagen tipe IX, X, XI','Serat elastis','Proteoglikan'], 1],
+    ['Dengan pewarnaan HE, bahan organik (kolagen) tulang tampak berwarna...', ['Biru pucat','Merah muda hingga merah','Ungu metakromatik','Hitam','Hijau'], 1],
+    ['Protein non-kolagen pada tulang adalah...', ['Kondronektin dan kondrokalsin','Osteonektin dan osteokalsin','Elastin dan fibrilin','Aktin dan miosin','Keratin dan vimentin'], 1],
+    ['Mineral anorganik utama tulang, yaitu Ca dan P, sebagian besar berbentuk...', ['Kalsium oksalat','Hidroksiapatit','Kalsium karbonat murni','Magnesium fosfat','Kalsium sitrat'], 1],
+    ['Selain Ca dan P, bahan anorganik tulang meliputi berikut ini, KECUALI...', ['Bikarbonat','Sitrat','Magnesium','Natrium','Besi (Fe)'], 4],
+    ['Sel osteoprogenitor berasal dari...', ['Monosit','Sel mesenkim primitif','Kondrosit hipertrofi','Osteosit','Makrofag'], 1],
+    ['Sel osteoprogenitor yang sudah tidak aktif lagi tampak sebagai...', ['Sel raksasa berinti banyak','Sel gepeng di permukaan tulang','Sel kolumnar rendah epiteloid','Sel dalam lakuna dengan filopodia','Sel bulat dalam lakuna Howship'], 1],
+    ['Secara mikroskopis, sel osteoprogenitor pada tulang yang sedang tumbuh memiliki ciri...', ['Sel kecil, sedikit, inti pipih','Sel besar dan banyak, inti besar oval, sitoplasma berbentuk kumparan padat','Sel raksasa berinti 5–50','Sitoplasma asidofilik kaya lisosom','Sel terperangkap dalam lakuna'], 1],
+    ['Fungsi osteoblas adalah...', ['Resorpsi tulang dan pembentukan lakuna Howship','Sekresi matriks ekstraseluler dan serat kolagen serta nukleasi mineral tulang','Fagositosis debris tulang','Menghasilkan kondroblas baru','Menghasilkan hormon paratiroid'], 1],
+    ['Osteoblas yang aktif di daerah pembentukan tulang memiliki sitoplasma sangat basofilik karena...', ['Banyak lisosom','Banyak glikogen','Banyak retikulum endoplasma granular (GER)','Banyak mitokondria','Banyak lemak'], 2],
+    ['Osteoblas yang tidak aktif tampak...', ['Kolumnar rendah, sangat basofilik','Gepeng dengan sitoplasma kurang basofilik','Raksasa berinti banyak','Bulat dengan inti eksentris dan juluran panjang','Asidofilik gelap'], 1],
+    ['Sel tulang yang disebut sebagai "sel tulang sebenarnya", memelihara matriks dan membebaskan kalsium, serta terletak dalam lakuna adalah...', ['Osteoblas','Osteoklas','Osteosit','Osteoprogenitor','Kondrosit'], 2],
+    ['Saluran halus yang menghubungkan osteosit satu dengan lainnya, berisi juluran sel (filopodia), disebut...', ['Kanalis Havers','Kanalis Volkmann','Kanalikuli','Lakuna Howship','Serat Sharpey'], 2],
+    ['Proses osteolisis osteositik...', ['Dirangsang kalsitonin dan dihambat hormon paratiroid','Dirangsang hormon paratiroid dan dihambat kalsitonin','Dirangsang somatotrofin dan dihambat insulin','Tidak dipengaruhi hormon','Hanya terjadi pada tulang rawan'], 1],
+    ['Osteoklas merupakan sel raksasa dengan jumlah inti...', ['Satu','2–4','5–50','100–200','Tidak berinti'], 2],
+    ['Osteoklas termasuk sistem fagosit mononuklear dan berasal dari...', ['Osteoblas','Osteosit','Monosit','Limfosit','Kondroblas'], 2],
+    ['Sitoplasma osteoklas pada pewarnaan HE bersifat...', ['Sangat basofilik','Asidofilik (eosin gelap)','Metakromatik','Tidak terpulas','Argirofilik'], 1],
+    ['Osteoklas meresorpsi tulang pada daerah cekungan dangkal yang disebut...', ['Lakuna primer','Lakuna sekunder','Lakuna Howship','Kanalis Volkmann','Cell nest'], 2],
+    ['Pada resorpsi selektif tulang, osteoklas membuat kondisi lokal menjadi asam dengan menyekresi asam organik yang menyebabkan pecahnya hidroksiapatit, yaitu asam...', ['Hialuronat, askorbat, folat','Karbonat, laktat, sitrat','Sulfat, nitrat, fosfat','Asetat, oksalat, urat','Klorida saja'], 1],
+    ['Hasil demineralisasi dan hidrolisis protein pada resorpsi tulang diresorpsi oleh...', ['Osteoblas dan osteosit','Osteoklas, monosit, dan makrofag','Kondrosit dan fibroblas','Neutrofil dan eosinofil','Sel osteoprogenitor saja'], 1],
+    ['Tulang kompakta terutama terdapat pada...', ['Epifisis','Diafisis','Lempeng epifisis','Kartilago artikularis','Rongga sumsum'], 1],
+    ['Lamel konsentris pada tulang kompakta membentuk...', ['Lamel interstisial','Sistem Havers (osteon)','Lamel sirkumferensial luar','Trabekel','Spikula'], 1],
+    ['Kanalis Havers berisi...', ['Pembuluh darah, saraf, dan jaringan ikat','Kondrosit dan matriks hyalin','Cairan sinovial','Osteoklas saja','Sumsum tulang merah'], 0],
+    ['Saluran yang menghubungkan dua kanalis Havers, dikelilingi lamel interstisial, dan berisi pembuluh darah, saraf, serta limfe adalah...', ['Kanalikuli','Kanalis Volkmann','Lakuna','Kanalis sentralis medula spinalis','Lakuna Howship'], 1],
+    ['Ciri lamel tulang spongiosa adalah...', ['Lamel banyak dengan sistem Havers jelas','Lamel sedikit dan tidak ada sistem Havers','Hanya lamel sirkumferensial','Lamel konsentris saja','Tidak mengandung osteosit'], 1],
+    ['Periosteum secara mikroskopik terdiri atas...', ['Lapisan luar osteogenik dan lapisan dalam fibrosa','Lapisan luar fibrosa yang relatif tebal dan lapisan dalam osteogenik','Satu lapisan tipis tanpa sel','Lapisan kondrogenik dan lapisan sinovial','Lapisan epitel dan lapisan otot'], 1],
+    ['Serat kolagen dari luar yang menembus periosteum dan lamel sirkumferensial luar sampai ke lamel interstisial disebut...', ['Serat elastis','Serat Sharpey','Serat retikular','Kanalikuli','Trabekel'], 1],
+    ['Perbedaan endosteum dibandingkan periosteum adalah...', ['Endosteum lebih tebal dan memiliki serat Sharpey','Endosteum lebih tipis, tidak memperlihatkan 2 lapisan, dan tidak ada serat Sharpey','Endosteum menutupi permukaan luar tulang','Endosteum merupakan tulang rawan hyalin','Tidak ada perbedaan'], 1],
+    ['Ciri tulang primer (tulang belum dewasa / woven bone) adalah...', ['Osteosit sedikit, mineral banyak, matriks asidofil','Osteosit banyak, mineral sedikit, matriks basofilik','Lamel teratur 4–12 µm','Bersifat permanen','Tidak pernah terbentuk setelah lahir'], 1],
+    ['Ciri tulang sekunder (tulang dewasa / lamellar bone) adalah...', ['Matriks basofilik dan osteosit banyak','Matriks asidofil, osteosit lebih sedikit tersebar merata, lamel teratur berukuran 4–12 µm','Terbentuk saat penyembuhan fraktur dan pada tumor tulang','Tidak memiliki lakuna','Bersifat sementara'], 1],
+    ['Osifikasi intramembranosa...', ['Terjadi di dalam model tulang rawan hyalin','Terjadi pada mesenkim yang vaskuler, mulai akhir bulan ke-2 kehamilan, pada tulang pipih seperti kranial, mandibula, dan klavikula','Bertanggung jawab atas pembentukan tulang panjang','Dimulai setelah lahir','Melibatkan lempeng epifisis'], 1],
+    ['Sel osteogenik bersifat bipoten. Arah diferensiasinya (menjadi osteoblas atau kondroblas) bergantung pada...', ['Kadar vitamin C','Adanya vaskularisasi','Hormon paratiroid','Jumlah serat elastis','Usia kehamilan'], 1],
+    ['Pada osifikasi intramembranosa, pusat osifikasi primer berupa spikula yang tersusun memanjang menjadi trabekel. Jaringan tulang yang belum mengalami kalsifikasi disebut...', ['Hidroksiapatit','Osteoid (pratulang)','Matriks teritorial','Perikondrium','Lamel interstisial'], 1],
+    ['Osifikasi enkondral...', ['Terjadi pada tulang pipih tengkorak','Terjadi di dalam tulang rawan hyalin sebagai model dan bertanggung jawab atas pembentukan tulang pendek dan panjang','Terjadi di dalam tulang rawan elastis','Tidak melibatkan kondrosit','Hanya terjadi saat penyembuhan fraktur'], 1],
+    ['Pusat osifikasi sekunder pada tulang panjang...', ['Terjadi di diafisis dan tumbuh secara longitudinal','Terjadi pada tiap epifisis, tumbuh secara radial, kebanyakan sesudah lahir','Terjadi sebelum pusat osifikasi primer','Menghasilkan tulang kompakta di diafisis','Menghilangkan seluruh tulang rawan epifisis'], 1],
+    ['Urutan zona tulang rawan epifisiel dari epifisis ke arah diafisis yang benar adalah...', ['Proliferasi → istirahat → hipertrofi → kalsifikasi → osifikasi','Istirahat → proliferasi → pematangan (hipertrofi) → kalsifikasi → osifikasi','Istirahat → hipertrofi → proliferasi → osifikasi → kalsifikasi','Osifikasi → kalsifikasi → hipertrofi → proliferasi → istirahat','Kalsifikasi → istirahat → proliferasi → hipertrofi → osifikasi'], 1],
+    ['Zona lempeng epifisis yang mengandung kondrosit terus membelah, membentuk kolom memanjang mirip tumpukan uang logam, dan tampak gambaran mitosis adalah zona...', ['Istirahat','Proliferasi','Hipertrofi','Kalsifikasi','Osifikasi'], 1],
+    ['Pada preparat lempeng epifisis tampak kondrosit tersusun dalam kolom, berukuran besar dan pucat, banyak vakuol, mengandung glikogen dan lipid, serta menghasilkan banyak enzim alkali fosfatase. Zona ini adalah...', ['Zona istirahat','Zona proliferasi','Zona pematangan/hipertrofi','Zona osifikasi','Zona resorpsi'], 2],
+    ['Zona di ujung diafisis tempat kondrosit berdegenerasi dan mati, lakuna yang membesar dimasuki lengkungan kapiler dan sel osteoprogenitor dari sumsum diafisis, lalu osteoblas terbentuk di permukaan spikula tulang rawan, adalah zona...', ['Istirahat','Proliferasi','Hipertrofi','Kalsifikasi sementara','Osifikasi (penulangan)'], 4],
+    ['Rangka tubuh berperan sebagai cadangan kalsium karena mengandung sekitar ... dari total kalsium tubuh.', ['50%','75%','90%','99%','10%'], 3],
+    ['Pernyataan yang benar mengenai persendian diartrosis adalah...', ['Permukaan sendi dilapisi tulang rawan fibrosa yang mempunyai perikondrium','Permukaan sendi dilapisi tulang rawan hyalin tanpa perikondrium, dengan cavum artikularis berisi cairan sinovial kental, transparan, dan kaya asam hialuronat','Mobilitasnya sangat terbatas','Kapsul sendi hanya terdiri atas satu lapisan sinovial','Tidak memiliki ruang sendi'], 1],
+    ['Yang BUKAN termasuk jenis sinartrosis adalah...', ['Sinostosis','Sinkondrosis','Sindesmosis','Diartrosis','Semua termasuk sinartrosis'], 3]
+  ];
+
+  $('bankBtn7').addEventListener('click', () => {
+    soalInput.value = bankToText(BANK7);
     $('parseBtn').click();
     preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
