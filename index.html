@@ -401,6 +401,7 @@
           <button class="btn" id="bankBtn6">🧫 Bank Membran Sel (100)</button>
           <button class="btn" id="bankBtn6s">🧱 Membran: Struktur (76)</button>
           <button class="btn" id="bankBtn7">🦴 Bank Tulang & Kartilago (100)</button>
+          <button class="btn" id="bankBtn8">💪 Bank Otot/Muskuloskeletal (100)</button>
           <button class="btn" id="sampleBtn">📄 Isi Contoh</button>
           <button class="btn warn" id="clearBtn">🗑️ Bersihkan</button>
         </div>
@@ -1560,6 +1561,116 @@ Catatan:
 
   $('bankBtn7').addEventListener('click', () => {
     soalInput.value = bankToText(BANK7);
+    $('parseBtn').click();
+    preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // Bank soal bawaan #8: Fisiologi Muskuloskeletal (Otot) — 100 butir, 5 opsi
+  const BANK8 = [
+    ['Istilah musculus berasal dari bahasa Latin yang berarti…', ['Tikus kecil','Serat kecil','Daging merah','Jaringan penggerak','Tali pengikat'], 0],
+    ['Jaringan otot merupakan kelompok jaringan terbesar di tubuh dan membentuk sekitar…', ['Seperempat berat tubuh','Sepertiga berat tubuh','Setengah berat tubuh','Dua pertiga berat tubuh','Tiga perempat berat tubuh'], 2],
+    ['Berikut yang BUKAN merupakan fungsi otot menurut handout adalah…', ['Termoregulasi','Respirasi','Mempertahankan postur','Hematopoiesis','Komunikasi'], 3],
+    ['Kemampuan otot untuk merespons stimulus disebut…', ['Kontraktilitas','Eksitabilitas','Ekstensibilitas','Elastisitas','Konduktivitas'], 1],
+    ['Kemampuan otot untuk kembali ke panjang normalnya setelah diregangkan disebut…', ['Eksitabilitas','Kontraktilitas','Ekstensibilitas','Elastisitas','Plastisitas'], 3],
+    ['Pernyataan yang BENAR tentang kontraktilitas otot adalah…', ['Otot menghasilkan gaya dengan cara mendorong','Otot menghasilkan gaya dengan cara memanjang','Otot memendek saat distimulasi','Otot dapat diperpanjang melebihi panjang normal','Otot merespons stimulus kimia saja'], 2],
+    ['Kemampuan otot untuk diperpanjang melebihi batas panjang normalnya disebut…', ['Elastisitas','Ekstensibilitas','Kontraktilitas','Eksitabilitas','Tonisitas'], 1],
+    ['Fungsi otot yang berkaitan dengan produksi panas tubuh adalah…', ['Proteksi','Stabilisasi postur','Termoregulasi','Komunikasi','Respirasi'], 2],
+    ['Berdasarkan ada tidaknya striasi, otot yang termasuk otot berstria adalah…', ['Otot rangka dan otot polos','Otot jantung dan otot polos','Otot rangka dan otot jantung','Otot polos saja','Otot rangka saja'], 2],
+    ['Otot yang tidak memiliki corakan linear (non-striated) adalah…', ['Otot rangka','Otot jantung','Otot polos','Otot lurik','Otot volunter'], 2],
+    ['Berdasarkan kemampuan kontrol gerakannya, otot volunter adalah…', ['Otot jantung','Otot polos','Otot rangka','Otot jantung dan polos','Semua jenis otot'], 2],
+    ['Otot jantung diklasifikasikan sebagai…', ['Berstria dan volunter','Berstria dan involunter','Tak berstria dan volunter','Tak berstria dan involunter','Berstria dan semi-volunter'], 1],
+    ['Otot polos berada dalam situasi yang terasosiasi dengan…', ['Skeleton','Jantung','Organ viseral (vaskuler, intestinal, kandung kemih, uterus)','Tendon','Ligamen'], 2],
+    ['Otot yang terasosiasi dengan skeleton dan membentuk sistem rangka adalah…', ['Otot polos','Otot jantung','Otot viseral','Otot rangka','Otot involunter'], 3],
+    ['Urutan hierarki struktur otot rangka dari yang terbesar ke terkecil adalah…', ['Otot – serat otot – fasikulus – miofibril – miofilamen','Otot – fasikulus – serat otot – miofibril – miofilamen','Otot – fasikulus – miofibril – serat otot – miofilamen','Fasikulus – otot – serat otot – miofilamen – miofibril','Otot – miofibril – fasikulus – serat otot – miofilamen'], 1],
+    ['Satu serat otot setara dengan…', ['Satu fasikulus','Satu sel otot','Satu miofibril','Satu sarkomer','Satu miofilamen'], 1],
+    ['Filamen tebal tersusun terutama dari protein…', ['Aktin','Troponin','Tropomiosin','Miosin','Titin'], 3],
+    ['Filamen tipis tersusun dari protein…', ['Miosin, aktin, troponin','Aktin, tropomiosin, troponin','Miosin, tropomiosin, troponin','Aktin dan miosin saja','Aktin, miosin, titin'], 1],
+    ['Ukuran diameter filamen tebal menurut handout adalah…', ['5–8 nm','8–10 nm','12–18 nm','20–25 nm','1,0 µm'], 2],
+    ['Panjang filamen tipis menurut handout adalah sekitar…', ['0,5 µm','1,0 µm','1,6 µm','2,0 µm','2,5 µm'], 1],
+    ['Pita gelap pada miofibril disebut…', ['Pita I','Pita A','Zona H','Garis Z','Garis M'], 1],
+    ['Pita A tersusun atas…', ['Filamen tipis saja','Filamen tebal dan bagian filamen tipis yang tumpang tindih','Bagian filamen tipis yang tidak masuk pita A','Garis Z saja','Retikulum sarkoplasma'], 1],
+    ['Daerah yang lebih terang di dalam pita A, tempat filamen tipis tidak bertemu, disebut…', ['Pita I','Garis Z','Zona H','Garis M','Triad'], 2],
+    ['Garis Z terletak di…', ['Tengah pita A','Tengah zona H','Tengah pita I','Batas pita A dan pita I','Ujung filamen tebal'], 2],
+    ['Unit fungsional otot rangka yang merupakan daerah antara dua garis Z adalah…', ['Miofibril','Fasikulus','Sarkomer','Triad','Motor unit'], 2],
+    ['Struktur protein yang menahan filamen tebal di tengah sarkomer adalah…', ['Garis Z','Garis M','Zona H','Pita I','Tubulus T'], 1],
+    ['Aktin dan miosin disebut protein kontraktil, sedangkan troponin dan tropomiosin disebut…', ['Protein struktural','Protein regulator','Protein transpor','Protein enzimatik','Protein reseptor'], 1],
+    ['Setiap jembatan silang miosin memiliki dua tempat penting, yaitu…', ['Tempat pengikatan Ca²⁺ dan tempat pengikatan ATP','Tempat pengikatan aktin dan tempat ATPase miosin','Tempat pengikatan troponin dan tropomiosin','Tempat pengikatan ACh dan Na⁺','Tempat pengikatan aktin dan Ca²⁺'], 1],
+    ['Bentuk molekul miosin digambarkan seperti…', ['Bola','Spiral ganda','Tongkat golf','Benang','Cincin'], 2],
+    ['Protein berbentuk seperti benang yang terletak sepanjang aktin dan menutupi tempat pengikatan jembatan silang adalah…', ['Troponin','Tropomiosin','Miosin','Titin','Nebulin'], 1],
+    ['Troponin merupakan kompleks yang terdiri dari tiga unit. Unit yang mengikat Ca²⁺ adalah…', ['Troponin T','Troponin I','Troponin C','Troponin A','Troponin M'], 2],
+    ['Aktin pada filamen tipis tersusun atas…', ['Satu untaian lurus','Dua untaian yang saling membelit seperti spiral','Tiga untaian paralel','Empat untaian bercabang','Kepala globuler dan ekor'], 1],
+    ['Selama kontraksi, filamen tipis bergerak…', ['Menjauhi pusat pita A','Masuk ke arah pusat pita A','Ke arah garis Z yang berlawanan','Memendek sendiri','Tidak bergerak'], 1],
+    ['Saat kontraksi, yang terjadi pada panjang filamen tebal dan tipis adalah…', ['Keduanya memendek','Filamen tebal memendek, filamen tipis tetap','Filamen tipis memendek, filamen tebal tetap','Keduanya tidak berubah panjang','Keduanya memanjang'], 3],
+    ['Gerakan menekuk jembatan silang ke arah pusat filamen tebal, seperti mengayuh sampan, disebut…', ['Recovery stroke','Power stroke','Cross-bridge detachment','Myosin reactivation','Active-site exposure'], 1],
+    ['Pada sarkomer yang berkontraksi total, struktur yang panjangnya TETAP adalah…', ['Pita I','Zona H','Sarkomer','Pita A','Jarak antar garis Z'], 3],
+    ['Pemendekan total serat otot terjadi karena…', ['Satu kali power stroke yang sangat kuat','Siklus pengikatan dan penekukan jembatan silang yang berulang','Pemendekan filamen tebal','Kontraksi garis Z','Pembengkakan retikulum sarkoplasma'], 1],
+    ['Pernyataan yang BENAR tentang ayunan jembatan silang adalah…', ['Semua jembatan silang mengayun bersamaan','Jembatan silang tidak mengayun secara bersamaan','Hanya satu jembatan silang yang aktif per sarkomer','Jembatan silang mengayun ke arah garis Z','Jembatan silang hanya mengayun saat relaksasi'], 1],
+    ['Saat sarkomer memendek, garis Z…', ['Menjauh satu sama lain','Tertarik mendekat satu sama lain','Menghilang','Bergerak ke tepi serat','Tidak berubah posisi'], 1],
+    ['Saat kontraksi, zona H dan pita I akan…', ['Melebar','Menyempit/menghilang','Tetap','Zona H melebar, pita I menyempit','Zona H menyempit, pita I melebar'], 1],
+    ['Excitation-contraction coupling adalah…', ['Penggabungan dua serat otot','Rangkaian kejadian yang menghubungkan eksitasi otot dengan kontraksi otot','Hubungan antara dua neuron motorik','Pemecahan ATP di mitokondria','Proses relaksasi otot'], 1],
+    ['Tubulus T terbentuk dari…', ['Retikulum sarkoplasma','Invaginasi membran permukaan sel otot','Mitokondria','Membran inti','Miofibril'], 1],
+    ['Tubulus T terletak pada…', ['Tengah pita A','Tengah pita I','Setiap taut antara pita A dan pita I','Zona H','Garis M'], 2],
+    ['Fungsi utama tubulus T adalah…', ['Menyimpan Ca²⁺','Menyebarkan potensial aksi ke bagian dalam serat otot','Menghasilkan ATP','Melepaskan asetilkolin','Mengikat troponin'], 1],
+    ['Retikulum sarkoplasma merupakan modifikasi dari…', ['Aparatus Golgi','Mitokondria','Retikulum endoplasma','Lisosom','Membran plasma'], 2],
+    ['Ujung segmen retikulum sarkoplasma yang membesar dan menyimpan Ca²⁺ disebut…', ['Tubulus T','Kantung lateral (terminal cisternae)','Triad','Motor end plate','Vesikel sinaptik'], 1],
+    ['Struktur triad terdiri dari…', ['Tiga miofibril','Satu tubulus T diapit dua terminal cisternae','Dua tubulus T dan satu terminal cisterna','Aktin, miosin, dan troponin','Tiga sarkomer'], 1],
+    ['Ion yang dilepaskan retikulum sarkoplasma akibat penyebaran potensial aksi ke tubulus T adalah…', ['Na⁺','K⁺','Cl⁻','Ca²⁺','Mg²⁺'], 3],
+    ['Ca²⁺ yang dilepaskan ke sitosol akan berikatan dengan…', ['Miosin','Aktin','Troponin','Tropomiosin','ATP'], 2],
+    ['Akibat ikatan Ca²⁺ dengan troponin adalah…', ['Miosin terlepas dari filamen tebal','Tropomiosin bergeser dan membuka tempat pengikatan aktin','ATP langsung terhidrolisis','Garis Z menghilang','Tubulus T menutup'], 1],
+    ['Penguraian ATP menjadi ADP + Pi pada jembatan silang terjadi…', ['Setelah power stroke','Sebelum jembatan silang berikatan dengan aktin','Hanya saat relaksasi','Di retikulum sarkoplasma','Di tubulus T'], 1],
+    ['Energi hasil hidrolisis ATP sebelum pengikatan aktin disimpan dalam bentuk…', ['Kreatin fosfat','Miosin berenergi tinggi','Ca²⁺ sitosol','Glikogen','Asetilkolin'], 1],
+    ['ADP dan Pi dilepaskan dari miosin saat…', ['Miosin berikatan dengan ATP baru','Gerakan mengayun (power stroke) terjadi','Ca²⁺ dipompa kembali','Otot dalam keadaan istirahat','Asetilkolin dipecah'], 1],
+    ['Yang menyebabkan terlepasnya ikatan aktin–miosin di akhir power stroke adalah…', ['Pelepasan ADP','Pelepasan Pi','Melekatnya molekul ATP baru ke miosin','Ikatan Ca²⁺ dengan troponin','Hidrolisis kreatin fosfat'], 2],
+    ['Urutan siklus jembatan silang yang benar adalah…', ['Cross-bridge formation → active-site exposure → pivoting → detachment → reactivation','Active-site exposure → cross-bridge formation → pivoting of myosin head → detachment → myosin reactivation','Pivoting → active-site exposure → detachment → cross-bridge formation → reactivation','Detachment → pivoting → cross-bridge formation → active-site exposure → reactivation','Reactivation → detachment → pivoting → cross-bridge formation → active-site exposure'], 1],
+    ['Rigor mortis terjadi karena…', ['Kelebihan ATP','Tidak adanya ATP sehingga aktin dan miosin tetap terikat','Kelebihan Ca²⁺ yang dipompa ke retikulum sarkoplasma','Asetilkolin tidak dipecah','Tropomiosin menutup tempat pengikatan aktin secara permanen'], 1],
+    ['Pada tahap "myosin reactivation", yang terjadi adalah…', ['Miosin berikatan dengan aktin','ATP baru dihidrolisis sehingga kepala miosin kembali berenergi','Ca²⁺ berikatan dengan troponin','Tubulus T terdepolarisasi','Asetilkolin dilepaskan'], 1],
+    ['Fungsi ATP dalam kontraksi otot meliputi hal berikut, KECUALI…', ['Memberi energi untuk power stroke','Melepaskan ikatan aktin–miosin','Memompa Ca²⁺ kembali ke retikulum sarkoplasma','Mengikat troponin C secara langsung','Menjadi satu-satunya sumber energi langsung kontraksi'], 3],
+    ['Akson neuron motorik yang mempersarafi serat otot rangka, sebelum bercabang menjadi terminal, akan…', ['Menebal selubung mielinnya','Kehilangan selubung mielin','Bergabung dengan akson lain','Membentuk sinaps elektrik','Masuk ke dalam tubulus T'], 1],
+    ['Vesikel jernih di ujung terminal akson (end feet) berisi…', ['Norepinefrin','Dopamin','Asetilkolin','Serotonin','GABA'], 2],
+    ['Penebalan membran otot pada hubungan saraf–otot disebut…', ['Tubulus T','Lempeng ujung motorik (motor end plate)','Terminal cisterna','Sarkolema bebas','Garis Z'], 1],
+    ['Seluruh struktur hubungan antara ujung saraf motorik dan serat otot disebut…', ['Sinaps elektrik','Triad','Taut saraf-otot (neuromuscular junction)','Motor unit','Sarkomer'], 2],
+    ['Impuls yang tiba di ujung neuron motorik meningkatkan permeabilitas terminal terhadap…', ['Na⁺','K⁺','Ca²⁺','Cl⁻','Mg²⁺'], 2],
+    ['Masuknya Ca²⁺ ke terminal akson menyebabkan…', ['Hiperpolarisasi terminal','Eksositosis vesikel asetilkolin','Pemecahan asetilkolin','Penutupan reseptor nikotinik','Pelepasan Ca²⁺ dari retikulum sarkoplasma'], 1],
+    ['Reseptor asetilkolin pada motor end plate otot rangka adalah reseptor…', ['Muskarinik','Nikotinik','Adrenergik α','Adrenergik β','Dopaminergik'], 1],
+    ['Ikatan asetilkolin dengan reseptornya meningkatkan permeabilitas membran terhadap…', ['Ca²⁺ dan Cl⁻','Na⁺ dan K⁺','K⁺ dan Cl⁻','Mg²⁺ dan Ca²⁺','Cl⁻ saja'], 1],
+    ['Potensial depolarisasi lokal akibat influks Na⁺ di motor end plate disebut…', ['Potensial aksi','Potensial istirahat','Potensial lempeng ujung (end plate potential)','Potensial hiperpolarisasi','Potensial reseptor'], 2],
+    ['Potensial aksi pada serat otot timbul ketika potensial lempeng ujung…', ['Menurunkan potensial membran di bawah istirahat','Mendepolarisasi membran sekitarnya hingga mencapai ambang letup','Menghiperpolarisasi membran','Memompa Ca²⁺ keluar sel','Menghambat kanal Na⁺'], 1],
+    ['Enzim yang memecah asetilkolin di celah sinaps adalah…', ['Kreatin kinase','Miosin ATPase','Asetilkolinesterase','Kolin asetiltransferase','Monoamin oksidase'], 2],
+    ['Hasil pemecahan asetilkolin oleh asetilkolinesterase adalah…', ['Kolin dan asam asetat','Kolin dan asetil-KoA','Asam laktat dan kolin','Glukosa dan asetat','ADP dan Pi'], 0],
+    ['Urutan tahap kontraksi yang benar adalah…', ['Pelepasan Ca²⁺ → potensial aksi otot → pelepasan ACh → cross-bridge','Pelepasan ACh → potensial lempeng ujung → potensial aksi otot → depolarisasi tubulus T → pelepasan Ca²⁺ → ikatan Ca²⁺–troponin C → cross-bridge','Potensial aksi otot → pelepasan ACh → pelepasan Ca²⁺ → potensial lempeng ujung','Ikatan Ca²⁺–troponin → pelepasan ACh → potensial aksi otot → tubulus T','Cross-bridge → pelepasan Ca²⁺ → potensial aksi → pelepasan ACh'], 1],
+    ['Relaksasi otot terjadi ketika…', ['Ca²⁺ terus dilepaskan dari retikulum sarkoplasma','Tidak ada lagi potensial aksi lokal dan Ca²⁺ dipompa kembali ke retikulum sarkoplasma','ATP habis','Asetilkolin terus berikatan dengan reseptor','Troponin terikat Ca²⁺ secara permanen'], 1],
+    ['Pada tahap relaksasi, kompleks troponin–tropomiosin…', ['Terlepas dari aktin','Bergeser kembali ke posisi menghambat','Berikatan dengan miosin','Dipecah oleh enzim','Tetap pada posisi terbuka'], 1],
+    ['Kembalinya otot ke panjang istirahat setelah kontraksi berakhir terjadi secara…', ['Aktif dengan power stroke terbalik','Pasif','Aktif oleh kontraksi garis Z','Aktif oleh asetilkolin','Aktif oleh tubulus T'], 1],
+    ['Kontraksi yang timbul tanpa pemendekan otot (panjang otot tetap) disebut…', ['Isotonik','Isometrik','Konsentrik','Eksentrik','Tetanik'], 1],
+    ['Kontraksi melawan beban tetap dengan ketegangan otot konstan disebut…', ['Isometrik','Isotonik','Tonus','Treppe','Tetanus'], 1],
+    ['Seseorang mendorong tembok yang tidak bergerak. Jenis kontraksi otot yang terjadi adalah…', ['Isotonik','Isometrik','Treppe','Wave summation','Tetanus komplit'], 1],
+    ['Pada grafik kontraksi isometrik dengan beban 6 kg, otot menghasilkan tegangan puncak sekitar 4 kg. Yang terjadi adalah…', ['Otot memendek dan beban terangkat','Panjang otot tetap karena tegangan tidak melebihi beban','Otot memanjang','Terjadi kontraksi isotonik','Otot langsung lelah'], 1],
+    ['Dua faktor yang dapat disesuaikan untuk menghasilkan tingkat ketegangan otot yang berbeda adalah…', ['Jumlah tubulus T dan jumlah mitokondria','Jumlah serat yang berkontraksi (rekrutmen) dan tegangan tiap serat','Panjang tendon dan jumlah ligamen','Jumlah ACh dan jumlah AChE','Diameter otot dan warna serat'], 1],
+    ['Unit motorik didefinisikan sebagai…', ['Satu serat otot dan seluruh miofibrilnya','Satu neuron motorik dan seluruh serat otot yang dipersarafinya','Seluruh neuron motorik yang mempersarafi satu otot','Satu sarkomer dan dua garis Z','Satu fasikulus otot'], 1],
+    ['Pernyataan yang BENAR tentang persarafan serat otot rangka adalah…', ['Satu serat otot dipersarafi banyak neuron motorik','Satu neuron motorik hanya mempersarafi satu serat otot','Satu neuron motorik mempersarafi sejumlah serat otot, tetapi setiap serat hanya dipersarafi satu neuron motorik','Serat otot tidak membutuhkan persarafan','Satu serat otot dipersarafi dua neuron motorik'], 2],
+    ['Otot dengan unit motorik yang hanya mengandung sekitar selusin serat otot, untuk gerakan halus dan cermat, contohnya adalah…', ['Otot paha','Otot gerak bola mata','Otot punggung','Otot betis','Otot gluteus'], 1],
+    ['Pada otot paha yang melakukan gerakan kuat, satu unit motorik dapat mengandung sekitar…', ['10–12 serat','50–100 serat','200–500 serat','1500–2000 serat','10.000 serat'], 3],
+    ['Rekrutmen unit motorik secara asinkron bertujuan untuk…', ['Meningkatkan kekuatan maksimal','Mencegah kelelahan otot','Mempercepat relaksasi','Meningkatkan tonus','Mengurangi kebutuhan Ca²⁺'], 1],
+    ['Rekrutmen asinkron TIDAK dapat terjadi pada…', ['Kontraksi submaksimal','Kontraksi maksimal','Aktivitas daya tahan','Mempertahankan postur','Gerakan halus'], 1],
+    ['Pada aktivitas daya tahan (endurance), unit motorik yang direkrut lebih dulu adalah…', ['Unit motorik yang cepat lelah','Unit motorik yang lebih resisten terhadap kelelahan','Unit motorik terbesar','Unit motorik glikolitik','Semua unit secara bersamaan'], 1],
+    ['Faktor yang memengaruhi tingkat ketegangan serat otot menurut handout adalah berikut, KECUALI…', ['Jumlah filamen aktin–miosin yang tumpang tindih','Panjang serat otot pada permulaan kontraksi','Frekuensi rangsangan','Tingkat kelelahan otot','Jumlah inti sel otot'], 4],
+    ['Ketegangan serat otot maksimal tercapai bila tumpang tindih aktin–miosin…', ['Sangat sedikit','Sangat banyak (filamen saling bertumpuk berlebihan)','Optimal','Tidak ada','Tidak berpengaruh'], 2],
+    ['Bila serat otot diregangkan melebihi panjang normalnya, tegangan aktif yang terjadi akan…', ['Meningkat','Menurun','Tetap','Menjadi maksimal','Berubah menjadi tetanus'], 1],
+    ['Muscle twitch (kedutan otot) adalah…', ['Kontraksi berkelanjutan akibat stimulus berfrekuensi tinggi','Kontraksi singkat seluruh serat otot dalam satu motor unit sebagai respons terhadap potensial aksi tunggal','Kontraksi bertingkat dengan stimulus sama','Kontraksi tanpa stimulus','Kekakuan otot setelah kematian'], 1],
+    ['Periode dari pemberian stimulus sampai terjadinya respons pada muscle twitch disebut…', ['Periode kontraksi','Periode relaksasi','Periode laten','Periode refrakter','Periode plateau'], 2],
+    ['Pada grafik kurva twitch, periode pemendekan otot yang melibatkan power stroke berulang disebut…', ['Periode laten','Periode kontraksi','Periode relaksasi','Periode istirahat','Lag phase'], 1],
+    ['Wave summation terjadi apabila…', ['Stimulus kedua diberikan setelah otot relaksasi sempurna','Stimulus kedua diberikan sebelum otot relaksasi sempurna','Stimulus diberikan dengan intensitas makin tinggi','Otot dalam keadaan lelah','Tidak ada stimulus'], 1],
+    ['Tetanus inkomplit (unfused tetanus) terjadi bila stimulasi diberikan lebih dari…', ['5 kali/detik','10 kali/detik','30 kali/detik','50 kali/detik','100 kali/detik'], 2],
+    ['Pada tetanus inkomplit, masih terlihat periode relaksasi parsial karena…', ['ATP habis','Masih ada waktu bagi Ca²⁺ untuk kembali ke retikulum sarkoplasma di antara potensial aksi','Asetilkolin tidak dilepas','Tropomiosin terlepas','Tubulus T tidak berfungsi'], 1],
+    ['Tetanus komplit (fused tetanus) ditandai dengan…', ['Stimulasi lebih dari 50 kali/detik dan tegangan plateau tanpa periode relaksasi','Stimulasi kurang dari 10 kali/detik','Twitch terpisah dengan relaksasi penuh','Kontraksi makin kuat dengan relaksasi penuh di antaranya','Tegangan bergelombang'], 0],
+    ['Yang BUKAN akibat kelelahan otot menurut handout adalah…', ['Penurunan cadangan metabolik otot','pH rendah akibat penumpukan asam laktat','Kerusakan sarkolema dan retikulum sarkoplasma','Peningkatan cadangan kreatin fosfat','Nyeri dan kepayahan otot'], 3],
+    ['Kelelahan otot yang terjadi di taut saraf–otot akibat kekurangan asetilkolin disebut kelelahan…', ['Psikologis','Muskular','Sinaptik','Metabolik','Sentral'], 2],
+    ['Sumber energi pertama yang digunakan pada awal aktivitas otot rangka, melalui reaksi yang dikatalisis kreatin kinase, adalah…', ['Glikolisis anaerob','Fosforilasi oksidatif','Kreatin fosfat','Asam lemak','Glikogen hati'], 2],
+    ['Serat otot tipe I (slow-twitch) memiliki karakteristik…', ['Kontraksi cepat, mioglobin sedikit, mudah lelah','Kontraksi lambat, mioglobin banyak, mitokondria banyak, tahan lelah','Diameter besar, glikolitik tinggi, berwarna putih','Kapiler sedikit, aktivitas ATPase miosin tinggi','Kandungan glikogen tinggi, kapasitas oksidatif rendah'], 1]
+  ];
+
+  $('bankBtn8').addEventListener('click', () => {
+    soalInput.value = bankToText(BANK8);
     $('parseBtn').click();
     preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });

@@ -14,7 +14,7 @@ Aplikasi web yang mengubah kumpulan soal pilihan ganda menjadi **kuis interaktif
 - 🔀 **Acak soal & pilihan** — cegah hafalan urutan
 - ⏱️ **Batas waktu per soal** — mode tantangan opsional
 - 📊 **Skor & pembahasan** — lihat nilai akhir plus kunci jawaban tiap soal
-- 🧬 **Bank soal bawaan** — 7 bank siap main satu klik: 75 Protein, 85 Karbohidrat, 90 Bioenergetika, 100 Lipid, 100 Pondasi Biokimiawi, 100 Membran Sel, & 100 Jaringan Tulang & Kartilago (Histologi)
+- 🧬 **Bank soal bawaan** — 8 bank siap main satu klik: 75 Protein, 85 Karbohidrat, 90 Bioenergetika, 100 Lipid, 100 Pondasi Biokimiawi, 100 Membran Sel, 100 Jaringan Tulang & Kartilago, & 100 Fisiologi Muskuloskeletal (Otot)
 - 🔊 **Backsound & efek suara** — musik latar lembut plus bunyi benar/salah/selesai (Web Audio, tanpa file eksternal, bisa dimatikan)
 - 🎉 **Efek konfeti** — perayaan saat nilaimu tinggi
 - 💾 **Tersimpan otomatis** — soal & pengaturan disimpan di browser (localStorage)
