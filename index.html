@@ -520,7 +520,7 @@ Catatan:
     sedang: { p: 0.72, name: 'Bot Seimbang', emoji: '🙂' },
     sulit:  { p: 0.90, name: 'Bot Jenius',   emoji: '🔥' }
   };
-  const instantOn = () => settings.instant || mode === 'bot';
+  const instantOn = () => mode === 'ujian' ? false : (settings.instant || mode === 'bot');
 
   function botAnswer(q) {
     const ci = q.options.findIndex(o => o.correct);
@@ -1631,7 +1631,8 @@ D. Gd`;
         <h2 style="margin-bottom:4px;">Siap bertanding?</h2>
         <p style="color:var(--muted);margin-bottom:8px;">${questions.length} soal menanti. Pilih mode:</p>
         <div class="mode-cards">
-          <button class="mode-card ${mode === 'solo' ? 'active' : ''}" data-mode="solo">🧘 Latihan<small>Santai, kerjakan sendiri</small></button>
+          <button class="mode-card ${mode === 'solo' ? 'active' : ''}" data-mode="solo">🧘 Latihan<small>Santai, umpan balik langsung</small></button>
+          <button class="mode-card ${mode === 'ujian' ? 'active' : ''}" data-mode="ujian">📝 Ujian<small>Nilai muncul setelah semua dijawab</small></button>
           <button class="mode-card ${mode === 'bot' ? 'active' : ''}" data-mode="bot">🤖 Lawan Bot<small>Adu skor melawan bot</small></button>
         </div>
         <div id="botOpts" ${mode === 'bot' ? '' : 'hidden'} style="margin-bottom:6px;">
@@ -1642,7 +1643,8 @@ D. Gd`;
             <button class="chip ${botLevel === 'sulit' ? 'active' : ''}" data-bot="sulit">🔥 Jenius</button>
           </div>
         </div>
-        <button class="btn primary" id="startBtn" style="margin-top:8px;">🚀 Mulai ${mode === 'bot' ? 'Bertanding' : 'Kuis'}</button>
+        ${mode === 'ujian' ? '<p style="color:var(--muted);font-size:.88rem;margin-bottom:4px;">📝 Mode Ujian: jawaban benar/salah disembunyikan; kamu bisa bebas mengganti jawaban dan berpindah soal. Skor &amp; pembahasan muncul setelah menekan Selesai.</p>' : ''}
+        <button class="btn primary" id="startBtn" style="margin-top:8px;">🚀 Mulai ${mode === 'bot' ? 'Bertanding' : (mode === 'ujian' ? 'Ujian' : 'Kuis')}</button>
       </div>`;
     playPanel.querySelectorAll('[data-mode]').forEach(b =>
       b.addEventListener('click', () => { mode = b.dataset.mode; save(); renderPlay(); }));
@@ -1767,11 +1769,17 @@ D. Gd`;
     const timerPill = settings.timer > 0
       ? `<div class="pill">⏱️ <span class="accent" id="cd">${settings.timer}</span>s</div>` : '';
     const streakPill = streak >= 2 ? `<div class="pill streak-pill">🔥 Beruntun x${streak}</div>` : '';
+    let answeredPill = '';
+    if (!instantOn()) {
+      const answeredCount = answers.filter(a => a !== null && a !== undefined && a !== '').length;
+      answeredPill = `<div class="pill">✅ Terjawab <span class="accent">${answeredCount}</span>/${quiz.length}</div>`;
+    }
 
     playPanel.innerHTML =
       versusHtml +
       `<div class="quiz-top">
         <div class="pill">Soal <span class="accent">${current + 1}</span> / ${quiz.length}</div>
+        ${answeredPill}
         ${streakPill}
         ${timerPill}
         <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></div>
@@ -1854,9 +1862,8 @@ D. Gd`;
 
   function next() {
     captureIsian();
-    // in non-instant mode, lock on leaving so it counts
-    const a = answers[current];
-    if (!instantOn() && a !== null && a !== undefined && a !== '') locked[current] = true;
+    // Mode non-instan (Ujian / umpan balik mati): JANGAN kunci saat berpindah —
+    // jawaban tetap bisa diubah dan benar/salah tidak dibocorkan sampai Selesai.
     if (current === quiz.length - 1) {
       finish();
     } else {

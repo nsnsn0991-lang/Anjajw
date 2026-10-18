@@ -7,7 +7,7 @@ Aplikasi web yang mengubah kumpulan soal pilihan ganda menjadi **kuis interaktif
 - ⚡ **Parser soal otomatis** — ubah teks soal menjadi kuis dalam sekejap
 - ✍️ **Dua tipe soal** — pilihan ganda & **isian (jawaban diketik)**; isian dicek otomatis, tidak peka huruf besar/kecil, mendukung jawaban alternatif (`/`)
 - 🖊️ **Format fleksibel** — dukung penanda jawaban `*` maupun baris `Jawaban: B`
-- 🤖 **Mode Lawan Bot** — adu skor melawan bot (3 tingkat: Santai/Seimbang/Jenius) dengan papan skor VS langsung
+- 🎮 **3 mode main** — Latihan (umpan balik langsung), 📝 Ujian (nilai muncul setelah semua dijawab), & 🤖 Lawan Bot (3 tingkat kecerdasan, papan skor VS)
 - 🔥 **Penyemarak** — penghitung rentetan (streak), animasi poin melayang, efek suara kombo & jingle kemenangan
 - 🎮 **Kuis interaktif** — satu soal per layar, progress bar, dan navigasi maju/mundur
 - ✅ **Umpan balik langsung** — tahu benar/salah begitu memilih (bisa dimatikan)
